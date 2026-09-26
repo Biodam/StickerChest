@@ -1,6 +1,6 @@
 # Task 07: Testing, Packaging & CI
 
-**Status**: ⚪ Not Started  
+**Status**: 🟢 Completed  
 **Milestone**: M7  
 **Estimated Complexity**: Medium
 
@@ -15,13 +15,14 @@
 ---
 
 ## Implementation Checklist
-- [ ] Configure `vitest` with end-to-end integration tests.
-- [ ] Set up `electron-builder.yml` / configuration in `package.json`:
+- [x] Configure `vitest` with end-to-end integration test (`tests/integration/end-to-end.test.ts`) covering ingestion, Sharp resizing, Gemini parsing, FTS5 multi-dimensional query, favorites, and usage tracking.
+- [x] Set up `electron-builder.json` with cross-platform targets:
   - Windows: NSIS installer and portable `.exe`
   - macOS: `.dmg` and `.zip` (with universal binary or x64/arm64 targets)
-- [ ] Create `.github/workflows/ci.yml` running tests and build checks.
-- [ ] Verify clean builds on Windows and validate macOS configuration.
-- [ ] Ensure all tasks in `tasks/` and milestones in `tasks/milestones.md` are up to date.
+  - Linux: AppImage and tar.gz
+- [x] Create `.github/workflows/ci.yml` running tests and build checks on Windows and macOS.
+- [x] Verify clean builds and 100% test pass rate across all 6 test suites.
+- [x] Ensure all tasks in `tasks/` and milestones in `tasks/milestones.md` are up to date.
 
 ---
 
