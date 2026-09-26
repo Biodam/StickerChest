@@ -1,6 +1,6 @@
 # Task 04: Gemini AI Metadata Tagger
 
-**Status**: ⚪ Not Started  
+**Status**: 🟢 Completed  
 **Milestone**: M4  
 **Estimated Complexity**: High
 
@@ -16,12 +16,12 @@
 ---
 
 ## Implementation Checklist
-- [ ] Create `src/main/services/gemini/client.ts` with API key configuration and health validation.
-- [ ] Implement `src/main/services/gemini/prompts.ts` with structured JSON schema response directives.
-- [ ] Create `src/main/services/gemini/queue.ts` managing concurrency (e.g. max 2-3 concurrent calls) and backoff handling.
-- [ ] Write fallback parser to handle edge cases in JSON responses.
-- [ ] Implement manual tag editing IPC handlers (`saveCustomMetadata`, `addTag`, `removeTag`).
-- [ ] Write unit tests with mocked Gemini responses in `tests/unit/gemini.test.ts`.
+- [x] Create `src/main/services/gemini/client.ts` with API key configuration and health validation.
+- [x] Implement `src/main/services/gemini/prompts.ts` with structured JSON schema response directives.
+- [x] Create `src/main/services/gemini/queue.ts` managing concurrency and exponential backoff retry.
+- [x] Write fallback parser `src/main/services/gemini/parser.ts` to handle edge cases and markdown code fences.
+- [x] Implement AI tagging coordinator in `tagger-service.ts` and IPC channels in `gemini-handlers.ts`.
+- [x] Write unit tests in `tests/unit/gemini.test.ts` verifying parsing, prompt structures, key management, and database FTS indexing.
 
 ---
 
