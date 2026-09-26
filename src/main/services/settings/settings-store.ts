@@ -13,6 +13,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   globalShortcut: 'Alt+Shift+V',
   preferredCopyTier: 'sticker',
   autoStartAtLogin: false,
+  syncIntervalMinutes: 15,
+  autoAiTagOnIngest: true,
+  cloudDriveMode: true,
 };
 
 let cachedSettings: AppSettings | null = null;
@@ -52,7 +55,7 @@ export function loadSettings(): AppSettings {
     setGeminiModel(loaded.geminiModel);
   }
   if (loaded.sourceFolder) {
-    getIngestionService().startWatching(loaded.sourceFolder);
+    getIngestionService().startWatching(loaded.sourceFolder, loaded.syncIntervalMinutes);
   }
 
   return loaded;
@@ -83,8 +86,11 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
   if (partial.globalShortcut !== undefined) {
     registerGlobalShortcuts(partial.globalShortcut);
   }
+  if (partial.syncIntervalMinutes !== undefined) {
+    getIngestionService().setPeriodicInterval(partial.syncIntervalMinutes);
+  }
   if (partial.sourceFolder && partial.sourceFolder !== current.sourceFolder) {
-    getIngestionService().startWatching(partial.sourceFolder);
+    getIngestionService().startWatching(partial.sourceFolder, updated.syncIntervalMinutes);
   }
 
   return updated;

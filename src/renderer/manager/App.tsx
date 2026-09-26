@@ -24,6 +24,9 @@ export default function App() {
     globalShortcut: 'Alt+Shift+V',
     preferredCopyTier: 'sticker',
     autoStartAtLogin: false,
+    syncIntervalMinutes: 15,
+    autoAiTagOnIngest: true,
+    cloudDriveMode: true,
   });
 
   const loadSettings = async () => {

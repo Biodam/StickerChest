@@ -4,6 +4,7 @@ import { ingestImageFile } from './coordinator';
 import { IngestionProgressEvent } from '../../../types/models';
 import { isSupportedImageExtension } from '../imaging/format-detector';
 import { getDatabaseDAL } from '../database/dal';
+import { isCloudDrivePath } from './cloud-sync-helper';
 
 export type ProgressListener = (event: IngestionProgressEvent) => void;
 
@@ -12,6 +13,8 @@ export class IngestionService {
   private watchedPath: string | null = null;
   private isScanning = false;
   private listeners: Set<ProgressListener> = new Set();
+  private periodicTimer: NodeJS.Timeout | null = null;
+  private periodicIntervalMinutes = 15;
 
   public addProgressListener(listener: ProgressListener): () => void {
     this.listeners.add(listener);
@@ -33,20 +36,12 @@ export class IngestionService {
     this.isScanning = true;
 
     try {
-      this.notify({
-        status: 'scanning',
-        processedCount: 0,
-        totalCount: 0,
-      });
+      this.notify({ status: 'scanning', processedCount: 0, totalCount: 0 });
 
       const filePaths = await scanDirectoryForImages(folderPath);
       const total = filePaths.length;
 
-      this.notify({
-        status: 'hashing',
-        processedCount: 0,
-        totalCount: total,
-      });
+      this.notify({ status: 'hashing', processedCount: 0, totalCount: total });
 
       const dal = getDatabaseDAL();
       let processed = 0;
@@ -62,17 +57,13 @@ export class IngestionService {
         try {
           await ingestImageFile(filePath, dal, forceReprocess);
         } catch (fileErr: any) {
-          console.error(`Failed to ingest ${filePath}:`, fileErr);
+          console.warn(`Skipping locked/syncing file ${filePath}:`, fileErr.message);
         }
 
         processed++;
       }
 
-      this.notify({
-        status: 'idle',
-        processedCount: processed,
-        totalCount: total,
-      });
+      this.notify({ status: 'idle', processedCount: processed, totalCount: total });
     } catch (err: any) {
       this.notify({
         status: 'error',
@@ -85,23 +76,33 @@ export class IngestionService {
     }
   }
 
-  public startWatching(folderPath: string): void {
+  public startWatching(folderPath: string, intervalMinutes = 15): void {
     this.stopWatching();
     this.watchedPath = folderPath;
+    this.periodicIntervalMinutes = intervalMinutes;
 
+    const isCloud = isCloudDrivePath(folderPath);
+
+    // Setup Chokidar with cloud-safe options
     this.watcher = chokidar.watch(folderPath, {
-      ignored: /(^|[\/\\])\../, // ignore dotfiles
+      ignored: /(^|[\/\\])\../,
       persistent: true,
-      ignoreInitial: true, // initial scan handled separately by scanFolder
+      ignoreInitial: true,
       depth: 5,
+      usePolling: isCloud, // Polling is required for Google Drive / OneDrive virtual mounts
+      interval: isCloud ? 2000 : 1000,
+      awaitWriteFinish: {
+        stabilityThreshold: 2000,
+        pollInterval: 250,
+      },
     });
 
     this.watcher.on('add', async (filePath) => {
       if (isSupportedImageExtension(filePath)) {
         try {
           await ingestImageFile(filePath, getDatabaseDAL(), false);
-        } catch (err) {
-          console.error(`Watcher failed to ingest new file ${filePath}:`, err);
+        } catch (err: any) {
+          console.warn(`Watcher deferred file ${filePath}:`, err.message);
         }
       }
     });
@@ -110,19 +111,49 @@ export class IngestionService {
       if (isSupportedImageExtension(filePath)) {
         try {
           await ingestImageFile(filePath, getDatabaseDAL(), true);
-        } catch (err) {
-          console.error(`Watcher failed to update changed file ${filePath}:`, err);
+        } catch (err: any) {
+          console.warn(`Watcher deferred change for ${filePath}:`, err.message);
         }
       }
     });
+
+    // Start periodic background scanner
+    this.schedulePeriodicSync();
+  }
+
+  public setPeriodicInterval(intervalMinutes: number): void {
+    this.periodicIntervalMinutes = intervalMinutes;
+    this.schedulePeriodicSync();
+  }
+
+  private schedulePeriodicSync(): void {
+    if (this.periodicTimer) {
+      clearInterval(this.periodicTimer);
+      this.periodicTimer = null;
+    }
+
+    if (this.periodicIntervalMinutes > 0 && this.watchedPath) {
+      const ms = this.periodicIntervalMinutes * 60 * 1000;
+      this.periodicTimer = setInterval(() => {
+        if (this.watchedPath) {
+          this.scanFolder(this.watchedPath, false).catch((err) => {
+            console.error('Periodic scan error:', err);
+          });
+        }
+      }, ms);
+    }
   }
 
   public stopWatching(): void {
     if (this.watcher) {
       this.watcher.close();
       this.watcher = null;
-      this.watchedPath = null;
     }
+    if (this.periodicTimer) {
+      clearInterval(this.periodicTimer);
+      this.periodicTimer = null;
+    }
+    this.watchedPath = null;
   }
 
   public getWatchedPath(): string | null {

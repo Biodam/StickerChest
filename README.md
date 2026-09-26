@@ -46,6 +46,7 @@
 - **[`docs/standards/image-standards.md`](file:///c:/Projects/sticker-database-manager/docs/standards/image-standards.md)**: Sizing tiers, animated GIF handling, aspect ratio and format standards.
 - **[`docs/standards/metadata-definitions.md`](file:///c:/Projects/sticker-database-manager/docs/standards/metadata-definitions.md)**: Metadata taxonomy, Gemini prompt schema, custom attributes, and search ranking.
 - **[`docs/standards/database-schema.md`](file:///c:/Projects/sticker-database-manager/docs/standards/database-schema.md)**: SQLite 3 tables, triggers, and FTS5 virtual table specifications.
+- **[`docs/standards/cloud-drive-compatibility.md`](file:///c:/Projects/sticker-database-manager/docs/standards/cloud-drive-compatibility.md)**: Google Drive Desktop & OneDrive compatibility, file stability locks, and periodic sync.
 - **[`docs/architecture/system-overview.md`](file:///c:/Projects/sticker-database-manager/docs/architecture/system-overview.md)**: Electron multi-process design, IPC channels, window lifecycle, and clipboard dispatch.
 - **[`tasks/milestones.md`](file:///c:/Projects/sticker-database-manager/tasks/milestones.md)**: Milestone roadmap tracking development progress.
 

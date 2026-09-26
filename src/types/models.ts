@@ -81,4 +81,7 @@ export interface AppSettings {
   globalShortcut: string;
   preferredCopyTier: 'sticker' | 'emoji';
   autoStartAtLogin: boolean;
+  syncIntervalMinutes: number;
+  autoAiTagOnIngest: boolean;
+  cloudDriveMode: boolean;
 }

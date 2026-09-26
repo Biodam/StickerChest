@@ -5,6 +5,9 @@ import { detectImageInfo } from '../imaging/format-detector';
 import { generateStickerVariant, generateEmojiVariant, generateThumbnailVariant } from '../imaging/resizer';
 import { ensureVaultDirectories, getVariantOutputPath } from './paths';
 import { StickerDatabaseDAL, getDatabaseDAL } from '../database/dal';
+import { waitUntilFileStable } from './cloud-sync-helper';
+import { tagStickerItem } from '../gemini/tagger-service';
+import { getGeminiApiKey } from '../gemini/client';
 
 export interface IngestFileResult {
   itemId: string;
@@ -15,14 +18,21 @@ export interface IngestFileResult {
 export async function ingestImageFile(
   filePath: string,
   dal: StickerDatabaseDAL = getDatabaseDAL(),
-  forceReprocess = false
+  forceReprocess = false,
+  autoTagAi = true
 ): Promise<IngestFileResult> {
   ensureVaultDirectories();
 
-  // 1. Calculate file SHA-256 for deduplication
+  // 1. Wait until cloud/local file is completely written and unlocked
+  const isStable = await waitUntilFileStable(filePath, 4000);
+  if (!isStable) {
+    throw new Error(`File is locked or incompletely synced: ${filePath}`);
+  }
+
+  // 2. Calculate file SHA-256 for deduplication
   const hash = await calculateFileSha256(filePath);
 
-  // 2. Check existing record
+  // 3. Check existing record
   const existing = dal.getItemByHash(hash);
   if (existing && !forceReprocess) {
     const hasAllVariants =
@@ -32,13 +42,13 @@ export async function ingestImageFile(
     }
   }
 
-  // 3. Detect format and metadata
+  // 4. Detect format and metadata
   const stats = await fs.promises.stat(filePath);
   const info = await detectImageInfo(filePath);
   const ext = path.extname(filePath).toLowerCase();
   const filename = path.basename(filePath);
 
-  // 4. Upsert item in database
+  // 5. Upsert item in database
   const itemId = dal.upsertItem({
     id: existing?.id,
     sha256Hash: hash,
@@ -53,7 +63,7 @@ export async function ingestImageFile(
     frameCount: info.frameCount,
   });
 
-  // 5. Generate variants in parallel
+  // 6. Generate variants in parallel
   const stickerPath = getVariantOutputPath(hash, 'sticker', '.webp');
   const emojiPath = getVariantOutputPath(hash, 'emoji', '.webp');
   const thumbPath = getVariantOutputPath(hash, 'thumb', '.webp');
@@ -64,7 +74,7 @@ export async function ingestImageFile(
     generateThumbnailVariant(filePath, thumbPath, info.isAnimated),
   ]);
 
-  // 6. Save variants in database
+  // 7. Save variants in database
   dal.upsertVariant({
     itemId,
     tier: 'sticker',
@@ -94,6 +104,13 @@ export async function ingestImageFile(
     height: thumbRes.height,
     fileSizeBytes: thumbRes.fileSizeBytes,
   });
+
+  // 8. If new item and auto-tag enabled, trigger Gemini AI in background
+  if (!existing && autoTagAi && getGeminiApiKey()) {
+    tagStickerItem(itemId, dal).catch((aiErr) => {
+      console.warn(`Background auto-tagging error for ${itemId}:`, aiErr);
+    });
+  }
 
   return { itemId, isNew: !existing, sha256Hash: hash };
 }
