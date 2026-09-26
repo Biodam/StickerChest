@@ -42,6 +42,7 @@
 
 ## 📂 Project Architecture & Documentation
 
+- **[`AGENTS.md`](file:///c:/Projects/sticker-database-manager/AGENTS.md)**: Agent instructions, modularity rules, file size limits, and naming conventions.
 - **[`docs/standards/image-standards.md`](file:///c:/Projects/sticker-database-manager/docs/standards/image-standards.md)**: Sizing tiers, animated GIF handling, aspect ratio and format standards.
 - **[`docs/standards/metadata-definitions.md`](file:///c:/Projects/sticker-database-manager/docs/standards/metadata-definitions.md)**: Metadata taxonomy, Gemini prompt schema, custom attributes, and search ranking.
 - **[`docs/standards/database-schema.md`](file:///c:/Projects/sticker-database-manager/docs/standards/database-schema.md)**: SQLite 3 tables, triggers, and FTS5 virtual table specifications.
