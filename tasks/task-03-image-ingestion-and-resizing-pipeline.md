@@ -1,6 +1,6 @@
 # Task 03: Image Ingestion & Resizing Pipeline
 
-**Status**: ⚪ Not Started  
+**Status**: 🟢 Completed  
 **Milestone**: M3  
 **Estimated Complexity**: High
 
@@ -20,14 +20,15 @@
 ---
 
 ## Implementation Checklist
-- [ ] Create `src/main/services/imaging/hasher.ts` calculating streaming SHA-256.
-- [ ] Create `src/main/services/imaging/resizer.ts` with methods:
+- [x] Create `src/main/services/imaging/hasher.ts` calculating streaming SHA-256.
+- [x] Create `src/main/services/imaging/format-detector.ts` detecting dimensions, format, and animation frames.
+- [x] Create `src/main/services/imaging/resizer.ts` with methods:
   - `generateStickerVariant(inputPath, outputPath, isAnimated)`
   - `generateEmojiVariant(inputPath, outputPath, isAnimated)`
   - `generateThumbnailVariant(inputPath, outputPath, isAnimated)`
-- [ ] Ensure animated GIF frame delays and loop headers are preserved during resize.
-- [ ] Create `src/main/services/ingestion/scanner.ts` with batch queue execution and event emitters for UI progress.
-- [ ] Write tests in `tests/unit/imaging.test.ts` verifying image dimensions and format compliance.
+- [x] Ensure animated GIF/WebP frame delays and loop headers are preserved during resize.
+- [x] Create `src/main/services/ingestion/` (`paths.ts`, `file-scanner.ts`, `coordinator.ts`, `folder-watcher.ts`) with batch execution and progress notifications.
+- [x] Write tests in `tests/unit/imaging.test.ts` verifying hashing, image dimensions, variants, deduplication, and database registration.
 
 ---
 

@@ -2,10 +2,14 @@ import { ipcMain, dialog } from 'electron';
 import { hidePickerWindow } from '../windows/pickerWindow';
 import { createMainWindow, getMainWindow } from '../windows/mainWindow';
 import { registerDbIpcHandlers } from './db-handlers';
+import { registerVaultIpcHandlers } from './vault-handlers';
 
 export function registerIpcHandlers(): void {
   // Database handlers
   registerDbIpcHandlers();
+
+  // Vault & Ingestion handlers
+  registerVaultIpcHandlers();
 
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {
@@ -31,10 +35,6 @@ export function registerIpcHandlers(): void {
   // Stubs for upcoming tasks (Task 3: Ingestion, Task 4: Gemini, etc.)
   ipcMain.handle('clipboard:copyItem', async (_event, itemId, tier) => {
     return true;
-  });
-
-  ipcMain.handle('vault:scan', async (_event, forceReprocess) => {
-    return { started: true };
   });
 
   ipcMain.handle('gemini:tagItem', async (_event, itemId) => {
