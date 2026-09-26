@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
 
 let pickerWindow: BrowserWindow | null = null;
@@ -7,6 +7,13 @@ export function createPickerWindow(): BrowserWindow {
   if (pickerWindow && !pickerWindow.isDestroyed()) {
     return pickerWindow;
   }
+
+  const appPath = app.getAppPath();
+  const preloadPath = path.join(appPath, 'dist-electron/preload/picker.preload.js');
+  const indexPath = path.join(appPath, 'dist/src/renderer/picker/index.html');
+
+  console.log('[PickerWindow] preloadPath:', preloadPath);
+  console.log('[PickerWindow] indexPath:', indexPath);
 
   pickerWindow = new BrowserWindow({
     title: 'StickerVault Quick Picker',
@@ -20,18 +27,22 @@ export function createPickerWindow(): BrowserWindow {
     show: false,
     hasShadow: true,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/picker.preload.js'),
+      preload: preloadPath,
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    pickerWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}src/renderer/picker/index.html`);
-  } else {
-    pickerWindow.loadFile(path.join(__dirname, '../../dist/src/renderer/picker/index.html'));
-  }
+  const loadPromise = process.env.VITE_DEV_SERVER_URL
+    ? pickerWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}src/renderer/picker/index.html`)
+    : pickerWindow.loadFile(indexPath);
+
+  loadPromise.then(() => {
+    console.log('[PickerWindow] load completed');
+  }).catch((err) => {
+    console.error('Failed to load Picker window:', err);
+  });
 
   // Auto-hide when losing focus (exact behavior of Win + . or Raycast)
   pickerWindow.on('blur', () => {

@@ -9,13 +9,13 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ]);
 
-try {
-  if (require('electron-squirrel-startup')) {
-    app.quit();
-  }
-} catch {
-  // Not running squirrel installer
-}
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception in Main process:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection in Main process:', reason);
+});
 
 app.whenReady().then(() => {
   // Register custom protocol for local vault images
@@ -44,10 +44,12 @@ app.whenReady().then(() => {
 });
 
 app.on('will-quit', () => {
+  console.log('[App] will-quit');
   unregisterGlobalShortcuts();
 });
 
 app.on('window-all-closed', () => {
+  console.log('[App] window-all-closed');
   if (process.platform !== 'darwin') {
     app.quit();
   }

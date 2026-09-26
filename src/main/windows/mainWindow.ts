@@ -1,4 +1,4 @@
-import { BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import path from 'path';
 
 let mainWindow: BrowserWindow | null = null;
@@ -10,6 +10,14 @@ export function createMainWindow(): BrowserWindow {
     return mainWindow;
   }
 
+  const appPath = app.getAppPath();
+  const preloadPath = path.join(appPath, 'dist-electron/preload/main.preload.js');
+  const indexPath = path.join(appPath, 'dist/src/renderer/manager/index.html');
+
+  console.log('[MainWindow] appPath:', appPath);
+  console.log('[MainWindow] preloadPath:', preloadPath);
+  console.log('[MainWindow] indexPath:', indexPath);
+
   mainWindow = new BrowserWindow({
     title: 'StickerVault — Database Manager',
     width: 1200,
@@ -19,7 +27,7 @@ export function createMainWindow(): BrowserWindow {
     backgroundColor: '#121316',
     show: false,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/main.preload.js'),
+      preload: preloadPath,
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
@@ -27,7 +35,16 @@ export function createMainWindow(): BrowserWindow {
   });
 
   mainWindow.once('ready-to-show', () => {
+    console.log('[MainWindow] ready-to-show triggered');
     mainWindow?.show();
+  });
+
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('[MainWindow] did-fail-load:', errorCode, errorDescription, validatedURL);
+  });
+
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('[MainWindow] render-process-gone:', details);
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -36,13 +53,19 @@ export function createMainWindow(): BrowserWindow {
   });
 
   // In development, load from Vite dev server URL
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}src/renderer/manager/index.html`);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../../dist/src/renderer/manager/index.html'));
-  }
+  const loadPromise = process.env.VITE_DEV_SERVER_URL
+    ? mainWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}src/renderer/manager/index.html`)
+    : mainWindow.loadFile(indexPath);
+
+  loadPromise.then(() => {
+    console.log('[MainWindow] load completed');
+  }).catch((err) => {
+    console.error('[MainWindow] Failed to load Manager window:', err);
+    mainWindow?.show();
+  });
 
   mainWindow.on('closed', () => {
+    console.log('[MainWindow] closed');
     mainWindow = null;
   });
 
