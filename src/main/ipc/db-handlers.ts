@@ -14,6 +14,15 @@ export function registerDbIpcHandlers(): void {
     }
   });
 
+  ipcMain.handle('db:getFacets', async () => {
+    try {
+      return dal.getFacets();
+    } catch (err: any) {
+      console.error('IPC db:getFacets error:', err);
+      return { franchises: [], characters: [], tags: [] };
+    }
+  });
+
   ipcMain.handle('db:getItem', async (_event, id: string) => {
     try {
       return dal.getItemById(id);

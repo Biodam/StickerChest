@@ -61,9 +61,21 @@ export interface SearchFilterOptions {
   character?: string;
   sourceOrigin?: string;
   feeling?: string;
+  tag?: string;
   isAnimated?: boolean;
   limit?: number;
   offset?: number;
+}
+
+export interface FilterFacet {
+  name: string;
+  count: number;
+}
+
+export interface LibraryFacets {
+  franchises: FilterFacet[];
+  characters: FilterFacet[];
+  tags: FilterFacet[];
 }
 
 export interface IngestionProgressEvent {

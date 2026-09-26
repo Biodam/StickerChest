@@ -249,4 +249,82 @@ describe('StickerDatabaseDAL & SQLite Schema', () => {
     expect(recents.total).toBe(1);
     expect(recents.items[0].id).toBe(item2);
   });
+
+  it('should query library facets sorted by frequency and filter by franchise, character, and tag', () => {
+    const id1 = dal.upsertItem({
+      sha256Hash: 'facet-hash-1',
+      filename: 'anya1.png',
+      originalPath: '/curated/anya1.png',
+      ext: '.png',
+      mimeType: 'image/png',
+      width: 100,
+      height: 100,
+      fileSizeBytes: 1000,
+      isAnimated: false,
+    });
+    dal.saveMetadata({
+      itemId: id1,
+      character: 'Anya Forger',
+      sourceOrigin: 'Spy x Family',
+      tags: ['smug', 'telepath'],
+    });
+
+    const id2 = dal.upsertItem({
+      sha256Hash: 'facet-hash-2',
+      filename: 'loid1.png',
+      originalPath: '/curated/loid1.png',
+      ext: '.png',
+      mimeType: 'image/png',
+      width: 100,
+      height: 100,
+      fileSizeBytes: 1000,
+      isAnimated: false,
+    });
+    dal.saveMetadata({
+      itemId: id2,
+      character: 'Loid Forger',
+      sourceOrigin: 'Spy x Family',
+      tags: ['spy'],
+    });
+
+    const id3 = dal.upsertItem({
+      sha256Hash: 'facet-hash-3',
+      filename: 'power1.png',
+      originalPath: '/curated/power1.png',
+      ext: '.png',
+      mimeType: 'image/png',
+      width: 100,
+      height: 100,
+      fileSizeBytes: 1000,
+      isAnimated: false,
+    });
+    dal.saveMetadata({
+      itemId: id3,
+      character: 'Power',
+      sourceOrigin: 'Chainsaw Man',
+      tags: ['smug', 'fiend'],
+    });
+
+    const facets = dal.getFacets();
+
+    // Verify franchises sorted by frequency descending
+    expect(facets.franchises[0]).toEqual({ name: 'Spy x Family', count: 2 });
+    expect(facets.franchises[1]).toEqual({ name: 'Chainsaw Man', count: 1 });
+
+    // Verify tags sorted by frequency descending (smug has 2, others have 1)
+    expect(facets.tags[0]).toEqual({ name: 'smug', count: 2 });
+
+    // Test filtering by franchise
+    const franchiseRes = dal.searchItems({ sourceOrigin: 'Spy x Family' });
+    expect(franchiseRes.total).toBe(2);
+
+    // Test filtering by character
+    const charRes = dal.searchItems({ character: 'Anya Forger' });
+    expect(charRes.total).toBe(1);
+    expect(charRes.items[0].id).toBe(id1);
+
+    // Test filtering by tag
+    const tagRes = dal.searchItems({ tag: 'smug' });
+    expect(tagRes.total).toBe(2);
+  });
 });

@@ -1,8 +1,9 @@
-import { StickerItem, SearchFilterOptions, IngestionProgressEvent, AppSettings, ImageTier } from './models';
+import { StickerItem, SearchFilterOptions, IngestionProgressEvent, AppSettings, ImageTier, LibraryFacets } from './models';
 
 export interface StickerVaultAPI {
   // Database & Search
   searchItems: (options: SearchFilterOptions) => Promise<{ items: StickerItem[]; total: number }>;
+  getFacets: () => Promise<LibraryFacets>;
   getItem: (id: string) => Promise<StickerItem | null>;
   toggleFavorite: (itemId: string) => Promise<boolean>;
   updateMetadata: (itemId: string, metadata: {

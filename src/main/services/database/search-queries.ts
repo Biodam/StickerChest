@@ -25,6 +25,7 @@ export function searchItems(
     character,
     sourceOrigin,
     feeling,
+    tag,
     isAnimated,
     limit = 50,
     offset = 0,
@@ -54,16 +55,24 @@ export function searchItems(
 
   // Filter conditions
   if (character) {
-    conditions.push(`m.character = ?`);
+    conditions.push(`m.character = ? COLLATE NOCASE`);
     params.push(character);
   }
   if (sourceOrigin) {
-    conditions.push(`m.source_origin = ?`);
+    conditions.push(`m.source_origin = ? COLLATE NOCASE`);
     params.push(sourceOrigin);
   }
   if (feeling) {
-    conditions.push(`m.feeling = ?`);
+    conditions.push(`m.feeling = ? COLLATE NOCASE`);
     params.push(feeling);
+  }
+  if (tag) {
+    conditions.push(`EXISTS (
+      SELECT 1 FROM item_tags it
+      JOIN tags t ON t.id = it.tag_id
+      WHERE it.item_id = i.id AND t.name = ? COLLATE NOCASE
+    )`);
+    params.push(tag);
   }
   if (isAnimated !== undefined) {
     conditions.push(`i.is_animated = ?`);

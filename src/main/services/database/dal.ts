@@ -1,11 +1,12 @@
 import type { Database } from 'better-sqlite3';
 import { getDatabase } from './connection';
 import { ItemInsertInput, VariantInsertInput, MetadataUpsertInput } from './types';
-import { StickerItem, SearchFilterOptions, UsageStats } from '../../../types/models';
+import { StickerItem, SearchFilterOptions, UsageStats, LibraryFacets } from '../../../types/models';
 import * as itemQueries from './item-queries';
 import * as metaQueries from './metadata-queries';
 import * as searchQueries from './search-queries';
 import * as usageQueries from './usage-queries';
+import * as facetQueries from './facet-queries';
 
 export class StickerDatabaseDAL {
   private customDb?: Database;
@@ -59,6 +60,10 @@ export class StickerDatabaseDAL {
   // Search & Retrieval
   public searchItems(options: SearchFilterOptions): { items: StickerItem[]; total: number } {
     return searchQueries.searchItems(this.db, options);
+  }
+
+  public getFacets(): LibraryFacets {
+    return facetQueries.getLibraryFacets(this.db);
   }
 
   // Usage & Favorites

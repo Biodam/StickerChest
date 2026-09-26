@@ -82,3 +82,14 @@ Search queries utilize SQLite FTS5 with BM25 ranking and custom weights:
 - **Action Match**: 2.0× weight.
 - **Custom Tags / AI Tags**: 1.8× weight.
 - **Usage Boost**: Frequently used stickers (`copy_count`) and favorited stickers (`is_favorite = 1`) receive a ranking boost in search results.
+
+---
+
+## 5. Library Facets & Frequency Ranking
+
+The desktop manager features dynamic facet filters in the left sidebar aggregated directly from the database:
+- **Franchises**: Unique `source_origin` entries ordered by sticker count descending.
+- **Characters**: Unique `character` entries ordered by sticker count descending.
+- **Tags**: Unique tag names joined from `item_tags` and `tags` tables ordered by sticker count descending.
+- **Surface Upwards**: The most common entries appear at the top with numeric count badges, with "+N more" expanders for large libraries. Active filter chips in the header allow removing individual filters or clearing all with a single click.
+

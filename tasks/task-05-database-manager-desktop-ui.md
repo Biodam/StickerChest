@@ -24,6 +24,7 @@
 - [x] Create responsive sticker grid with thumbnail previews, GIF badges, and empty states.
 - [x] Implement inspector drawer for displaying and editing item details, adding/removing tags, and re-analyzing with Gemini.
 - [x] Implement filtering controls: All, Recent, Favorites, Animated GIFs, and real-time full-text search.
+- [x] Implement dynamic facet filters in the sidebar: Franchises, Characters, and Tags, frequency-sorted with count badges and active filter chips.
 - [x] Build Settings modal with folder selection dialog and Gemini API key verification.
 - [x] Wire IPC hooks (`settings:get`, `settings:save`, `vault:scan`, `vault:progress`, `db:search`, `db:updateMetadata`) for real-time synchronization.
 

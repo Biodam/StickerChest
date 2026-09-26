@@ -3,6 +3,7 @@ import { StickerVaultAPI } from '../types/ipc';
 
 const api: StickerVaultAPI = {
   searchItems: (options) => ipcRenderer.invoke('db:search', options),
+  getFacets: () => ipcRenderer.invoke('db:getFacets'),
   getItem: (id) => ipcRenderer.invoke('db:getItem', id),
   toggleFavorite: (itemId) => ipcRenderer.invoke('db:toggleFavorite', itemId),
   updateMetadata: (itemId, metadata) => ipcRenderer.invoke('db:updateMetadata', itemId, metadata),
