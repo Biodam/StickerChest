@@ -1,8 +1,13 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, protocol, net } from 'electron';
+import { pathToFileURL } from 'url';
 import { createMainWindow } from './windows/mainWindow';
 import { createPickerWindow } from './windows/pickerWindow';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts/globalShortcuts';
 import { registerIpcHandlers } from './ipc';
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true } },
+]);
 
 try {
   if (require('electron-squirrel-startup')) {
@@ -13,6 +18,13 @@ try {
 }
 
 app.whenReady().then(() => {
+  // Register custom protocol for local vault images
+  protocol.handle('vault', (request) => {
+    let pathname = request.url.slice('vault://'.length);
+    pathname = decodeURIComponent(pathname);
+    return net.fetch(pathToFileURL(pathname).toString());
+  });
+
   // Register IPC handlers
   registerIpcHandlers();
 

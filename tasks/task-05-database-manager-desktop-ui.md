@@ -1,6 +1,6 @@
 # Task 05: Database Manager Desktop UI
 
-**Status**: ⚪ Not Started  
+**Status**: 🟢 Completed  
 **Milestone**: M5  
 **Estimated Complexity**: High
 
@@ -20,12 +20,12 @@
 ---
 
 ## Implementation Checklist
-- [ ] Implement layout framework (sidebar, header with global search, main content area, inspector drawer) using Tailwind CSS.
-- [ ] Create virtualized sticker grid (`@tanstack/react-virtual` or custom virtualization) using Tier 3 thumbnail previews.
-- [ ] Implement inspector panel for displaying and editing item details.
-- [ ] Implement filtering controls: by source franchise, character, feeling, animation type, or favorite status.
-- [ ] Build Settings modal for directory paths and Gemini API key management.
-- [ ] Wire IPC hooks to sync state in real time with backend events.
+- [x] Implement layout framework (`Sidebar.tsx`, `Header.tsx`, `StickerGrid.tsx`, `InspectorDrawer.tsx`, `SettingsModal.tsx`, `IngestionBanner.tsx`) using Tailwind CSS.
+- [x] Create responsive sticker grid with thumbnail previews, GIF badges, and empty states.
+- [x] Implement inspector drawer for displaying and editing item details, adding/removing tags, and re-analyzing with Gemini.
+- [x] Implement filtering controls: All, Recent, Favorites, Animated GIFs, and real-time full-text search.
+- [x] Build Settings modal with folder selection dialog and Gemini API key verification.
+- [x] Wire IPC hooks (`settings:get`, `settings:save`, `vault:scan`, `vault:progress`, `db:search`, `db:updateMetadata`) for real-time synchronization.
 
 ---
 

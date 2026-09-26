@@ -4,6 +4,7 @@ import { createMainWindow, getMainWindow } from '../windows/mainWindow';
 import { registerDbIpcHandlers } from './db-handlers';
 import { registerVaultIpcHandlers } from './vault-handlers';
 import { registerGeminiIpcHandlers } from './gemini-handlers';
+import { registerSettingsIpcHandlers } from './settings-handlers';
 
 export function registerIpcHandlers(): void {
   // Database handlers
@@ -14,6 +15,9 @@ export function registerIpcHandlers(): void {
 
   // Gemini AI handlers
   registerGeminiIpcHandlers();
+
+  // Settings handlers
+  registerSettingsIpcHandlers();
 
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {
@@ -38,21 +42,6 @@ export function registerIpcHandlers(): void {
 
   // Stubs for upcoming tasks (Task 6: Clipboard)
   ipcMain.handle('clipboard:copyItem', async (_event, itemId, tier) => {
-    return true;
-  });
-
-  ipcMain.handle('settings:get', async () => {
-    return {
-      sourceFolder: '',
-      geminiApiKey: '',
-      geminiModel: 'gemini-2.5-flash',
-      globalShortcut: 'Alt+Shift+V',
-      preferredCopyTier: 'sticker',
-      autoStartAtLogin: false,
-    };
-  });
-
-  ipcMain.handle('settings:save', async (_event, settings) => {
     return true;
   });
 }
