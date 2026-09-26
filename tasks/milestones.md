@@ -24,8 +24,8 @@ This document tracks high-level progress across the core development milestones 
 | **M3** | **Ingestion & Resizing Pipeline** | SHA-256 deduplication, Sharp multi-tier resizing (emoji, sticker, thumb), GIF support | 🟢 Completed |
 | **M4** | **Gemini AI Metadata Tagger** | GenAI SDK integration, vision prompt schema, batch queue, manual metadata override | 🟢 Completed |
 | **M5** | **Manager Desktop UI** | Library grid, search/filter sidebar, inspector drawer, bulk tagger, settings | 🟢 Completed |
-| **M6** | **Quick Picker Companion Panel** | Frameless floating modal, global hotkey (`Alt+Shift+V`), Recent/Favs/All tabs, copy to clipboard | 🟡 Ready to Start |
-| **M7** | **Testing, Verification & Packaging** | Unit/integration test suites, cross-platform build scripts (Windows & macOS) | ⚪ Not Started |
+| **M6** | **Quick Picker Companion Panel** | Frameless floating modal, global hotkey (`Alt+Shift+V`), Recent/Favs/All tabs, copy to clipboard | 🟢 Completed |
+| **M7** | **Testing, Verification & Packaging** | Unit/integration test suites, cross-platform build scripts (Windows & macOS) | 🟡 Ready to Start |
 
 ---
 

@@ -19,13 +19,14 @@ export function toggleFavorite(db: Database, itemId: string, forceState?: boolea
 }
 
 export function recordItemUsage(db: Database, itemId: string): void {
+  const now = new Date().toISOString();
   db.prepare(`
     INSERT INTO usage_stats (item_id, is_favorite, copy_count, last_copied_at)
-    VALUES (?, 0, 1, CURRENT_TIMESTAMP)
+    VALUES (?, 0, 1, ?)
     ON CONFLICT(item_id) DO UPDATE SET
       copy_count = usage_stats.copy_count + 1,
-      last_copied_at = CURRENT_TIMESTAMP
-  `).run(itemId);
+      last_copied_at = ?
+  `).run(itemId, now, now);
 }
 
 export function getUsageStats(db: Database, itemId: string): UsageStats {

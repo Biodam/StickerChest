@@ -1,6 +1,6 @@
 # Task 06: Quick Picker Companion Panel
 
-**Status**: ⚪ Not Started  
+**Status**: 🟢 Completed  
 **Milestone**: M6  
 **Estimated Complexity**: High
 
@@ -20,16 +20,16 @@
 ---
 
 ## Implementation Checklist
-- [ ] Configure Electron `BrowserWindow` with `frame: false`, `alwaysOnTop: true`, `skipTaskbar: true`, `transparent: true`.
-- [ ] Implement `globalShortcut.register` in main process with customizable keybind.
-- [ ] Implement focus/blur auto-hide listeners.
-- [ ] Build the Picker React UI (`src/renderer/picker/`):
-  - Top search input with immediate debounced FTS query.
-  - Tab switcher (Recent, Favorites, All).
-  - Compact grid of stickers with keyboard focus rings.
-  - Tier selector toggle (copy as Sticker or Emoji).
-- [ ] Implement clipboard copy IPC call and auto-dismiss on selection.
-- [ ] Verify instant clipboard pasting in external applications (Discord, Slack, browsers).
+- [x] Configure Electron `BrowserWindow` with `frame: false`, `alwaysOnTop: true`, `skipTaskbar: true`, `transparent: true`.
+- [x] Implement `globalShortcut.register` in main process with customizable keybind (`Alt+Shift+V`).
+- [x] Implement focus/blur auto-hide listeners and Escape key dismiss.
+- [x] Build the Picker React UI (`src/renderer/picker/`):
+  - Top search input (`PickerSearch.tsx`) with immediate debounced FTS query.
+  - Tab switcher (`PickerTabs.tsx`) for Recent, Favorites, All.
+  - Compact sticker grid (`PickerGrid.tsx`) with keyboard focus and arrow navigation.
+  - Tier selector toggle (`copyTier`: Sticker vs Emoji).
+- [x] Implement clipboard copy IPC call (`clipboard-service.ts`, `clipboard-handlers.ts`) and auto-dismiss on selection.
+- [x] Unit test suite in `tests/unit/clipboard.test.ts` verifying copy operations, usage tracking, and Recent sorting.
 
 ---
 

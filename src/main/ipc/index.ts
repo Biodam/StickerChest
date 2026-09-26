@@ -5,6 +5,7 @@ import { registerDbIpcHandlers } from './db-handlers';
 import { registerVaultIpcHandlers } from './vault-handlers';
 import { registerGeminiIpcHandlers } from './gemini-handlers';
 import { registerSettingsIpcHandlers } from './settings-handlers';
+import { registerClipboardIpcHandlers } from './clipboard-handlers';
 
 export function registerIpcHandlers(): void {
   // Database handlers
@@ -18,6 +19,9 @@ export function registerIpcHandlers(): void {
 
   // Settings handlers
   registerSettingsIpcHandlers();
+
+  // Clipboard handlers
+  registerClipboardIpcHandlers();
 
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {
@@ -38,10 +42,5 @@ export function registerIpcHandlers(): void {
       return null;
     }
     return result.filePaths[0];
-  });
-
-  // Stubs for upcoming tasks (Task 6: Clipboard)
-  ipcMain.handle('clipboard:copyItem', async (_event, itemId, tier) => {
-    return true;
   });
 }
