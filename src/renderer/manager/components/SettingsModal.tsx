@@ -21,12 +21,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [folder, setFolder] = useState(settings.sourceFolder);
   const [apiKey, setApiKey] = useState(settings.geminiApiKey);
-  const [model, setModel] = useState(settings.geminiModel || 'gemini-3.8-flash');
+  const [model, setModel] = useState(
+    settings.geminiModel === 'gemini-2.5-flash' ? 'gemini-3.8-flash' : (settings.geminiModel || 'gemini-3.8-flash')
+  );
   const [syncInterval, setSyncInterval] = useState(settings.syncIntervalMinutes ?? 15);
   const [autoTag, setAutoTag] = useState(settings.autoAiTagOnIngest ?? true);
   const [testStatus, setTestStatus] = useState<{ testing: boolean; valid?: boolean; message?: string }>({
     testing: false,
   });
+
+  React.useEffect(() => {
+    setFolder(settings.sourceFolder);
+    setApiKey(settings.geminiApiKey);
+    const m = settings.geminiModel === 'gemini-2.5-flash' ? 'gemini-3.8-flash' : (settings.geminiModel || 'gemini-3.8-flash');
+    setModel(m);
+    setSyncInterval(settings.syncIntervalMinutes ?? 15);
+    setAutoTag(settings.autoAiTagOnIngest ?? true);
+    setTestStatus({ testing: false });
+  }, [settings, isOpen]);
 
   if (!isOpen) return null;
 

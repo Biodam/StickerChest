@@ -20,7 +20,7 @@ export default function App() {
   const [settings, setSettings] = useState<AppSettings>({
     sourceFolder: '',
     geminiApiKey: '',
-    geminiModel: 'gemini-2.5-flash',
+    geminiModel: 'gemini-3.8-flash',
     globalShortcut: 'Alt+Shift+V',
     preferredCopyTier: 'sticker',
     autoStartAtLogin: false,

@@ -15,10 +15,13 @@ export function getGeminiApiKey(): string | null {
 }
 
 export function setGeminiModel(model: string): void {
-  globalModel = model.replace(/^models\//, '').trim() || 'gemini-3.8-flash';
+  let cleaned = model.replace(/^models\//, '').trim() || 'gemini-3.8-flash';
+  if (cleaned === 'gemini-2.5-flash') cleaned = 'gemini-3.8-flash';
+  globalModel = cleaned;
 }
 
 export function getGeminiModel(): string {
+  if (globalModel === 'gemini-2.5-flash') globalModel = 'gemini-3.8-flash';
   return globalModel;
 }
 
@@ -30,7 +33,8 @@ export async function testGeminiApiKey(
     return { valid: false, message: 'API key is too short or empty' };
   }
 
-  const cleanModel = (modelName || globalModel).replace(/^models\//, '').trim() || 'gemini-3.8-flash';
+  let cleanModel = (modelName || globalModel).replace(/^models\//, '').trim() || 'gemini-3.8-flash';
+  if (cleanModel === 'gemini-2.5-flash') cleanModel = 'gemini-3.8-flash';
 
   try {
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
@@ -57,10 +61,13 @@ export async function requestGeminiTagging(
     throw new Error('GEMINI_API_KEY is not configured');
   }
 
+  let modelToUse = globalModel;
+  if (modelToUse === 'gemini-2.5-flash') modelToUse = 'gemini-3.8-flash';
+
   const ai = new GoogleGenAI({ apiKey: globalApiKey });
 
   const response = await ai.models.generateContent({
-    model: globalModel,
+    model: modelToUse,
     contents: [
       {
         role: 'user',
