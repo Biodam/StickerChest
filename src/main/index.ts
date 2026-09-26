@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import { app, BrowserWindow, protocol, net } from 'electron';
 import { pathToFileURL } from 'url';
 import { createMainWindow } from './windows/mainWindow';
@@ -7,7 +9,7 @@ import { registerIpcHandlers } from './ipc';
 import { resolveVaultPath } from './services/ingestion/paths';
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true } },
+  { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
 ]);
 
 process.on('uncaughtException', (err) => {
@@ -20,11 +22,62 @@ process.on('unhandledRejection', (reason) => {
 
 app.whenReady().then(() => {
   // Register custom protocol for local vault images
-  protocol.handle('vault', (request) => {
-    let pathname = request.url.slice('vault://'.length);
-    pathname = decodeURIComponent(pathname);
-    const resolved = resolveVaultPath(pathname);
-    return net.fetch(pathToFileURL(resolved).toString());
+  protocol.handle('vault', async (request) => {
+    try {
+      let targetPath: string | null = null;
+      try {
+        const parsed = new URL(request.url);
+        targetPath = parsed.searchParams.get('path');
+      } catch {
+        // Fall through
+      }
+
+      if (!targetPath) {
+        let raw = request.url.replace(/^vault:\/\//i, '');
+        if (raw.startsWith('media/')) {
+          raw = raw.slice('media/'.length);
+        } else if (raw.startsWith('media?path=')) {
+          raw = raw.slice('media?path='.length);
+        }
+        targetPath = decodeURIComponent(raw);
+
+        // Fix Windows drive letter stripped colon by Chromium (e.g. "c/Users/..." -> "C:/Users/...")
+        if (/^[a-zA-Z]\//.test(targetPath)) {
+          targetPath = targetPath[0].toUpperCase() + ':/' + targetPath.slice(2);
+        }
+      }
+
+      const resolved = resolveVaultPath(targetPath);
+      if (!resolved || !fs.existsSync(resolved)) {
+        console.warn('[VaultProtocol] Image file not found:', resolved, 'from request:', request.url);
+        return new Response('Not Found', { status: 404 });
+      }
+
+      try {
+        return await net.fetch(pathToFileURL(resolved).toString());
+      } catch (fetchErr) {
+        console.warn('[VaultProtocol] net.fetch failed, reading file directly:', fetchErr);
+        const buffer = await fs.promises.readFile(resolved);
+        const ext = path.extname(resolved).toLowerCase();
+        const mimeTypes: Record<string, string> = {
+          '.webp': 'image/webp',
+          '.png': 'image/png',
+          '.jpg': 'image/jpeg',
+          '.jpeg': 'image/jpeg',
+          '.gif': 'image/gif',
+          '.avif': 'image/avif',
+        };
+        return new Response(buffer, {
+          headers: {
+            'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+            'Cache-Control': 'max-age=31536000, immutable',
+          },
+        });
+      }
+    } catch (err) {
+      console.error('[VaultProtocol] Handler error:', err);
+      return new Response('Internal Error', { status: 500 });
+    }
   });
 
   // Register IPC handlers

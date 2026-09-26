@@ -62,21 +62,50 @@ export function resolveVaultPath(storedPath: string): string {
   if (!storedPath) return storedPath;
   const root = getVaultRoot();
 
-  // If already absolute and exists on local filesystem, return it
+  // 1. If already absolute and exists on local filesystem, return it
   if (path.isAbsolute(storedPath) && fs.existsSync(storedPath)) {
     return storedPath;
   }
 
   const normalized = storedPath.replace(/\\/g, '/');
 
-  // Direct relative resolution against root
+  // 2. Direct relative resolution against active root
   const directPath = path.resolve(root, normalized);
   if (fs.existsSync(directPath)) {
     return directPath;
   }
 
-  // Handle cross-platform path migration (e.g. Windows C:/... on Mac or Mac /Users/... on Windows)
-  for (const marker of ['.stickervault', 'sources']) {
+  // 3. Variant tiers resolution (.stickervault/variants/<tier>, root/<tier>, or AppData vault fallback)
+  const tierMatch =
+    normalized.match(/(?:variants|vault)[\/\\](sticker|emoji|thumb)[\/\\]([^\/\\]+)$/i) ||
+    normalized.match(/(?:^|[\/\\])(sticker|emoji|thumb)[\/\\]([^\/\\]+)$/i);
+  if (tierMatch) {
+    const tier = tierMatch[1].toLowerCase();
+    const file = tierMatch[2];
+
+    const cand1 = path.resolve(root, '.stickervault', 'variants', tier, file);
+    if (fs.existsSync(cand1)) return cand1;
+
+    const cand2 = path.resolve(root, 'vault', tier, file);
+    if (fs.existsSync(cand2)) return cand2;
+
+    const cand3 = path.resolve(root, tier, file);
+    if (fs.existsSync(cand3)) return cand3;
+
+    try {
+      const userData = app.getPath('userData');
+      const appData1 = path.resolve(userData, 'vault', tier, file);
+      if (fs.existsSync(appData1)) return appData1;
+
+      const appData2 = path.resolve(userData, 'vault', '.stickervault', 'variants', tier, file);
+      if (fs.existsSync(appData2)) return appData2;
+    } catch {
+      // In non-Electron / test runners
+    }
+  }
+
+  // 4. Handle cross-platform path migration markers (.stickervault, sources, vault)
+  for (const marker of ['.stickervault', 'sources', 'vault']) {
     const idx = normalized.indexOf(marker);
     if (idx !== -1) {
       const candidate = path.resolve(root, normalized.substring(idx));
@@ -84,7 +113,7 @@ export function resolveVaultPath(storedPath: string): string {
     }
   }
 
-  // Fallback to checking by filename in sources or root
+  // 5. Fallback to checking by filename in sources or root
   const filename = path.basename(normalized);
   const inSources = path.resolve(root, 'sources', filename);
   if (fs.existsSync(inSources)) return inSources;

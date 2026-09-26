@@ -74,13 +74,15 @@ StickerVault organizes the selected cloud folder so it can be opened across mult
         └── thumb/         # 96x96 WebP / animated WebP
 ```
 
-### 3.1 Cross-Platform Relative Paths
+### 3.1 Cross-Platform Relative Paths & Custom Protocol
 To ensure seamless interoperability between Windows (`G:\My Drive\Vault`) and macOS (`~/Library/CloudStorage/GoogleDrive-...`):
 - All database records store paths relative to the vault root (e.g. `.stickervault/variants/sticker/<hash>.webp` and `sources/reactions/cat.gif`).
-- The Data Access Layer (`item-queries.ts`) and custom protocol handler (`vault://`) dynamically resolve relative paths against the active machine's vault root.
+- The custom protocol handler (`vault://media?path=<encoded_path>`) cleanly parses paths on both Windows and macOS without host-segment delimiter loss (such as drive letters without colon).
+- `resolveVaultPath()` intelligently resolves relative paths, absolute paths, variant tier locations (`.stickervault/variants/<tier>/`, `vault/<tier>/`), and userData fallbacks.
 - Opening the same Google Drive folder on Mac or Windows immediately loads all stickers, tags, metadata, and pre-rendered thumbnails with zero reprocessing.
 
 ### 3.2 Offline Local Mode
 - Gemini AI is completely optional: users can import, resize, search, and manually edit metadata (character, origin, action, feeling, description, tags) completely offline.
 - Vision AI tagging defaults to `gemini-3.8-flash` (or user-selectable models: `gemini-2.0-flash`, `gemini-1.5-flash`, `gemini-1.5-pro`).
+
 
