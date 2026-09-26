@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { getGeminiQueue } from './queue';
 import { StickerDatabaseDAL, getDatabaseDAL } from '../database/dal';
-import { getGeminiApiKey } from './client';
+import { getGeminiApiKey, getGeminiModel } from './client';
 
 export async function tagStickerItem(
   itemId: string,
@@ -46,7 +46,9 @@ export async function tagStickerItem(
     const queue = getGeminiQueue();
     const result = await queue.enqueue(itemId, buffer, mimeType);
 
-    // Save extracted metadata into SQLite
+    const model = getGeminiModel() || 'gemini-3.8-flash';
+
+    // Save extracted metadata into SQLite without overwriting user-locked fields
     dal.saveMetadata({
       itemId,
       character: result.character,
@@ -54,10 +56,11 @@ export async function tagStickerItem(
       action: result.action,
       feeling: result.feeling,
       description: result.description,
-      aiModel: 'gemini-2.5-flash',
+      aiModel: model,
       aiStatus: 'completed',
       tags: result.tags,
       rawAiJson: JSON.stringify(result),
+      isUserEdited: false,
     });
 
     return true;

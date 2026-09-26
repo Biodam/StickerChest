@@ -43,6 +43,13 @@ export function registerDbIpcHandlers(): void {
 
   ipcMain.handle('db:updateMetadata', async (_event, itemId: string, metadata: any) => {
     try {
+      const userLockedFields: string[] = metadata.userLockedFields || [];
+      if (metadata.character !== undefined) userLockedFields.push('character');
+      if (metadata.sourceOrigin !== undefined) userLockedFields.push('source_origin');
+      if (metadata.action !== undefined) userLockedFields.push('action');
+      if (metadata.feeling !== undefined) userLockedFields.push('feeling');
+      if (metadata.description !== undefined) userLockedFields.push('description');
+
       dal.saveMetadata({
         itemId,
         character: metadata.character,
@@ -52,6 +59,8 @@ export function registerDbIpcHandlers(): void {
         description: metadata.description,
         tags: metadata.tags,
         customAttributes: metadata.customAttributes,
+        userLockedFields: Array.from(new Set(userLockedFields)),
+        isUserEdited: true,
         aiStatus: 'manual_only',
       });
       return true;

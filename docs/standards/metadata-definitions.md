@@ -66,11 +66,20 @@ Do not output markdown codeblocks, only valid JSON.
 Users can augment or override AI-generated tags with custom attributes:
 
 ### 3.1 Supported Custom Field Types
-- **Custom Tags**: User-added keywords (flagged as `is_ai_generated = 0` to prevent being overwritten during re-scans).
+- **Custom Tags**: User-added keywords (flagged as `is_ai_generated = 0` to prevent being overwritten during AI vision re-scans).
 - **Categories / Packs**: e.g., `"Work Appropriate"`, `"Gaming Reactions"`, `"Tier 1 Memes"`.
 - **NSFW / SFW Toggle**: Flags sensitive stickers to hide or blur them in public settings.
 - **Rating / Priority**: Star rating (`1` to `5`) to influence search ordering.
 - **Custom Key-Value Attributes**: Arbitrary key-value pairs stored in the `custom_attributes` table (e.g. `artist: "Kei"`, `lore_event: "Summer 2024"`).
+
+### 3.2 User Edits & AI Overwrite Protection Guarantee
+When users edit tags or metadata fields (`character`, `sourceOrigin`, `action`, `feeling`, `description`) via the Desktop Manager:
+1. **User Lock**: The edited fields are recorded in `metadata.user_locked_fields` JSON array and flagged with `is_user_edited = 1`.
+2. **AI Protection**: Any subsequent AI vision processing (initial batch tagging, model changes, or manual re-tagging) **strictly respects** user edits:
+   - Locked metadata fields are never overwritten with AI model predictions.
+   - Non-locked fields (empty or not edited by the user) can still receive AI enrichment.
+   - User-created tags (`is_ai_generated = 0`) are permanently preserved. AI tag generation merges new tags alongside user tags without deleting or replacing user tags.
+3. **Visual Indicators**: The desktop Inspector drawer displays a padlock badge next to user-locked fields, a "User Edit — Protected from AI overwrite" banner, and visually distinguishes user tags (blue pill with lock icon) from AI-generated tags (purple/sparkle icon).
 
 ---
 

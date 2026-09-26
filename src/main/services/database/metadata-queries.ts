@@ -21,70 +21,175 @@ export function syncFtsIndex(db: Database, itemId: string): void {
 
 export function upsertMetadata(db: Database, input: MetadataUpsertInput): void {
   const transaction = db.transaction(() => {
-    // 1. If tags provided, insert tags first so they are present for FTS
-    if (input.tags && input.tags.length > 0) {
-      setTags(db, input.itemId, input.tags, input.aiStatus !== 'manual_only');
+    const existing = db.prepare(`SELECT * FROM metadata WHERE item_id = ?`).get(input.itemId) as any;
+    const id = existing?.id || randomUUID();
+
+    let existingLocked: string[] = [];
+    try {
+      if (existing?.user_locked_fields) {
+        existingLocked = JSON.parse(existing.user_locked_fields);
+      }
+    } catch {}
+
+    const isUserEdit = input.isUserEdited === true;
+
+    // Calculate updated locked fields
+    let userLockedFields = existingLocked;
+    if (isUserEdit) {
+      const newLocked = new Set(existingLocked);
+      if (input.userLockedFields && input.userLockedFields.length > 0) {
+        input.userLockedFields.forEach((f) => newLocked.add(f));
+      } else {
+        if (input.character !== undefined && input.character !== null) newLocked.add('character');
+        if (input.sourceOrigin !== undefined && input.sourceOrigin !== null) newLocked.add('source_origin');
+        if (input.action !== undefined && input.action !== null) newLocked.add('action');
+        if (input.feeling !== undefined && input.feeling !== null) newLocked.add('feeling');
+        if (input.description !== undefined && input.description !== null) newLocked.add('description');
+      }
+      userLockedFields = Array.from(newLocked);
+    }
+
+    // Protection logic: if AI is writing, never overwrite user-locked fields!
+    const character = !isUserEdit && userLockedFields.includes('character')
+      ? (existing?.character ?? null)
+      : (input.character ?? existing?.character ?? null);
+
+    const sourceOrigin = !isUserEdit && userLockedFields.includes('source_origin')
+      ? (existing?.source_origin ?? null)
+      : (input.sourceOrigin ?? existing?.source_origin ?? null);
+
+    const action = !isUserEdit && userLockedFields.includes('action')
+      ? (existing?.action ?? null)
+      : (input.action ?? existing?.action ?? null);
+
+    const feeling = !isUserEdit && userLockedFields.includes('feeling')
+      ? (existing?.feeling ?? null)
+      : (input.feeling ?? existing?.feeling ?? null);
+
+    const description = !isUserEdit && userLockedFields.includes('description')
+      ? (existing?.description ?? null)
+      : (input.description ?? existing?.description ?? null);
+
+    const isUserEdited = isUserEdit ? 1 : (existing?.is_user_edited ?? 0);
+    const lockedJson = JSON.stringify(userLockedFields);
+
+    // Save tags: user edit marks tags with is_ai_generated = 0, AI never touches user tags
+    if (input.tags) {
+      if (isUserEdit) {
+        setTags(db, input.itemId, input.tags, false);
+      } else {
+        applyAiTags(db, input.itemId, input.tags);
+      }
     }
 
     if (input.customAttributes) {
       setCustomAttributes(db, input.itemId, input.customAttributes);
     }
 
-    const existing = db.prepare(`SELECT id FROM metadata WHERE item_id = ?`).get(input.itemId) as { id: string } | undefined;
-    const id = existing?.id || randomUUID();
-
     const stmt = db.prepare(`
       INSERT INTO metadata (
         id, item_id, character, source_origin, action, feeling, description,
-        ai_model, ai_status, ai_error, raw_ai_json, updated_at
+        ai_model, ai_status, ai_error, raw_ai_json, user_locked_fields, is_user_edited, updated_at
       ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
       ) ON CONFLICT(item_id) DO UPDATE SET
-        character = coalesce(excluded.character, metadata.character),
-        source_origin = coalesce(excluded.source_origin, metadata.source_origin),
-        action = coalesce(excluded.action, metadata.action),
-        feeling = coalesce(excluded.feeling, metadata.feeling),
-        description = coalesce(excluded.description, metadata.description),
+        character = excluded.character,
+        source_origin = excluded.source_origin,
+        action = excluded.action,
+        feeling = excluded.feeling,
+        description = excluded.description,
         ai_model = coalesce(excluded.ai_model, metadata.ai_model),
-        ai_status = coalesce(excluded.ai_status, metadata.ai_status),
+        ai_status = excluded.ai_status,
         ai_error = excluded.ai_error,
         raw_ai_json = coalesce(excluded.raw_ai_json, metadata.raw_ai_json),
+        user_locked_fields = excluded.user_locked_fields,
+        is_user_edited = excluded.is_user_edited,
         updated_at = CURRENT_TIMESTAMP
     `);
 
     stmt.run(
       id,
       input.itemId,
-      input.character ?? null,
-      input.sourceOrigin ?? null,
-      input.action ?? null,
-      input.feeling ?? null,
-      input.description ?? null,
-      input.aiModel ?? null,
-      input.aiStatus ?? 'completed',
+      character,
+      sourceOrigin,
+      action,
+      feeling,
+      description,
+      input.aiModel ?? existing?.ai_model ?? null,
+      input.aiStatus ?? existing?.ai_status ?? 'completed',
       input.aiError ?? null,
-      input.rawAiJson ?? null
+      input.rawAiJson ?? existing?.raw_ai_json ?? null,
+      lockedJson,
+      isUserEdited
     );
 
-    // Explicitly sync FTS index
     syncFtsIndex(db, input.itemId);
   });
 
   transaction();
 }
 
-export function setTags(db: Database, itemId: string, tags: string[], isAiGenerated = true): void {
+export function applyAiTags(db: Database, itemId: string, aiTags: string[]): void {
   const insertTagStmt = db.prepare(`INSERT OR IGNORE INTO tags (id, name) VALUES (?, ?)`);
   const getTagStmt = db.prepare(`SELECT id FROM tags WHERE name = ? COLLATE NOCASE`);
-  const linkStmt = db.prepare(`INSERT OR REPLACE INTO item_tags (item_id, tag_id, is_ai_generated) VALUES (?, ?, ?)`);
+  const linkStmt = db.prepare(`
+    INSERT INTO item_tags (item_id, tag_id, is_ai_generated) VALUES (?, ?, 1)
+    ON CONFLICT(item_id, tag_id) DO UPDATE SET
+      is_ai_generated = CASE WHEN item_tags.is_ai_generated = 0 THEN 0 ELSE 1 END
+  `);
+
+  const transaction = db.transaction((tags: string[]) => {
+    // Only delete previous AI tags; NEVER delete user tags (is_ai_generated = 0)
+    db.prepare(`DELETE FROM item_tags WHERE item_id = ? AND is_ai_generated = 1`).run(itemId);
+
+    for (const rawTag of tags) {
+      const cleanTag = rawTag.trim().toLowerCase();
+      if (!cleanTag) continue;
+
+      insertTagStmt.run(randomUUID(), cleanTag);
+      const tagRow = getTagStmt.get(cleanTag) as { id: string } | undefined;
+      if (tagRow) {
+        linkStmt.run(itemId, tagRow.id);
+      }
+    }
+    syncFtsIndex(db, itemId);
+  });
+
+  transaction(aiTags);
+}
+
+export function setTags(db: Database, itemId: string, tags: string[], isAiGenerated = false): void {
+  const insertTagStmt = db.prepare(`INSERT OR IGNORE INTO tags (id, name) VALUES (?, ?)`);
+  const getTagStmt = db.prepare(`SELECT id FROM tags WHERE name = ? COLLATE NOCASE`);
+  const linkStmt = db.prepare(`
+    INSERT INTO item_tags (item_id, tag_id, is_ai_generated) VALUES (?, ?, ?)
+    ON CONFLICT(item_id, tag_id) DO UPDATE SET
+      is_ai_generated = excluded.is_ai_generated
+  `);
 
   const transaction = db.transaction((tagList: string[]) => {
+    if (!isAiGenerated) {
+      const cleanList = tagList.map((t) => t.trim().toLowerCase()).filter(Boolean);
+      const allItemTags = db.prepare(`
+        SELECT t.id, t.name, it.is_ai_generated
+        FROM item_tags it
+        JOIN tags t ON t.id = it.tag_id
+        WHERE it.item_id = ?
+      `).all(itemId) as { id: string; name: string; is_ai_generated: number }[];
+
+      for (const existingTag of allItemTags) {
+        if (!cleanList.includes(existingTag.name.toLowerCase())) {
+          db.prepare(`DELETE FROM item_tags WHERE item_id = ? AND tag_id = ?`).run(itemId, existingTag.id);
+        }
+      }
+    }
+
     for (const rawTag of tagList) {
       const cleanTag = rawTag.trim().toLowerCase();
       if (!cleanTag) continue;
 
       insertTagStmt.run(randomUUID(), cleanTag);
-      const tagRow = getTagStmt.get(cleanTag) as { id: string };
+      const tagRow = getTagStmt.get(cleanTag) as { id: string } | undefined;
       if (tagRow) {
         linkStmt.run(itemId, tagRow.id, isAiGenerated ? 1 : 0);
       }

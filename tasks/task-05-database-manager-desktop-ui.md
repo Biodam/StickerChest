@@ -23,6 +23,7 @@
 - [x] Implement layout framework (`Sidebar.tsx`, `Header.tsx`, `StickerGrid.tsx`, `InspectorDrawer.tsx`, `SettingsModal.tsx`, `IngestionBanner.tsx`) using Tailwind CSS.
 - [x] Create responsive sticker grid with thumbnail previews, GIF badges, and empty states.
 - [x] Implement inspector drawer for displaying and editing item details, adding/removing tags, and re-analyzing with Gemini.
+- [x] Add user-edited metadata marking (`is_user_edited = 1`), user-locked fields, and lock indicators in UI with AI overwrite protection guarantee.
 - [x] Implement filtering controls: All, Recent, Favorites, Animated GIFs, and real-time full-text search.
 - [x] Implement dynamic facet filters in the sidebar: Franchises, Characters, and Tags, frequency-sorted with count badges and active filter chips.
 - [x] Build Settings modal with folder selection dialog and Gemini API key verification.

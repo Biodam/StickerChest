@@ -17,6 +17,7 @@ export interface StickerItem {
   variants: Record<ImageTier, StickerVariant | null>;
   metadata: StickerMetadata | null;
   tags: string[];
+  userTags: string[];
   customAttributes: Record<string, string>;
   usage: UsageStats;
 }
@@ -44,6 +45,8 @@ export interface StickerMetadata {
   aiModel: string | null;
   aiStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'manual_only';
   aiError?: string | null;
+  userLockedFields: string[];
+  isUserEdited: boolean;
   createdAt: string;
   updatedAt: string;
 }

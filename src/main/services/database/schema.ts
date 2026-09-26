@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS metadata (
     ai_status TEXT DEFAULT 'pending' CHECK(ai_status IN ('pending', 'processing', 'completed', 'failed', 'manual_only')),
     ai_error TEXT,
     raw_ai_json TEXT,
+    user_locked_fields TEXT DEFAULT '[]',
+    is_user_edited INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -182,4 +184,12 @@ END;
 
 export function initializeSchema(db: Database): void {
   db.exec(SCHEMA_SQL);
+
+  // Safe migrations for existing databases
+  try {
+    db.exec(`ALTER TABLE metadata ADD COLUMN user_locked_fields TEXT DEFAULT '[]'`);
+  } catch {}
+  try {
+    db.exec(`ALTER TABLE metadata ADD COLUMN is_user_edited INTEGER DEFAULT 0`);
+  } catch {}
 }

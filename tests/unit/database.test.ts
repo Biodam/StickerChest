@@ -327,4 +327,64 @@ describe('StickerDatabaseDAL & SQLite Schema', () => {
     const tagRes = dal.searchItems({ tag: 'smug' });
     expect(tagRes.total).toBe(2);
   });
+
+  it('should protect user-edited metadata fields and user tags from being overwritten by AI', () => {
+    const itemId = dal.upsertItem({
+      sha256Hash: 'lock-test-hash',
+      filename: 'roxy_custom.png',
+      originalPath: '/curated/roxy_custom.png',
+      ext: '.png',
+      mimeType: 'image/png',
+      width: 200,
+      height: 200,
+      fileSizeBytes: 5000,
+      isAnimated: false,
+    });
+
+    // 1. User performs manual edit: sets character, source, custom user tags
+    dal.saveMetadata({
+      itemId,
+      character: 'Roxy Migurdia',
+      sourceOrigin: 'Mushoku Tensei',
+      action: 'casting spell',
+      tags: ['favorite-waifu', 'goddess'],
+      userLockedFields: ['character', 'source_origin'],
+      isUserEdited: true,
+      aiStatus: 'manual_only',
+    });
+
+    let item = dal.getItemById(itemId);
+    expect(item?.metadata?.character).toBe('Roxy Migurdia');
+    expect(item?.metadata?.sourceOrigin).toBe('Mushoku Tensei');
+    expect(item?.metadata?.isUserEdited).toBe(true);
+    expect(item?.metadata?.userLockedFields).toEqual(['character', 'source_origin']);
+    expect(item?.userTags).toEqual(['favorite-waifu', 'goddess']);
+
+    // 2. AI tagging service attempts to overwrite with AI results
+    dal.saveMetadata({
+      itemId,
+      character: 'Different Character Name', // Must be ignored!
+      sourceOrigin: 'Wrong Anime Origin',   // Must be ignored!
+      action: 'reading grimoire',            // Can update (not user-locked)
+      feeling: 'calm focus',                 // Can update (not user-locked)
+      description: 'AI detected description',
+      tags: ['magic', 'blue-hair', 'favorite-waifu'], // AI tags should be merged; user tags protected!
+      isUserEdited: false,
+      aiStatus: 'completed',
+    });
+
+    // 3. Verify user-locked fields were NOT overwritten by AI
+    item = dal.getItemById(itemId);
+    expect(item?.metadata?.character).toBe('Roxy Migurdia'); // PRESERVED!
+    expect(item?.metadata?.sourceOrigin).toBe('Mushoku Tensei'); // PRESERVED!
+    expect(item?.metadata?.action).toBe('reading grimoire'); // Updated non-locked field
+    expect(item?.metadata?.feeling).toBe('calm focus'); // Updated non-locked field
+    expect(item?.metadata?.isUserEdited).toBe(true); // Still marked as user edited
+
+    // 4. Verify user tags are still present and marked as user tags
+    expect(item?.userTags).toContain('favorite-waifu');
+    expect(item?.userTags).toContain('goddess'); // User tag kept even though AI did not return it!
+    expect(item?.tags).toContain('magic'); // AI tag successfully merged
+    expect(item?.tags).toContain('blue-hair'); // AI tag successfully merged
+  });
 });

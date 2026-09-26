@@ -40,6 +40,8 @@ export interface MetadataRow {
   ai_status: 'pending' | 'processing' | 'completed' | 'failed' | 'manual_only';
   ai_error: string | null;
   raw_ai_json: string | null;
+  user_locked_fields?: string | null;
+  is_user_edited?: number;
   created_at: string;
   updated_at: string;
 }
@@ -88,6 +90,8 @@ export interface MetadataUpsertInput {
   aiStatus?: 'pending' | 'processing' | 'completed' | 'failed' | 'manual_only';
   aiError?: string | null;
   rawAiJson?: string | null;
+  userLockedFields?: string[];
+  isUserEdited?: boolean;
   tags?: string[];
   customAttributes?: Record<string, string>;
 }

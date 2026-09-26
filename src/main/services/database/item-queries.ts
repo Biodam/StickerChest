@@ -90,10 +90,11 @@ export function hydrateItem(db: Database, row: ItemRow): StickerItem {
   const usageRow = db.prepare(`SELECT * FROM usage_stats WHERE item_id = ?`).get(row.id) as UsageRow | undefined;
 
   const tagRows = db.prepare(`
-    SELECT t.name FROM tags t
+    SELECT t.name, it.is_ai_generated FROM tags t
     JOIN item_tags it ON it.tag_id = t.id
     WHERE it.item_id = ?
-  `).all(row.id) as { name: string }[];
+    ORDER BY it.rowid ASC
+  `).all(row.id) as { name: string; is_ai_generated: number }[];
 
   const customRows = db.prepare(`
     SELECT attribute_key, attribute_value FROM custom_attributes WHERE item_id = ?
@@ -125,6 +126,13 @@ export function hydrateItem(db: Database, row: ItemRow): StickerItem {
     customAttributes[c.attribute_key] = c.attribute_value;
   }
 
+  let userLockedFields: string[] = [];
+  try {
+    if (metaRow?.user_locked_fields) {
+      userLockedFields = JSON.parse(metaRow.user_locked_fields);
+    }
+  } catch {}
+
   const metadata: StickerMetadata | null = metaRow ? {
     id: metaRow.id,
     itemId: metaRow.item_id,
@@ -136,6 +144,8 @@ export function hydrateItem(db: Database, row: ItemRow): StickerItem {
     aiModel: metaRow.ai_model,
     aiStatus: metaRow.ai_status,
     aiError: metaRow.ai_error,
+    userLockedFields,
+    isUserEdited: (metaRow.is_user_edited ?? 0) === 1,
     createdAt: metaRow.created_at,
     updatedAt: metaRow.updated_at,
   } : null;
@@ -157,6 +167,7 @@ export function hydrateItem(db: Database, row: ItemRow): StickerItem {
     variants: variantsMap,
     metadata,
     tags: tagRows.map((t) => t.name),
+    userTags: tagRows.filter((t) => t.is_ai_generated === 0).map((t) => t.name),
     customAttributes,
     usage: {
       itemId: row.id,

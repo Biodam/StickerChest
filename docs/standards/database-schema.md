@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS metadata (
     ai_status TEXT DEFAULT 'pending' CHECK(ai_status IN ('pending', 'processing', 'completed', 'failed', 'manual_only')),
     ai_error TEXT,
     raw_ai_json TEXT,                          -- Full raw AI payload
+    user_locked_fields TEXT DEFAULT '[]',      -- JSON array of user-locked field names protected from AI overwrite
+    is_user_edited INTEGER DEFAULT 0,          -- 1 if user manually edited metadata or tags
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -70,6 +72,7 @@ CREATE TABLE IF NOT EXISTS metadata (
 CREATE INDEX IF NOT EXISTS idx_metadata_character ON metadata(character);
 CREATE INDEX IF NOT EXISTS idx_metadata_source ON metadata(source_origin);
 CREATE INDEX IF NOT EXISTS idx_metadata_ai_status ON metadata(ai_status);
+CREATE INDEX IF NOT EXISTS idx_metadata_user_edited ON metadata(is_user_edited);
 ```
 
 ### 1.4 `tags` & `item_tags`
