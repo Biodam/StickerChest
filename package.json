@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "> ⚠️ **DISCLAIMER: AI-GENERATED APPLICATION**   > This software is **entirely AI-generated** by Antigravity (Google DeepMind). All architecture, source code, documentation, and task plans were produced autonomously under prompt direction.",
   "main": "dist-electron/main/index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "package": "npm run build && electron-builder --win --dir",
+    "dist": "npm run build && electron-builder --win"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +34,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.6.1",
     "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
