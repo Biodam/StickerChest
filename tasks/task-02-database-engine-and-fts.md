@@ -1,6 +1,6 @@
 # Task 02: Database Engine & FTS5
 
-**Status**: ⚪ Not Started  
+**Status**: 🟢 Completed  
 **Milestone**: M2  
 **Estimated Complexity**: Medium
 
@@ -20,16 +20,16 @@
 ---
 
 ## Implementation Checklist
-- [ ] Create `src/main/services/database/connection.ts` managing the SQLite instance in the app user data directory.
-- [ ] Create migration system in `src/main/services/database/migrations/`.
-- [ ] Implement `src/main/services/database/dal.ts` with typed methods:
-  - `upsertItem(item: ItemInsert): Item`
-  - `upsertVariants(variants: VariantInsert[]): void`
-  - `saveMetadata(metadata: MetadataInsert): void`
-  - `searchItems(query: string, options: SearchOptions): SearchResult`
+- [x] Create `src/main/services/database/connection.ts` managing the SQLite instance in the app user data directory.
+- [x] Create schema initialization and migration system in `src/main/services/database/schema.ts`.
+- [x] Implement `src/main/services/database/dal.ts` and modular query files (`item-queries.ts`, `metadata-queries.ts`, `search-queries.ts`, `usage-queries.ts`) with typed methods:
+  - `upsertItem(item: ItemInsertInput): string`
+  - `upsertVariant(variant: VariantInsertInput): string`
+  - `saveMetadata(metadata: MetadataUpsertInput): void`
+  - `searchItems(options: SearchFilterOptions): SearchResult`
   - `toggleFavorite(itemId: string): boolean`
   - `recordItemUsage(itemId: string): void`
-- [ ] Create automated tests in `tests/unit/database.test.ts` verifying:
+- [x] Create automated tests in `tests/unit/database.test.ts` verifying:
   - Table creation and foreign key constraints
   - FTS5 query matching characters, feelings, and tags
   - Trigger updates when metadata changes

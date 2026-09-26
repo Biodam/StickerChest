@@ -1,8 +1,12 @@
 import { ipcMain, dialog } from 'electron';
 import { hidePickerWindow } from '../windows/pickerWindow';
 import { createMainWindow, getMainWindow } from '../windows/mainWindow';
+import { registerDbIpcHandlers } from './db-handlers';
 
 export function registerIpcHandlers(): void {
+  // Database handlers
+  registerDbIpcHandlers();
+
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {
     hidePickerWindow();
@@ -14,7 +18,7 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('dialog:selectFolder', async () => {
     const mainWindow = getMainWindow();
-    const result = await dialog.showOpenDialog(mainWindow || undefined as any, {
+    const result = await dialog.showOpenDialog(mainWindow || (undefined as any), {
       properties: ['openDirectory'],
       title: 'Select Curated Stickers Folder',
     });
@@ -24,23 +28,7 @@ export function registerIpcHandlers(): void {
     return result.filePaths[0];
   });
 
-  // Stubs for upcoming tasks (Task 2: Database, Task 3: Ingestion, Task 4: Gemini, etc.)
-  ipcMain.handle('db:search', async (_event, options) => {
-    return { items: [], total: 0 };
-  });
-
-  ipcMain.handle('db:getItem', async (_event, id) => {
-    return null;
-  });
-
-  ipcMain.handle('db:toggleFavorite', async (_event, itemId) => {
-    return false;
-  });
-
-  ipcMain.handle('db:updateMetadata', async (_event, itemId, metadata) => {
-    return true;
-  });
-
+  // Stubs for upcoming tasks (Task 3: Ingestion, Task 4: Gemini, etc.)
   ipcMain.handle('clipboard:copyItem', async (_event, itemId, tier) => {
     return true;
   });
