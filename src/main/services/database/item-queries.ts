@@ -2,6 +2,7 @@ import type { Database } from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 import { StickerItem, StickerVariant, StickerMetadata, ImageTier } from '../../../types/models';
 import { ItemInsertInput, VariantInsertInput, ItemRow, VariantRow, MetadataRow, UsageRow } from './types';
+import { resolveVaultPath } from '../ingestion/paths';
 
 export function upsertItem(db: Database, input: ItemInsertInput): string {
   const id = input.id || randomUUID();
@@ -110,7 +111,7 @@ export function hydrateItem(db: Database, row: ItemRow): StickerItem {
       id: v.id,
       itemId: v.item_id,
       tier: v.tier,
-      filePath: v.file_path,
+      filePath: resolveVaultPath(v.file_path),
       format: v.format,
       width: v.width,
       height: v.height,
@@ -143,7 +144,7 @@ export function hydrateItem(db: Database, row: ItemRow): StickerItem {
     id: row.id,
     sha256Hash: row.sha256_hash,
     filename: row.filename,
-    originalPath: row.original_path,
+    originalPath: resolveVaultPath(row.original_path),
     ext: row.ext,
     mimeType: row.mime_type,
     width: row.width,

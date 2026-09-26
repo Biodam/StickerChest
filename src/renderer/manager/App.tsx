@@ -162,7 +162,7 @@ export default function App() {
           }
         }}
         onSelectFolder={async () => window.stickerVault?.selectFolderDialog?.() || null}
-        onTestKey={async (key) => window.stickerVault?.testGeminiKey?.(key) || { valid: false }}
+        onTestKey={async (key, model) => window.stickerVault?.testGeminiKey?.(key, model) || { valid: false }}
       />
     </div>
   );

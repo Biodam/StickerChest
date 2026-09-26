@@ -19,12 +19,13 @@ export interface StickerVaultAPI {
   copyItemToClipboard: (itemId: string, tier?: ImageTier) => Promise<boolean>;
 
   // Vault & Ingestion
-  scanSourceFolder: (forceReprocess?: boolean) => Promise<{ started: boolean }>;
+  scanSourceFolder: (forceReprocess?: boolean, folderPath?: string) => Promise<{ started: boolean }>;
   onIngestionProgress: (callback: (progress: IngestionProgressEvent) => void) => () => void;
+  showItemInFolder: (filePath: string) => Promise<boolean>;
 
   // AI Tagging
   tagItemWithGemini: (itemId: string) => Promise<boolean>;
-  testGeminiKey: (apiKey: string) => Promise<{ valid: boolean; message?: string }>;
+  testGeminiKey: (apiKey: string, model?: string) => Promise<{ valid: boolean; message?: string }>;
 
   // Settings
   getSettings: () => Promise<AppSettings>;

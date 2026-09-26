@@ -1,6 +1,7 @@
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain, BrowserWindow, shell } from 'electron';
 import { getIngestionService } from '../services/ingestion/folder-watcher';
-import { getDatabaseDAL } from '../services/database/dal';
+import { loadSettings } from '../services/settings/settings-store';
+import { resolveVaultPath } from '../services/ingestion/paths';
 
 export function registerVaultIpcHandlers(): void {
   const ingestionService = getIngestionService();
@@ -15,15 +16,27 @@ export function registerVaultIpcHandlers(): void {
   });
 
   ipcMain.handle('vault:scan', async (_event, folderPath?: string, forceReprocess?: boolean) => {
-    if (!folderPath) {
-      return { started: false, error: 'No folder path provided' };
+    const targetFolder = folderPath || ingestionService.getWatchedPath() || loadSettings().sourceFolder;
+    if (!targetFolder) {
+      return { started: false, error: 'No folder path configured' };
     }
 
     // Launch scan asynchronously so IPC returns immediately
-    ingestionService.scanFolder(folderPath, forceReprocess).catch((err) => {
+    ingestionService.scanFolder(targetFolder, forceReprocess).catch((err) => {
       console.error('Scan error:', err);
     });
 
     return { started: true };
+  });
+
+  ipcMain.handle('vault:showItemInFolder', async (_event, filePath: string) => {
+    try {
+      const resolved = resolveVaultPath(filePath);
+      shell.showItemInFolder(resolved);
+      return true;
+    } catch (err: any) {
+      console.error('IPC vault:showItemInFolder error:', err);
+      return false;
+    }
   });
 }

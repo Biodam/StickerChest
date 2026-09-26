@@ -55,4 +55,32 @@ If the user selects a folder matching known cloud storage patterns (e.g. `Google
 To guarantee no files are missed when Google Drive syncs in the background:
 - The user can configure a periodic scan interval in Settings (default: **every 15 minutes**, or 5, 30, 60 minutes).
 - The periodic scanner runs lightweight incremental scans without freezing the UI.
-- Any newly discovered image or GIF is imported, resized, and immediately queued for Gemini AI vision tagging.
+- Any newly discovered image or GIF is imported, resized, and immediately queued for Gemini AI vision tagging (or local manual tagging if offline).
+
+---
+
+## 3. Portable Vault Architecture & Multi-Device Sync
+
+StickerVault organizes the selected cloud folder so it can be opened across multiple PCs and Macs without re-importing or re-processing:
+
+```
+<SelectedVaultFolder>/
+├── sources/               # User source images and GIFs (supports arbitrary subfolders)
+└── .stickervault/         # Hidden sync folder for database & processed variants
+    ├── stickervault.db    # SQLite 3 Database (WAL mode, schema & FTS5)
+    └── variants/
+        ├── sticker/       # 512x512 WebP / animated WebP
+        ├── emoji/         # 128x128 WebP / animated WebP
+        └── thumb/         # 96x96 WebP / animated WebP
+```
+
+### 3.1 Cross-Platform Relative Paths
+To ensure seamless interoperability between Windows (`G:\My Drive\Vault`) and macOS (`~/Library/CloudStorage/GoogleDrive-...`):
+- All database records store paths relative to the vault root (e.g. `.stickervault/variants/sticker/<hash>.webp` and `sources/reactions/cat.gif`).
+- The Data Access Layer (`item-queries.ts`) and custom protocol handler (`vault://`) dynamically resolve relative paths against the active machine's vault root.
+- Opening the same Google Drive folder on Mac or Windows immediately loads all stickers, tags, metadata, and pre-rendered thumbnails with zero reprocessing.
+
+### 3.2 Offline Local Mode
+- Gemini AI is completely optional: users can import, resize, search, and manually edit metadata (character, origin, action, feeling, description, tags) completely offline.
+- Vision AI tagging defaults to `gemini-3.8-flash` (or user-selectable models: `gemini-2.0-flash`, `gemini-1.5-flash`, `gemini-1.5-pro`).
+

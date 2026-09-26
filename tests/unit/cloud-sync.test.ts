@@ -53,4 +53,41 @@ describe('Cloud Drive Compatibility & Periodic Sync', () => {
     service.stopWatching();
     expect(service.getWatchedPath()).toBeNull();
   });
+
+  it('should create portable vault subfolders and resolve cross-platform paths', async () => {
+    const {
+      setCustomVaultRoot,
+      getVaultRoot,
+      ensureVaultDirectories,
+      getRelativePath,
+      resolveVaultPath,
+    } = await import('../../src/main/services/ingestion/paths');
+
+    setCustomVaultRoot(testDir);
+    expect(getVaultRoot()).toBe(testDir);
+
+    ensureVaultDirectories();
+    expect(fs.existsSync(path.join(testDir, 'sources'))).toBe(true);
+    expect(fs.existsSync(path.join(testDir, '.stickervault', 'variants', 'sticker'))).toBe(true);
+
+    const fullPath = path.join(testDir, 'sources', 'reaction.gif');
+    const rel = getRelativePath(fullPath);
+    expect(rel).toBe('sources/reaction.gif');
+
+    const resolved = resolveVaultPath('sources/reaction.gif');
+    expect(resolved).toBe(path.resolve(testDir, 'sources', 'reaction.gif'));
+  });
+
+  it('should switch SQLite database dynamically when selecting vault folder', async () => {
+    const { switchDatabase, getDatabase, closeDatabase } = await import(
+      '../../src/main/services/database/connection'
+    );
+    const customDbPath = path.join(testDir, '.stickervault', 'stickervault.db');
+
+    const newDb = switchDatabase(customDbPath);
+    expect(newDb).toBeDefined();
+    expect(getDatabase()).toBe(newDb);
+
+    closeDatabase();
+  });
 });

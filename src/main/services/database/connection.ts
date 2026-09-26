@@ -5,8 +5,11 @@ import { app } from 'electron';
 import { initializeSchema } from './schema';
 
 let activeDatabase: DatabaseInstance | null = null;
+let currentDbPath: string | null = null;
 
 export function getDatabasePath(): string {
+  if (currentDbPath) return currentDbPath;
+
   try {
     const userData = app.getPath('userData');
     return path.join(userData, 'stickervault.db');
@@ -39,9 +42,20 @@ export function getDatabase(): DatabaseInstance {
   return activeDatabase;
 }
 
+export function switchDatabase(newDbPath: string): DatabaseInstance {
+  closeDatabase();
+  currentDbPath = newDbPath;
+  activeDatabase = createDatabaseConnection(newDbPath);
+  return activeDatabase;
+}
+
 export function closeDatabase(): void {
   if (activeDatabase) {
-    activeDatabase.close();
+    try {
+      activeDatabase.close();
+    } catch (err) {
+      console.warn('Error closing database:', err);
+    }
     activeDatabase = null;
   }
 }

@@ -4,6 +4,7 @@ import { createMainWindow } from './windows/mainWindow';
 import { createPickerWindow } from './windows/pickerWindow';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts/globalShortcuts';
 import { registerIpcHandlers } from './ipc';
+import { resolveVaultPath } from './services/ingestion/paths';
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -22,7 +23,8 @@ app.whenReady().then(() => {
   protocol.handle('vault', (request) => {
     let pathname = request.url.slice('vault://'.length);
     pathname = decodeURIComponent(pathname);
-    return net.fetch(pathToFileURL(pathname).toString());
+    const resolved = resolveVaultPath(pathname);
+    return net.fetch(pathToFileURL(resolved).toString());
   });
 
   // Register IPC handlers

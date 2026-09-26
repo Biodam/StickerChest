@@ -8,10 +8,14 @@ import * as searchQueries from './search-queries';
 import * as usageQueries from './usage-queries';
 
 export class StickerDatabaseDAL {
-  private db: Database;
+  private customDb?: Database;
 
   constructor(customDb?: Database) {
-    this.db = customDb || getDatabase();
+    this.customDb = customDb;
+  }
+
+  private get db(): Database {
+    return this.customDb || getDatabase();
   }
 
   // Items & Variants

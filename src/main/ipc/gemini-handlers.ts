@@ -12,9 +12,9 @@ export function registerGeminiIpcHandlers(): void {
     }
   });
 
-  ipcMain.handle('gemini:testKey', async (_event, apiKey: string) => {
+  ipcMain.handle('gemini:testKey', async (_event, apiKey: string, model?: string) => {
     try {
-      const result = await testGeminiApiKey(apiKey);
+      const result = await testGeminiApiKey(apiKey, model);
       if (result.valid) {
         setGeminiApiKey(apiKey);
       }

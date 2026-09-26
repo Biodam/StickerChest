@@ -9,15 +9,16 @@ const api: StickerVaultAPI = {
 
   copyItemToClipboard: (itemId, tier) => ipcRenderer.invoke('clipboard:copyItem', itemId, tier),
 
-  scanSourceFolder: (forceReprocess) => ipcRenderer.invoke('vault:scan', forceReprocess),
+  scanSourceFolder: (forceReprocess, folderPath) => ipcRenderer.invoke('vault:scan', folderPath, forceReprocess),
   onIngestionProgress: (callback) => {
     const handler = (_event: any, data: any) => callback(data);
     ipcRenderer.on('vault:progress', handler);
     return () => ipcRenderer.removeListener('vault:progress', handler);
   },
+  showItemInFolder: (filePath) => ipcRenderer.invoke('vault:showItemInFolder', filePath),
 
   tagItemWithGemini: (itemId) => ipcRenderer.invoke('gemini:tagItem', itemId),
-  testGeminiKey: (apiKey) => ipcRenderer.invoke('gemini:testKey', apiKey),
+  testGeminiKey: (apiKey, model) => ipcRenderer.invoke('gemini:testKey', apiKey, model),
 
   getSettings: () => ipcRenderer.invoke('settings:get'),
   saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Copy, Sparkles, Star, Plus, Check } from 'lucide-react';
+import { X, Copy, Sparkles, Star, Check } from 'lucide-react';
 import { StickerItem, ImageTier } from '../../../types/models';
 import { getVaultImageUrl } from '../../shared/image-url';
+import { MetadataForm } from './MetadataForm';
 
 interface InspectorDrawerProps {
   item: StickerItem;
@@ -22,7 +23,6 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
 }) => {
   const [selectedTier, setSelectedTier] = useState<ImageTier>('sticker');
   const [copied, setCopied] = useState(false);
-  const [newTagInput, setNewTagInput] = useState('');
 
   const previewPath =
     selectedTier === 'emoji'
@@ -39,17 +39,10 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleAddTag = (e: React.FormEvent) => {
-    e.preventDefault();
-    const clean = newTagInput.trim().toLowerCase();
-    if (!clean || item.tags.includes(clean)) return;
-
-    onUpdateMetadata(item.id, { tags: [...item.tags, clean] });
-    setNewTagInput('');
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    onUpdateMetadata(item.id, { tags: item.tags.filter((t) => t !== tagToRemove) });
+  const handleShowInFolder = () => {
+    if (window.stickerVault?.showItemInFolder) {
+      window.stickerVault.showItemInFolder(item.originalPath);
+    }
   };
 
   return (
@@ -105,84 +98,51 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
         </div>
       </div>
 
-      {/* AI Metadata Details */}
-      <div className="p-4 space-y-4 text-xs">
+      {/* Metadata & Tagging Section */}
+      <div className="p-4 space-y-3.5 text-xs">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-gray-400 uppercase tracking-wider text-[10px]">AI Metadata</span>
+          <div className="flex items-center space-x-1.5">
+            <span className="font-semibold text-gray-400 uppercase tracking-wider text-[10px]">Sticker Metadata</span>
+            <span className={`text-[9px] px-1.5 py-0.2 rounded font-medium ${
+              item.metadata?.aiStatus === 'completed'
+                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+            }`}>
+              {item.metadata?.aiStatus === 'completed' ? 'AI Tagged' : 'Manual'}
+            </span>
+          </div>
           <button
             onClick={() => onTagWithGemini(item.id)}
             className="flex items-center space-x-1 text-amber-400 hover:text-amber-300 font-medium"
+            title="Analyze using Gemini Vision AI"
           >
             <Sparkles className="w-3 h-3" />
-            <span>Re-analyze</span>
+            <span>AI Tag</span>
           </button>
         </div>
 
-        <div>
-          <label className="text-gray-400 block mb-1">Character</label>
-          <p className="font-medium text-gray-200 bg-[#25262b] px-2.5 py-1.5 rounded-lg border border-[#2c2e33]">
-            {item.metadata?.character || <span className="text-gray-500 italic">Unknown</span>}
-          </p>
-        </div>
+        {/* Embedded Metadata Form */}
+        <MetadataForm item={item} onUpdateMetadata={onUpdateMetadata} />
 
-        <div>
-          <label className="text-gray-400 block mb-1">Source / Origin</label>
-          <p className="font-medium text-gray-200 bg-[#25262b] px-2.5 py-1.5 rounded-lg border border-[#2c2e33]">
-            {item.metadata?.sourceOrigin || <span className="text-gray-500 italic">None</span>}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="text-gray-400 block mb-1">Action</label>
-            <p className="font-medium text-gray-200 bg-[#25262b] px-2.5 py-1.5 rounded-lg border border-[#2c2e33] truncate">
-              {item.metadata?.action || <span className="text-gray-500 italic">None</span>}
-            </p>
-          </div>
-          <div>
-            <label className="text-gray-400 block mb-1">Feeling</label>
-            <p className="font-medium text-gray-200 bg-[#25262b] px-2.5 py-1.5 rounded-lg border border-[#2c2e33] truncate">
-              {item.metadata?.feeling || <span className="text-gray-500 italic">None</span>}
-            </p>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className="text-gray-400 block mb-1.5">Tags & Keywords</label>
-          <div className="flex flex-wrap gap-1.5 mb-2">
-            {item.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center space-x-1 bg-[#25262b] border border-[#2c2e33] px-2 py-0.5 rounded-md text-[11px] text-gray-300"
-              >
-                <span>#{tag}</span>
-                <button onClick={() => handleRemoveTag(tag)} className="text-gray-500 hover:text-red-400 ml-0.5">
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-
-          <form onSubmit={handleAddTag} className="flex space-x-1.5">
-            <input
-              type="text"
-              placeholder="Add tag..."
-              value={newTagInput}
-              onChange={(e) => setNewTagInput(e.target.value)}
-              className="flex-1 px-2.5 py-1 bg-[#25262b] border border-[#2c2e33] rounded-md text-xs placeholder-gray-500 text-gray-200 focus:outline-none focus:border-blue-500"
-            />
-            <button type="submit" className="p-1 rounded-md bg-[#25262b] border border-[#2c2e33] text-gray-400 hover:text-white">
-              <Plus className="w-4 h-4" />
+        {/* Source File & File Details */}
+        <div className="pt-2 border-t border-[#2c2e33] text-gray-400 text-[11px] space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-gray-300">Source File</span>
+            <button
+              onClick={handleShowInFolder}
+              className="text-blue-400 hover:text-blue-300 underline font-medium text-[10px]"
+            >
+              Show in Folder
             </button>
-          </form>
-        </div>
-
-        {/* Usage Stats */}
-        <div className="pt-2 border-t border-[#2c2e33] text-gray-500 text-[11px] space-y-1">
-          <p>Copied: {item.usage.copyCount} times</p>
-          <p>Dimensions: {item.width} × {item.height} px</p>
-          <p className="truncate">File: {item.filename}</p>
+          </div>
+          <p className="truncate text-gray-300 font-mono text-[10px] bg-[#121316] p-1.5 rounded border border-[#2c2e33]">
+            {item.originalPath}
+          </p>
+          <div className="flex justify-between text-gray-500 text-[10px]">
+            <span>{item.width} × {item.height} px ({item.ext.toUpperCase()})</span>
+            <span>{(item.fileSizeBytes / 1024).toFixed(1)} KB</span>
+          </div>
+          <p className="text-gray-500 text-[10px]">Copied {item.usage.copyCount} times</p>
         </div>
       </div>
     </aside>

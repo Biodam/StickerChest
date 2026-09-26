@@ -4,7 +4,7 @@ import { parseGeminiResponse } from './parser';
 import { GeminiStickerResponse } from './types';
 
 let globalApiKey: string | null = process.env.GEMINI_API_KEY || null;
-let globalModel = 'gemini-2.5-flash';
+let globalModel = 'gemini-3.8-flash';
 
 export function setGeminiApiKey(key: string): void {
   globalApiKey = key.trim();
@@ -15,19 +15,28 @@ export function getGeminiApiKey(): string | null {
 }
 
 export function setGeminiModel(model: string): void {
-  globalModel = model;
+  globalModel = model.replace(/^models\//, '').trim() || 'gemini-3.8-flash';
 }
 
-export async function testGeminiApiKey(apiKey: string): Promise<{ valid: boolean; message?: string }> {
+export function getGeminiModel(): string {
+  return globalModel;
+}
+
+export async function testGeminiApiKey(
+  apiKey: string,
+  modelName = globalModel
+): Promise<{ valid: boolean; message?: string }> {
   if (!apiKey || apiKey.trim().length < 10) {
     return { valid: false, message: 'API key is too short or empty' };
   }
 
+  const cleanModel = (modelName || globalModel).replace(/^models\//, '').trim() || 'gemini-3.8-flash';
+
   try {
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
     const response = await ai.models.generateContent({
-      model: globalModel,
-      contents: ['Respond with the single word "OK" if this test ping succeeds.'],
+      model: cleanModel,
+      contents: ['Respond with "OK".'],
     });
 
     const text = response.text || '';

@@ -123,8 +123,12 @@ describe('Gemini AI Vision Metadata Service', () => {
     db.close();
   });
 
-  it('should manage API key setter and getter', () => {
+  it('should manage API key and model setters and getters', async () => {
+    const { setGeminiModel, getGeminiModel } = await import('../../src/main/services/gemini/client');
     setGeminiApiKey('test-key-12345');
     expect(getGeminiApiKey()).toBe('test-key-12345');
+
+    setGeminiModel('models/gemini-3.8-flash');
+    expect(getGeminiModel()).toBe('gemini-3.8-flash');
   });
 });

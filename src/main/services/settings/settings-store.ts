@@ -5,11 +5,13 @@ import { AppSettings } from '../../../types/models';
 import { setGeminiApiKey, setGeminiModel } from '../gemini/client';
 import { registerGlobalShortcuts } from '../../shortcuts/globalShortcuts';
 import { getIngestionService } from '../ingestion/folder-watcher';
+import { setCustomVaultRoot, ensureVaultDirectories } from '../ingestion/paths';
+import { switchDatabase } from '../database/connection';
 
 const DEFAULT_SETTINGS: AppSettings = {
   sourceFolder: '',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
-  geminiModel: 'gemini-2.5-flash',
+  geminiModel: 'gemini-3.8-flash',
   globalShortcut: 'Alt+Shift+V',
   preferredCopyTier: 'sticker',
   autoStartAtLogin: false,
@@ -46,6 +48,11 @@ export function loadSettings(): AppSettings {
     loaded = { ...DEFAULT_SETTINGS };
   }
 
+  // Auto-upgrade deprecated gemini-2.5-flash model
+  if (loaded.geminiModel === 'gemini-2.5-flash') {
+    loaded.geminiModel = 'gemini-3.8-flash';
+  }
+
   cachedSettings = loaded;
 
   if (loaded.geminiApiKey) {
@@ -55,6 +62,10 @@ export function loadSettings(): AppSettings {
     setGeminiModel(loaded.geminiModel);
   }
   if (loaded.sourceFolder) {
+    setCustomVaultRoot(loaded.sourceFolder);
+    ensureVaultDirectories();
+    const dbPath = path.join(loaded.sourceFolder, '.stickervault', 'stickervault.db');
+    switchDatabase(dbPath);
     getIngestionService().startWatching(loaded.sourceFolder, loaded.syncIntervalMinutes);
   }
 
@@ -90,6 +101,10 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
     getIngestionService().setPeriodicInterval(partial.syncIntervalMinutes);
   }
   if (partial.sourceFolder && partial.sourceFolder !== current.sourceFolder) {
+    setCustomVaultRoot(partial.sourceFolder);
+    ensureVaultDirectories();
+    const dbPath = path.join(partial.sourceFolder, '.stickervault', 'stickervault.db');
+    switchDatabase(dbPath);
     getIngestionService().startWatching(partial.sourceFolder, updated.syncIntervalMinutes);
   }
 

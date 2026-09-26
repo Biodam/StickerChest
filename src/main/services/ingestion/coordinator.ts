@@ -3,7 +3,7 @@ import path from 'path';
 import { calculateFileSha256 } from '../imaging/hasher';
 import { detectImageInfo } from '../imaging/format-detector';
 import { generateStickerVariant, generateEmojiVariant, generateThumbnailVariant } from '../imaging/resizer';
-import { ensureVaultDirectories, getVariantOutputPath } from './paths';
+import { ensureVaultDirectories, getVariantOutputPath, getRelativePath } from './paths';
 import { StickerDatabaseDAL, getDatabaseDAL } from '../database/dal';
 import { waitUntilFileStable } from './cloud-sync-helper';
 import { tagStickerItem } from '../gemini/tagger-service';
@@ -48,12 +48,13 @@ export async function ingestImageFile(
   const ext = path.extname(filePath).toLowerCase();
   const filename = path.basename(filePath);
 
-  // 5. Upsert item in database
+  // 5. Upsert item in database with relative path for cross-platform sync
+  const relativeOriginal = getRelativePath(filePath);
   const itemId = dal.upsertItem({
     id: existing?.id,
     sha256Hash: hash,
     filename,
-    originalPath: filePath,
+    originalPath: relativeOriginal,
     ext,
     mimeType: info.mimeType,
     width: info.width,
@@ -74,11 +75,11 @@ export async function ingestImageFile(
     generateThumbnailVariant(filePath, thumbPath, info.isAnimated),
   ]);
 
-  // 7. Save variants in database
+  // 7. Save variants in database with relative paths
   dal.upsertVariant({
     itemId,
     tier: 'sticker',
-    filePath: stickerRes.filePath,
+    filePath: getRelativePath(stickerRes.filePath),
     format: stickerRes.format,
     width: stickerRes.width,
     height: stickerRes.height,
@@ -88,7 +89,7 @@ export async function ingestImageFile(
   dal.upsertVariant({
     itemId,
     tier: 'emoji',
-    filePath: emojiRes.filePath,
+    filePath: getRelativePath(emojiRes.filePath),
     format: emojiRes.format,
     width: emojiRes.width,
     height: emojiRes.height,
@@ -98,18 +99,32 @@ export async function ingestImageFile(
   dal.upsertVariant({
     itemId,
     tier: 'thumb',
-    filePath: thumbRes.filePath,
+    filePath: getRelativePath(thumbRes.filePath),
     format: thumbRes.format,
     width: thumbRes.width,
     height: thumbRes.height,
     fileSizeBytes: thumbRes.fileSizeBytes,
   });
 
-  // 8. If new item and auto-tag enabled, trigger Gemini AI in background
-  if (!existing && autoTagAi && getGeminiApiKey()) {
-    tagStickerItem(itemId, dal).catch((aiErr) => {
-      console.warn(`Background auto-tagging error for ${itemId}:`, aiErr);
-    });
+  // 8. If new item, tag with AI if key available, or create manual metadata record
+  if (!existing) {
+    if (autoTagAi && getGeminiApiKey()) {
+      tagStickerItem(itemId, dal).catch((aiErr) => {
+        console.warn(`Background auto-tagging error for ${itemId}:`, aiErr);
+      });
+    } else {
+      const cleanName = path.parse(filename).name.replace(/[-_]/g, ' ');
+      dal.saveMetadata({
+        itemId,
+        character: null,
+        sourceOrigin: null,
+        action: null,
+        feeling: null,
+        description: null,
+        tags: [cleanName.toLowerCase()],
+        aiStatus: 'manual_only',
+      });
+    }
   }
 
   return { itemId, isNew: !existing, sha256Hash: hash };
