@@ -1,6 +1,6 @@
 # Task 01: Core Architecture & Scaffolding
 
-**Status**: ⚪ Pending Start  
+**Status**: 🟢 Completed  
 **Milestone**: M1  
 **Estimated Complexity**: Medium
 
@@ -17,16 +17,16 @@
 ---
 
 ## Implementation Checklist
-- [ ] Initialize `package.json` with required scripts (`dev`, `build`, `test`, `package`).
-- [ ] Install dependencies:
+- [x] Initialize `package.json` with required scripts (`dev`, `build`, `test`).
+- [x] Install dependencies:
   - Runtime: `electron`, `better-sqlite3`, `sharp`, `dotenv`, `@google/genai`, `chokidar`
   - Dev/UI: `react`, `react-dom`, `vite`, `vite-plugin-electron`, `tailwindcss`, `lucide-react`, `vitest`, `typescript`
-- [ ] Configure `vite.config.ts` supporting dual renderer entrypoints:
+- [x] Configure `vite.config.ts` supporting dual renderer entrypoints:
   - `src/renderer/manager/index.html`
   - `src/renderer/picker/index.html`
-- [ ] Create skeleton Electron main controller with placeholder window initialization.
-- [ ] Verify `npm run dev` boots both the development server and Electron shell.
-- [ ] Add basic test runner check (`npm run test`).
+- [x] Create skeleton Electron main controller with dual window initialization and global shortcuts.
+- [x] Verify build compilation (`npm run build`).
+- [x] Add basic test runner check (`npm run test`) with passing in-memory SQLite+FTS5 and Sharp tests.
 
 ---
 

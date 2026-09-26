@@ -19,8 +19,8 @@ This document tracks high-level progress across the core development milestones 
 
 | Milestone | Title | Target Scope | Status |
 |---|---|---|---|
-| **M1** | **Core Architecture & Scaffolding** | Monorepo setup, Electron + Vite + React + TS, build configurations, linting | 🟡 Pending Start |
-| **M2** | **Database Engine & FTS5** | SQLite 3 setup, migrations, FTS5 triggers, DAL queries, usage stats | ⚪ Not Started |
+| **M1** | **Core Architecture & Scaffolding** | Monorepo setup, Electron + Vite + React + TS, build configurations, linting | 🟢 Completed |
+| **M2** | **Database Engine & FTS5** | SQLite 3 setup, migrations, FTS5 triggers, DAL queries, usage stats | 🟡 Ready to Start |
 | **M3** | **Ingestion & Resizing Pipeline** | SHA-256 deduplication, Sharp multi-tier resizing (emoji, sticker, thumb), GIF support | ⚪ Not Started |
 | **M4** | **Gemini AI Metadata Tagger** | GenAI SDK integration, vision prompt schema, batch queue, manual metadata override | ⚪ Not Started |
 | **M5** | **Manager Desktop UI** | Library grid, search/filter sidebar, inspector drawer, bulk tagger, settings | ⚪ Not Started |
