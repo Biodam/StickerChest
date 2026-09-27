@@ -40,6 +40,21 @@
   - `"dist:all": "npm run build && electron-builder -mwl"`
 - [x] Create `.github/workflows/release.yml` with dual-OS matrix build (`windows-latest`, `macos-latest`) to compile native C++ modules on their respective native platforms and publish release assets.
 - [x] Test and verify electron-builder configuration.
+- [x] Successfully deployed first production release `v0.0.1` via GitHub Actions with Windows & macOS multiplatform installers.
+
+---
+
+## Release Verification (v0.0.1)
+- **Tag**: `v0.0.1`
+- **Release URL**: [https://github.com/Biodam/sticker-database-manager/releases/tag/v0.0.1](https://github.com/Biodam/sticker-database-manager/releases/tag/v0.0.1)
+- **Published Artifacts**:
+  - `StickerVault.Setup.0.0.1.exe` (Windows NSIS Setup Installer)
+  - `StickerVault.0.0.1.exe` (Windows Standalone Portable Executable)
+  - `StickerVault-0.0.1.dmg` (macOS Intel x64 DMG)
+  - `StickerVault-0.0.1-arm64.dmg` (macOS Apple Silicon arm64 DMG)
+  - `StickerVault-0.0.1-mac.zip` (macOS Intel x64 App Bundle)
+  - `StickerVault-0.0.1-arm64-mac.zip` (macOS Apple Silicon App Bundle)
+  - `latest.yml` & `latest-mac.yml` (Auto-update distribution manifests)
 
 ---
 
@@ -48,3 +63,4 @@
 2. Update `tasks/milestones.md` (M9 status).
 3. Run tests: `npm run test && npm run build`.
 4. Commit: `git commit -m "chore(dist): configure windows nsis installer, macos dmg, and github release pipeline"`.
+
