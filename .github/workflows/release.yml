@@ -44,6 +44,9 @@ jobs:
 
       - name: Build Windows NSIS & Portable executables
         run: npm run dist:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Windows Installers
         uses: actions/upload-artifact@v4
@@ -78,6 +81,10 @@ jobs:
 
       - name: Build macOS DMG & Zip bundles
         run: npm run dist:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Upload macOS Installers
         uses: actions/upload-artifact@v4
