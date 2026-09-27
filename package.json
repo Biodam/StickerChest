@@ -14,6 +14,7 @@
     "dist:win": "npm run build && electron-builder --win --publish never",
     "dist:mac": "npm run build && electron-builder --mac --publish never",
     "dist:all": "npm run build && electron-builder -mwl --publish never",
+    "check-quota": "node scripts/check-quota.js",
     "release": "node scripts/release.js"
   },
   "keywords": [],

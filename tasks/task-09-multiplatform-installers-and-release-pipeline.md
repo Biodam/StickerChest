@@ -41,6 +41,7 @@
 - [x] Create `.github/workflows/release.yml` with dual-OS matrix build (`windows-latest`, `macos-latest`) to compile native C++ modules on their respective native platforms and publish release assets.
 - [x] Test and verify electron-builder configuration.
 - [x] Successfully deployed first production release `v0.0.1` via GitHub Actions with Windows & macOS multiplatform installers.
+- [x] Setup quota and repository visibility preflight checks (`scripts/check-quota.js`, CI & Release workflow preflight jobs, concurrency auto-cancel).
 
 ---
 
@@ -55,6 +56,14 @@
   - `StickerVault-0.0.1-mac.zip` (macOS Intel x64 App Bundle)
   - `StickerVault-0.0.1-arm64-mac.zip` (macOS Apple Silicon App Bundle)
   - `latest.yml` & `latest-mac.yml` (Auto-update distribution manifests)
+
+---
+
+## Quota & Cost Protection System
+- **Local Preflight Tool**: `npm run check-quota` inspects repository visibility and live GitHub Actions billing minutes before any builds fire.
+- **Release Guard**: `npm run release` automatically runs `checkQuota({ strict: true })` prior to version bumping or tag creation.
+- **CI / Release Matrix Guard**: `check-quota` job runs on `ubuntu-latest` before any Windows or macOS matrix builders are started. If the repo is private and `ALLOW_PRIVATE_BUILDS` is not explicitly set, the run fails immediately without consuming billable runner minutes.
+- **Concurrency Control**: Automatic cancellation of superseded in-progress builds (`concurrency: cancel-in-progress: true`) across both CI and Release workflows.
 
 ---
 

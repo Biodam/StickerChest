@@ -1,6 +1,10 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { checkQuota } from './check-quota.js';
+
+// Preflight quota and repository visibility check
+await checkQuota({ strict: true });
 
 const packageJsonPath = path.resolve(process.cwd(), 'package.json');
 const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));

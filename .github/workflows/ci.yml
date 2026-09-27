@@ -6,9 +6,38 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  check-quota:
+    name: Quota & Visibility Preflight Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Repository Visibility & Runner Quota
+        run: |
+          echo "============================================================"
+          echo "Repository: ${{ github.repository }}"
+          echo "Visibility: ${{ github.event.repository.private && 'PRIVATE' || 'PUBLIC' }}"
+          echo "============================================================"
+          if [ "${{ github.event.repository.private }}" = "true" ]; then
+            echo "⚠️ WARNING: Repository is PRIVATE."
+            echo "Private repository runs consume billable Actions minutes (macOS: 10x multiplier)."
+            if [ "${{ vars.ALLOW_PRIVATE_BUILDS }}" != "true" ] && [ "${{ secrets.ALLOW_PRIVATE_BUILDS }}" != "true" ]; then
+              echo "❌ CI BLOCKED: Repository is private and ALLOW_PRIVATE_BUILDS is not set."
+              echo "Keep the repository public for 100% free runner minutes, or set secret/variable ALLOW_PRIVATE_BUILDS=true."
+              exit 1
+            else
+              echo "ℹ️ ALLOW_PRIVATE_BUILDS is enabled. Proceeding with CI."
+            fi
+          else
+            echo "✅ PASS: Repository is PUBLIC. Standard GitHub runners are 100% FREE with unlimited minutes."
+          fi
+
   test-and-build:
     name: Test & Build (${{ matrix.os }})
+    needs: check-quota
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
