@@ -2,6 +2,7 @@ import fs from 'fs';
 import { getGeminiQueue } from './queue';
 import { StickerDatabaseDAL, getDatabaseDAL } from '../database/dal';
 import { getGeminiApiKey, getGeminiModel } from './client';
+import { parseTagsFromFilename } from '../ingestion/filename-tagger';
 
 export async function tagStickerItem(
   itemId: string,
@@ -44,9 +45,11 @@ export async function tagStickerItem(
     const mimeType = imagePath.endsWith('.webp') ? 'image/webp' : item.mimeType;
 
     const queue = getGeminiQueue();
-    const result = await queue.enqueue(itemId, buffer, mimeType);
+    const result = await queue.enqueue(itemId, buffer, mimeType, item.filename);
 
     const model = getGeminiModel() || 'gemini-3.8-flash';
+    const filenameTags = parseTagsFromFilename(item.filename);
+    const mergedTags = Array.from(new Set([...(result.tags || []), ...filenameTags]));
 
     // Save extracted metadata into SQLite without overwriting user-locked fields
     dal.saveMetadata({
@@ -58,7 +61,7 @@ export async function tagStickerItem(
       description: result.description,
       aiModel: model,
       aiStatus: 'completed',
-      tags: result.tags,
+      tags: mergedTags,
       rawAiJson: JSON.stringify(result),
       isUserEdited: false,
     });

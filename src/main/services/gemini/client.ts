@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { GEMINI_STICKER_SYSTEM_PROMPT } from './prompts';
+import { buildGeminiTaggingPrompt } from './prompts';
 import { parseGeminiResponse } from './parser';
 import { GeminiStickerResponse } from './types';
 
@@ -55,7 +55,8 @@ export async function testGeminiApiKey(
 
 export async function requestGeminiTagging(
   buffer: Buffer,
-  mimeType: string
+  mimeType: string,
+  filename?: string
 ): Promise<GeminiStickerResponse> {
   if (!globalApiKey) {
     throw new Error('GEMINI_API_KEY is not configured');
@@ -65,6 +66,7 @@ export async function requestGeminiTagging(
   if (modelToUse === 'gemini-2.5-flash') modelToUse = 'gemini-3.8-flash';
 
   const ai = new GoogleGenAI({ apiKey: globalApiKey });
+  const promptText = buildGeminiTaggingPrompt(filename);
 
   const response = await ai.models.generateContent({
     model: modelToUse,
@@ -72,7 +74,7 @@ export async function requestGeminiTagging(
       {
         role: 'user',
         parts: [
-          { text: GEMINI_STICKER_SYSTEM_PROMPT },
+          { text: promptText },
           {
             inlineData: {
               mimeType,

@@ -27,3 +27,11 @@ export const GEMINI_JSON_SCHEMA = {
   },
   required: ['character', 'source', 'action', 'feeling', 'tags', 'description'],
 };
+
+export function buildGeminiTaggingPrompt(filename?: string): string {
+  let prompt = GEMINI_STICKER_SYSTEM_PROMPT;
+  if (filename) {
+    prompt += `\n\nImage filename context: "${filename}". Use any character name, franchise, action, or emotion/feeling indicated in this filename as a strong hint, but verify against the actual visual content.`;
+  }
+  return prompt;
+}

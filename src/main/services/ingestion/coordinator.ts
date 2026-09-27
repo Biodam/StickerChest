@@ -8,6 +8,7 @@ import { StickerDatabaseDAL, getDatabaseDAL } from '../database/dal';
 import { waitUntilFileStable } from './cloud-sync-helper';
 import { tagStickerItem } from '../gemini/tagger-service';
 import { getGeminiApiKey } from '../gemini/client';
+import { parseTagsFromFilename } from './filename-tagger';
 
 export interface IngestFileResult {
   itemId: string;
@@ -113,7 +114,11 @@ export async function ingestImageFile(
       console.warn(`Background auto-tagging error for ${itemId}:`, aiErr);
     });
   } else if (!existing) {
-    const cleanName = path.parse(filename).name.replace(/[-_]/g, ' ');
+    const filenameTags = parseTagsFromFilename(filename);
+    const fallbackTags = filenameTags.length > 0
+      ? filenameTags
+      : [path.parse(filename).name.replace(/[-_]/g, ' ').toLowerCase()];
+
     dal.saveMetadata({
       itemId,
       character: null,
@@ -121,7 +126,7 @@ export async function ingestImageFile(
       action: null,
       feeling: null,
       description: null,
-      tags: [cleanName.toLowerCase()],
+      tags: fallbackTags,
       aiStatus: 'manual_only',
     });
   }

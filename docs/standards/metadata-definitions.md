@@ -59,6 +59,12 @@ Do not output markdown codeblocks, only valid JSON.
 }
 ```
 
+### 2.3 Filename Parsing & Context Hinting
+Image filenames often contain critical character names, emotions, or memes (e.g. `miku_happy_dance.png`, `anya-smug-face.gif`, `PikachuSurprised.webp`).
+1. **Filename Tag Extraction**: The pipeline automatically parses tokens from filenames using CamelCase, snake_case, and kebab-case tokenizers, stripping noise like `(1)`, `512x512`, `IMG_` prefixes, or pure numbers.
+2. **AI Vision Context**: The filename is supplied directly in the prompt directive to Gemini as additional contextual guidance (`Image filename context: "..."`), greatly improving character and emotion recognition.
+3. **Tag Merging**: Extracted keywords from the filename are merged with Gemini's vision output to guarantee searchability even if an AI tag missed a specific synonym.
+
 ---
 
 ## 3. Custom Configured Metadata

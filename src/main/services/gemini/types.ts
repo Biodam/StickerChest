@@ -11,6 +11,7 @@ export interface TaggingTask {
   itemId: string;
   imageBuffer: Buffer;
   mimeType: string;
+  filename?: string;
   resolve: (value: GeminiStickerResponse) => void;
   reject: (reason: any) => void;
   retries: number;

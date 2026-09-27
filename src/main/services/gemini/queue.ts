@@ -16,13 +16,15 @@ export class GeminiQueue {
   public enqueue(
     itemId: string,
     imageBuffer: Buffer,
-    mimeType = 'image/webp'
+    mimeType = 'image/webp',
+    filename?: string
   ): Promise<GeminiStickerResponse> {
     return new Promise((resolve, reject) => {
       this.queue.push({
         itemId,
         imageBuffer,
         mimeType,
+        filename,
         resolve,
         reject,
         retries: 0,
@@ -43,7 +45,7 @@ export class GeminiQueue {
     this.activeWorkers++;
 
     try {
-      const result = await requestGeminiTagging(task.imageBuffer, task.mimeType);
+      const result = await requestGeminiTagging(task.imageBuffer, task.mimeType, task.filename);
       task.resolve(result);
     } catch (err: any) {
       const isRateLimited = err?.status === 429 || String(err?.message).includes('429') || String(err?.message).includes('RESOURCE_EXHAUSTED');
