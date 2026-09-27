@@ -1,6 +1,6 @@
 # Task 12: Animated Sticker & GIF Playback & Optimization Controls
 
-**Status**: ⏳ Planned  
+**Status**: 🟢 Completed  
 **Milestone**: M12  
 **Estimated Complexity**: Medium
 
@@ -23,13 +23,13 @@
 ---
 
 ## Implementation Checklist
-- [ ] Extend `AppSettings` in `src/types/models.ts` with `animationPlaybackMode: 'always' | 'hover' | 'reduced_motion'`.
-- [ ] Add playback configuration controls to `SettingsModal.tsx`.
-- [ ] Create an optimized `AnimatedStickerCard` component utilizing `IntersectionObserver` and hover-to-play state.
-- [ ] Update `PickerGrid.tsx` and `StickerGrid.tsx` to support hover-to-play and keyboard-focus animation trigger.
-- [ ] Add animation frame preview & telemetry section to `InspectorDrawer.tsx`.
-- [ ] Write unit tests in `tests/unit/animation-controls.test.ts`.
-- [ ] Run test suite (`npm run test`) and production build (`npm run build`).
+- [x] Extend `AppSettings` in `src/types/models.ts` with `animationPlaybackMode: 'always' | 'hover' | 'reduced_motion'`.
+- [x] Add playback configuration controls to `SettingsModal.tsx`.
+- [x] Create an optimized `AnimatedStickerImage` component utilizing `IntersectionObserver` and hover-to-play state.
+- [x] Update `PickerGrid.tsx` and `StickerCard.tsx` to support hover-to-play and keyboard-focus animation trigger.
+- [x] Add animation frame preview & telemetry section with play/pause controls to `InspectorDrawer.tsx`.
+- [x] Write unit tests in `tests/unit/animation-controls.test.ts` (4 passing tests).
+- [x] Run test suite (`npm run test`: 76/76 passing) and production build (`npm run build`).
 
 ---
 
@@ -38,3 +38,4 @@
 2. Update `tasks/milestones.md` (M12 status).
 3. Run tests: `npm run test && npm run build`.
 4. Commit: `git commit -m "feat(animation): implement animated sticker playback controls and viewport optimizations"`.
+

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Copy, Sparkles, Star, Check } from 'lucide-react';
+import { X, Copy, Sparkles, Star, Check, Film, Play, Pause } from 'lucide-react';
 import { StickerItem, ImageTier } from '../../../types/models';
 import { getChestImageUrl } from '../../shared/image-url';
+import { getAnimationTelemetry } from '../../shared/animation-helper';
 import { MetadataForm } from './MetadataForm';
 
 interface InspectorDrawerProps {
@@ -23,13 +24,21 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
 }) => {
   const [selectedTier, setSelectedTier] = useState<ImageTier>('sticker');
   const [copied, setCopied] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  const previewPath =
+  const telemetry = getAnimationTelemetry(item);
+
+  const activePath =
     selectedTier === 'emoji'
       ? item.variants.emoji?.filePath || item.originalPath
       : selectedTier === 'raw'
       ? item.originalPath
       : item.variants.sticker?.filePath || item.originalPath;
+
+  const previewPath =
+    item.isAnimated && !isPlaying
+      ? item.variants.thumb?.filePath || activePath
+      : activePath;
 
   const previewUrl = getChestImageUrl(previewPath);
 
@@ -58,9 +67,31 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
 
       {/* Preview Section */}
       <div className="p-4 border-b border-[#2c2e33] flex flex-col items-center">
-        <div className="w-48 h-48 rounded-xl bg-[#121316] border border-[#2c2e33] flex items-center justify-center p-2 mb-3 overflow-hidden shadow-inner">
+        <div className="relative w-48 h-48 rounded-xl bg-[#121316] border border-[#2c2e33] flex items-center justify-center p-2 mb-3 overflow-hidden shadow-inner group">
           <img src={previewUrl} alt={item.filename} className="max-w-full max-h-full object-contain" />
+
+          {/* Animation Play/Pause Overlay */}
+          {item.isAnimated && (
+            <button
+              onClick={() => setIsPlaying((prev) => !prev)}
+              title={isPlaying ? 'Pause animation' : 'Play animation'}
+              className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-black/70 hover:bg-black text-white/90 shadow transition-opacity"
+            >
+              {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+            </button>
+          )}
         </div>
+
+        {/* Animation Telemetry Bar */}
+        {item.isAnimated && (
+          <div className="w-full mb-3 px-2.5 py-1.5 bg-purple-950/30 border border-purple-800/40 rounded-lg flex items-center justify-between text-[11px] text-purple-300">
+            <div className="flex items-center space-x-1.5">
+              <Film className="w-3.5 h-3.5 text-purple-400" />
+              <span className="font-semibold">{telemetry.formatLabel}</span>
+            </div>
+            <span>{telemetry.durationText}</span>
+          </div>
+        )}
 
         {/* Tier Tabs */}
         <div className="flex bg-[#121316] p-1 rounded-lg border border-[#2c2e33] text-xs w-full mb-3">

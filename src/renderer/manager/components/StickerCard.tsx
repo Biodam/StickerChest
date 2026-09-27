@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Star, Film, ShieldAlert, Check } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
-import { getChestImageUrl } from '../../shared/image-url';
+import { AnimatedStickerImage } from '../../shared/AnimatedStickerImage';
 
 interface StickerCardProps {
   item: StickerItem;
@@ -18,7 +18,7 @@ export const StickerCard: React.FC<StickerCardProps> = ({
   onSelect,
   onToggleFavorite,
 }) => {
-  const imageUrl = getChestImageUrl(item.variants.thumb?.filePath || item.originalPath);
+  const [isHovered, setIsHovered] = useState(false);
   const title = item.metadata?.character || item.filename;
   const subtitle = item.metadata?.feeling || item.metadata?.action || (item.tags[0] ? `#${item.tags[0]}` : null);
   const isNsfw = item.customAttributes?.nsfw === 'true';
@@ -27,6 +27,8 @@ export const StickerCard: React.FC<StickerCardProps> = ({
   return (
     <div
       onClick={(e) => onSelect(item, e)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`group relative rounded-xl p-2.5 transition-all cursor-pointer flex flex-col items-center select-none ${
         isMultiSelected
           ? 'bg-blue-600/30 border-2 border-blue-400 shadow-lg shadow-blue-500/30'
@@ -62,12 +64,13 @@ export const StickerCard: React.FC<StickerCardProps> = ({
         <Star className={`w-3.5 h-3.5 ${item.usage.isFavorite ? 'fill-amber-400' : ''}`} />
       </button>
 
-      {/* Image Preview Box */}
+      {/* Image Preview Box with Viewport & Hover Awareness */}
       <div className="relative w-full aspect-square flex items-center justify-center p-2 rounded-lg bg-[#141517] overflow-hidden mb-2">
-        <img
-          src={imageUrl}
+        <AnimatedStickerImage
+          item={item}
+          isHovered={isHovered}
+          isSelected={isSelected}
           alt={title}
-          loading="lazy"
           className={`max-w-full max-h-full object-contain transition-all duration-200 group-hover:scale-105 ${
             isNsfw ? 'filter blur-md group-hover:blur-none' : ''
           }`}

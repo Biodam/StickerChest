@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Folder, Key, Sparkles, Check, AlertCircle, RefreshCw, Cloud, Clipboard } from 'lucide-react';
+import { X, Folder, Key, Sparkles, Check, AlertCircle, RefreshCw, Cloud, Clipboard, Film } from 'lucide-react';
 import { AppSettings } from '../../../types/models';
 
 interface SettingsModalProps {
@@ -27,6 +27,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [syncInterval, setSyncInterval] = useState(settings.syncIntervalMinutes ?? 15);
   const [autoTag, setAutoTag] = useState(settings.autoAiTagOnIngest ?? true);
   const [autoPaste, setAutoPaste] = useState(settings.autoPasteOnSelect ?? true);
+  const [animationMode, setAnimationMode] = useState<'always' | 'hover' | 'reduced_motion'>(
+    settings.animationPlaybackMode || 'hover'
+  );
   const [testStatus, setTestStatus] = useState<{ testing: boolean; valid?: boolean; message?: string }>({
     testing: false,
   });
@@ -39,6 +42,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setSyncInterval(settings.syncIntervalMinutes ?? 15);
     setAutoTag(settings.autoAiTagOnIngest ?? true);
     setAutoPaste(settings.autoPasteOnSelect ?? true);
+    setAnimationMode(settings.animationPlaybackMode || 'hover');
     setTestStatus({ testing: false });
   }, [settings, isOpen]);
 
@@ -65,6 +69,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       syncIntervalMinutes: syncInterval,
       autoAiTagOnIngest: autoTag,
       autoPasteOnSelect: autoPaste,
+      animationPlaybackMode: animationMode,
     });
     onClose();
   };
@@ -174,6 +179,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             <p className="text-[10px] text-gray-400 leading-normal">
               When you select a sticker in the floating Quick Picker (<kbd className="px-1 py-0.5 bg-[#25262b] rounded text-gray-300 text-[10px]">Win + /</kbd>), Sticker Chest automatically pastes it directly into your active chat or document input field.
+            </p>
+          </div>
+
+          {/* Animated Sticker Playback Settings */}
+          <div className="p-3 bg-[#121316] border border-[#2c2e33] rounded-xl space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-gray-200 font-medium flex items-center space-x-1.5">
+                <Film className="w-3.5 h-3.5 text-purple-400" />
+                <span>Animated Sticker Playback</span>
+              </label>
+              <select
+                value={animationMode}
+                onChange={(e) => setAnimationMode(e.target.value as 'always' | 'hover' | 'reduced_motion')}
+                className="px-2.5 py-1 bg-[#1a1b1e] border border-[#2c2e33] rounded-lg text-xs text-gray-200 focus:outline-none focus:border-purple-500"
+              >
+                <option value="hover">Hover / Focus to Play (Recommended)</option>
+                <option value="always">Always Animate (Continuous)</option>
+                <option value="reduced_motion">Reduced Motion (Static Preview)</option>
+              </select>
+            </div>
+            <p className="text-[10px] text-gray-400 leading-normal">
+              Hover-to-play displays static first-frame thumbnails and animates only when hovered or selected, significantly reducing CPU & GPU compositor load.
             </p>
           </div>
 

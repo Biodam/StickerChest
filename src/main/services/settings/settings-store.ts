@@ -19,6 +19,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   autoAiTagOnIngest: true,
   cloudDriveMode: true,
   autoPasteOnSelect: true,
+  animationPlaybackMode: 'hover',
 };
 
 let cachedSettings: AppSettings | null = null;
@@ -57,6 +58,10 @@ export function loadSettings(): AppSettings {
   // Auto-upgrade legacy Alt+Shift+V default to modern Super+/ or Control+/
   if (loaded.globalShortcut === 'Alt+Shift+V') {
     loaded.globalShortcut = DEFAULT_GLOBAL_SHORTCUT;
+  }
+
+  if (!loaded.animationPlaybackMode) {
+    loaded.animationPlaybackMode = 'hover';
   }
 
   cachedSettings = loaded;

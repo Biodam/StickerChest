@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { Star } from 'lucide-react';
+import { Star, Film } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
-import { getChestImageUrl } from '../../shared/image-url';
+import { AnimatedStickerImage } from '../../shared/AnimatedStickerImage';
 
 interface PickerGridProps {
   items: StickerItem[];
@@ -44,11 +44,6 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
     <div ref={containerRef} className="flex-1 overflow-y-auto p-2.5 scroll-smooth">
       <div className="grid grid-cols-4 gap-2">
         {items.map((item, index) => {
-          const imageUrl = getChestImageUrl(
-            item.variants.thumb?.filePath ||
-            item.variants.emoji?.filePath ||
-            item.originalPath
-          );
           const isSelected = index === selectedIndex;
           const title = item.metadata?.character || item.filename;
 
@@ -58,18 +53,29 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
               data-index={index}
               onClick={() => onSelectItem(item)}
               title={`${title} ${item.metadata?.feeling ? `(${item.metadata.feeling})` : ''}`}
-              className={`relative aspect-square rounded-xl p-2 flex items-center justify-center transition-all bg-[#25262b]/60 hover:bg-[#2c2e33] ${
+              className={`group relative aspect-square rounded-xl p-2 flex items-center justify-center transition-all bg-[#25262b]/60 hover:bg-[#2c2e33] ${
                 isSelected
                   ? 'ring-2 ring-blue-500 bg-blue-600/20 shadow-md shadow-blue-500/30'
                   : 'border border-[#2c2e33]/60'
               }`}
             >
-              <img
-                src={imageUrl}
+              <AnimatedStickerImage
+                item={item}
+                isHovered={false}
+                isSelected={isSelected}
                 alt={title}
-                loading="lazy"
-                className="max-w-full max-h-full object-contain pointer-events-none transition-transform hover:scale-110 duration-150"
+                className="max-w-full max-h-full object-contain pointer-events-none transition-transform group-hover:scale-110 duration-150"
               />
+
+              {/* GIF indicator badge */}
+              {item.isAnimated && (
+                <div className="absolute top-1 left-1 bg-purple-600/80 rounded px-1 py-0.2 text-[9px] font-medium text-white flex items-center space-x-0.5 pointer-events-none shadow">
+                  <Film className="w-2 h-2" />
+                  <span>GIF</span>
+                </div>
+              )}
+
+              {/* Favorite Star */}
               {item.usage?.isFavorite && (
                 <div className="absolute top-1 right-1 text-yellow-400 bg-black/60 rounded-full p-0.5 pointer-events-none">
                   <Star className="w-2.5 h-2.5 fill-current" />

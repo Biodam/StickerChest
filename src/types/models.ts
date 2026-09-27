@@ -100,5 +100,6 @@ export interface AppSettings {
   autoAiTagOnIngest: boolean;
   cloudDriveMode: boolean;
   autoPasteOnSelect: boolean;
+  animationPlaybackMode?: 'always' | 'hover' | 'reduced_motion';
 }
 
