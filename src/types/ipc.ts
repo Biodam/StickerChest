@@ -44,6 +44,18 @@ export interface StickerChestAPI {
   saveSettings: (settings: Partial<AppSettings>) => Promise<boolean>;
   selectFolderDialog: () => Promise<string | null>;
 
+  // Vault Backup, Restore & Pack Exporters
+  createVaultBackup: (customFilePath?: string) => Promise<{ canceled: boolean; success?: boolean; totalItems?: number; outputPath?: string; error?: string }>;
+  restoreVaultBackup: (options?: { backupFilePath?: string; conflictResolution?: 'skip' | 'overwrite' | 'merge' }) => Promise<{ canceled: boolean; success?: boolean; restored?: number; skipped?: number; overwritten?: number; errors?: number; error?: string }>;
+  exportStickerPack: (options: {
+    platform: 'telegram' | 'discord-emoji' | 'discord-sticker' | 'whatsapp';
+    itemIds: string[];
+    outputZipPath?: string;
+    packTitle?: string;
+    packAuthor?: string;
+  }) => Promise<{ canceled: boolean; success?: boolean; totalExported?: number; outputPath?: string; error?: string }>;
+  onExportProgress: (callback: (progress: any) => void) => () => void;
+
   // Window Controls
   hidePicker: () => Promise<void>;
   openManager: () => Promise<void>;

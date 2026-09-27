@@ -31,7 +31,7 @@ This document tracks high-level progress across the core development milestones 
 | **M10** | **Quick Picker Auto-Paste Integration** | Paste directly into active input field on select, native OS keystroke simulation (Windows/macOS/Linux), auto-paste settings toggle | 🟢 Completed |
 | **M11** | **Quick Picker Keyboard Navigation** | Window-level keyboard controls, 2D arrow grid navigation with auto-scroll into view, Home/End/PageUp/Down, Ctrl+1/2/3 tabs, Ctrl+T tier toggle, Ctrl+S favorite toggle, two-stage Escape | 🟢 Completed |
 | **M12** | **Animated Sticker & GIF Controls** | Hover-to-play vs always-play, viewport-aware offscreen animation pausing, frame-by-frame scrubber & telemetry in Inspector | 🟢 Completed |
-| **M13** | **Vault Backup & Pack Exporter** | Full portable `.stickervault` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | ⏳ Planned |
+| **M13** | **Vault Backup & Pack Exporter** | Full portable `.stickervault` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | 🟢 Completed |
 | **M14** | **Custom Global Hotkeys & UI Themes** | Interactive global summon hotkey rebinding in Settings; curated theme engine (OLED Black, Slate, Cyberpunk, Catppuccin, Light) | ⏳ Planned |
 | **M15** | **Google Drive Cloud Sync & OAuth** | Direct Google OAuth 2.0 PKCE login, isolated `appDataFolder` cloud storage, content-addressable image mirroring & SQLite snapshot sync | ⏳ Planned |
 
@@ -51,7 +51,7 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 10: Quick Picker Auto-Paste Integration](file:///c:/Projects/sticker-database-manager/tasks/task-10-quick-picker-auto-paste.md)
 - [x] [Task 11: Quick Picker Keyboard Navigation](file:///c:/Projects/sticker-database-manager/tasks/task-11-quick-picker-keyboard-navigation.md)
 - [x] [Task 12: Animated Sticker & GIF Controls](file:///c:/Projects/sticker-database-manager/tasks/task-12-animated-sticker-and-gif-controls.md)
-- [ ] [Task 13: Vault Backup & Pack Exporter](file:///c:/Projects/sticker-database-manager/tasks/task-13-vault-backup-and-pack-export.md)
+- [x] [Task 13: Vault Backup & Pack Exporter](file:///c:/Projects/sticker-database-manager/tasks/task-13-vault-backup-and-pack-export.md)
 - [ ] [Task 14: Custom Hotkeys & Visual Themes](file:///c:/Projects/sticker-database-manager/tasks/task-14-custom-hotkeys-and-visual-themes.md)
 - [ ] [Task 15: Google Drive Cloud Sync & OAuth](file:///c:/Projects/sticker-database-manager/tasks/task-15-google-drive-sync-and-oauth.md)
 

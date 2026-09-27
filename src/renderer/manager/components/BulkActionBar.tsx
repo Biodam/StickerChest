@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Tag, Trash2, Sparkles, X, Check } from 'lucide-react';
+import { Star, Tag, Trash2, Sparkles, X, Check, Download } from 'lucide-react';
 
 interface BulkActionBarProps {
   selectedCount: number;
@@ -7,6 +7,7 @@ interface BulkActionBarProps {
   onBulkFavorite: (favorite: boolean) => void;
   onBulkAddTag: (tag: string) => void;
   onBulkAiTag: () => void;
+  onBulkExport?: () => void;
   onBulkDelete: () => void;
 }
 
@@ -16,6 +17,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
   onBulkFavorite,
   onBulkAddTag,
   onBulkAiTag,
+  onBulkExport,
   onBulkDelete,
 }) => {
   const [showTagInput, setShowTagInput] = useState(false);
@@ -97,6 +99,18 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
           <span>AI Tag</span>
         </button>
+
+        {/* Bulk Export Pack */}
+        {onBulkExport && (
+          <button
+            onClick={onBulkExport}
+            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#2c2e33] hover:bg-[#373a40] text-gray-200 transition-colors"
+            title="Export selected stickers to Telegram, Discord, or WhatsApp"
+          >
+            <Download className="w-3.5 h-3.5 text-sky-400" />
+            <span>Export Pack</span>
+          </button>
+        )}
 
         {/* Bulk Delete */}
         {showDeleteConfirm ? (

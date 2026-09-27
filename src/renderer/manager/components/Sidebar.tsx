@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX } from 'lucide-react';
+import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud } from 'lucide-react';
 import { LibraryFacets } from '../../../types/models';
 import { FacetFilterGroup } from './FacetFilterGroup';
 
@@ -10,6 +10,8 @@ interface SidebarProps {
   onToggleAnimatedOnly: () => void;
   onSyncFolder: () => void;
   onOpenSettings: () => void;
+  onOpenExport?: () => void;
+  onOpenImport?: () => void;
   isScanning: boolean;
   facets: LibraryFacets;
   selectedFranchise: string | null;
@@ -28,6 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleAnimatedOnly,
   onSyncFolder,
   onOpenSettings,
+  onOpenExport,
+  onOpenImport,
   isScanning,
   facets,
   selectedFranchise,
@@ -157,24 +161,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Action Footer */}
-      <div className="p-3 border-t border-[#2c2e33] space-y-2 flex-shrink-0">
+      <div className="p-3 border-t border-[#2c2e33] space-y-1.5 flex-shrink-0">
         <button
           onClick={onSyncFolder}
           disabled={isScanning}
-          className={`w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+          className={`w-full flex items-center justify-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             isScanning
               ? 'bg-blue-600/30 text-blue-300 cursor-not-allowed'
               : 'bg-[#25262b] hover:bg-[#2c2e33] text-gray-300'
           }`}
         >
-          <FolderSync className={`w-4 h-4 text-blue-400 ${isScanning ? 'animate-spin' : ''}`} />
+          <FolderSync className={`w-3.5 h-3.5 text-blue-400 ${isScanning ? 'animate-spin' : ''}`} />
           <span>{isScanning ? 'Scanning...' : 'Sync Folder'}</span>
         </button>
+
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            onClick={onOpenExport}
+            className="flex items-center justify-center space-x-1 px-2 py-1.5 rounded-lg bg-[#25262b] hover:bg-[#2c2e33] text-xs font-medium text-gray-300 transition-colors"
+            title="Export vault backup or sticker packs"
+          >
+            <Download className="w-3.5 h-3.5 text-sky-400" />
+            <span>Export</span>
+          </button>
+          <button
+            onClick={onOpenImport}
+            className="flex items-center justify-center space-x-1 px-2 py-1.5 rounded-lg bg-[#25262b] hover:bg-[#2c2e33] text-xs font-medium text-gray-300 transition-colors"
+            title="Restore vault archive"
+          >
+            <UploadCloud className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Restore</span>
+          </button>
+        </div>
+
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg hover:bg-[#25262b] text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
+          className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#25262b] text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="w-3.5 h-3.5" />
           <span>Settings & API</span>
         </button>
       </div>

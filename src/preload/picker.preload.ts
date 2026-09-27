@@ -37,6 +37,16 @@ const api: StickerChestAPI = {
   saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),
   selectFolderDialog: () => ipcRenderer.invoke('dialog:selectFolder'),
 
+  // Vault Backup, Restore & Pack Exporters
+  createVaultBackup: (customFilePath) => ipcRenderer.invoke('export:createBackup', customFilePath),
+  restoreVaultBackup: (options) => ipcRenderer.invoke('export:restoreBackup', options),
+  exportStickerPack: (options) => ipcRenderer.invoke('export:exportStickerPack', options),
+  onExportProgress: (callback) => {
+    const handler = (_event: any, data: any) => callback(data);
+    ipcRenderer.on('export:progress', handler);
+    return () => ipcRenderer.removeListener('export:progress', handler);
+  },
+
   hidePicker: () => ipcRenderer.invoke('window:hidePicker'),
   openManager: () => ipcRenderer.invoke('window:openManager'),
 };

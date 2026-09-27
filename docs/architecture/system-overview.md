@@ -104,7 +104,13 @@ Renderers communicate securely with the Main process using `contextBridge` with 
 | `gemini:getUntaggedCount` | Invoke | None | Count of untagged/pending items |
 | `gemini:testKey` | Invoke | `{ apiKey: string, model?: string }` | Validates Gemini API key and model |
 | `settings:get` / `save` | Invoke | Settings object | Loads or saves application settings |
+| `export:createBackup` | Invoke | `customFilePath?: string` | Creates portable `.stickervault` archive |
+| `export:restoreBackup` | Invoke | `{ backupFilePath?: string, conflictResolution?: 'skip'\|'overwrite'\|'merge' }` | Restores vault archive with conflict strategy |
+| `export:exportStickerPack` | Invoke | `{ platform: ExportPlatform, itemIds: string[], outputZipPath?: string }` | Packages stickers for Telegram, Discord, or WhatsApp |
+| `export:progress` | Event | `BackupProgressEvent` (Main $\rightarrow$ Renderer) | Export, packing, and restore progress stream |
 | `dialog:selectFolder` | Invoke | None | Native folder selection dialog |
+| `dialog:showSaveDialog` | Invoke | `defaultName: string, filters: object[]` | Native file save dialog |
+| `dialog:showOpenDialog` | Invoke | `filters: object[]` | Native file open dialog |
 | `window:hidePicker` | Invoke | None | Hides floating companion modal |
 | `window:openManager` | Invoke | None | Focuses or creates Main Manager window |
 
@@ -140,3 +146,19 @@ The companion modal implements a window-level event capture architecture (`usePi
   - `Ctrl+S`: Star/favorite toggle directly in the database.
   - `Enter` vs `Shift+Enter`: Auto-paste execution vs copy-only override.
   - `Escape`: Two-stage dismiss (clears search query if non-empty; hides window if empty).
+
+---
+
+## 6. Vault Backup, Migration & Third-Party Sticker Pack Exporters
+
+Sticker Chest provides native archival preservation and cross-platform packaging:
+- **Portable Vault Archives (`.stickervault`)**: Single-archive compressed bundles containing source images (`sources/`), multi-tier WebP caches (`variants/`), a live SQLite database snapshot (`database.sqlite`), and an external portable `manifest.json`.
+- **Import & Restore Engine**: Restores vault archives with user-selectable conflict resolution:
+  - `skip`: Preserves existing local stickers without alteration.
+  - `merge`: Combines tags and user metadata without deleting existing files.
+  - `overwrite`: Replaces existing database records and variant files with backup data.
+- **Third-Party Sticker Pack Exporters**:
+  - **Telegram**: Fits within 512×512 WebP (<512 KB), includes `pack-info.json`.
+  - **Discord**: Discord Emojis (128×128 square PNG/GIF, <256 KB) and Discord Stickers (320×320 square PNG, <500 KB).
+  - **WhatsApp**: 512×512 square WebP (<100 KB per sticker) complete with official `contents.json` and 96×96 `tray.png`.
+

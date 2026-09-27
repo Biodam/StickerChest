@@ -6,6 +6,8 @@ import { InspectorDrawer } from './components/InspectorDrawer';
 import { SettingsModal } from './components/SettingsModal';
 import { IngestionBanner } from './components/IngestionBanner';
 import { BulkActionBar } from './components/BulkActionBar';
+import { ExportModal } from './components/ExportModal';
+import { ImportModal } from './components/ImportModal';
 import { useSelection } from './hooks/useSelection';
 import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
 
@@ -22,6 +24,8 @@ export default function App() {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedItem, setSelectedItem] = useState<StickerItem | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
   const [untaggedCount, setUntaggedCount] = useState(0);
 
@@ -154,6 +158,8 @@ export default function App() {
         onSelectTab={setActiveTab} onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
         onSyncFolder={async () => settings.sourceFolder ? api?.scanSourceFolder?.(false) : setSettingsOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
+        onOpenExport={() => setExportOpen(true)}
+        onOpenImport={() => setImportOpen(true)}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
         facets={facets} selectedFranchise={selectedFranchise}
         selectedCharacter={selectedCharacter} selectedTag={selectedTag}
@@ -212,10 +218,28 @@ export default function App() {
             onBulkFavorite={handleBulkFavorite}
             onBulkAddTag={handleBulkAddTag}
             onBulkAiTag={handleBulkAiTag}
+            onBulkExport={() => setExportOpen(true)}
             onBulkDelete={handleBulkDelete}
           />
         </div>
       </div>
+
+      <ExportModal
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+        totalStickers={totalItems}
+        selectedItemIds={Array.from(selectedIds)}
+      />
+
+      <ImportModal
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        onRestoreComplete={() => {
+          fetchItems();
+          fetchFacets();
+          fetchUntagged();
+        }}
+      />
 
       <SettingsModal
         settings={settings}

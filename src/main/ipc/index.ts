@@ -6,6 +6,7 @@ import { registerVaultIpcHandlers } from './vault-handlers';
 import { registerGeminiIpcHandlers } from './gemini-handlers';
 import { registerSettingsIpcHandlers } from './settings-handlers';
 import { registerClipboardIpcHandlers } from './clipboard-handlers';
+import { registerExportIpcHandlers } from './export-handlers';
 
 export function registerIpcHandlers(): void {
   // Database handlers
@@ -22,6 +23,9 @@ export function registerIpcHandlers(): void {
 
   // Clipboard handlers
   registerClipboardIpcHandlers();
+
+  // Vault Backup, Restore & Pack Exporters
+  registerExportIpcHandlers();
 
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {

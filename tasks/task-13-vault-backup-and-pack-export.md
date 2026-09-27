@@ -1,6 +1,6 @@
 # Task 13: Vault Backup, Restore & Sticker Pack Exporter
 
-**Status**: ⏳ Planned  
+**Status**: 🟢 Completed  
 **Milestone**: M13  
 **Estimated Complexity**: High
 
@@ -14,9 +14,9 @@
 3. **Third-Party Sticker Pack Exporters**:
    - **Telegram Sticker Pack**: Export selected stickers conforming to Telegram Bot API specifications (512×512, transparent background, <512KB PNG/WebP).
    - **Discord Pack**: Export formatted Discord Emojis (128×128, <256KB) and Discord Stickers (320×320 PNG/APNG, <500KB).
-   - **WhatsApp / Signal Bundle**: Formatted WebP bundles with metadata JSON.
+   - **WhatsApp / Signal Bundle**: Formatted WebP bundles with metadata JSON (<100KB per sticker, tray.png, contents.json).
 4. **IPC Progress & Dialogs**:
-   - Export/import progress stream (`backup:progress`) displayed in a dedicated modal.
+   - Export/import progress stream (`export:progress`) displayed in a dedicated modal.
    - Native OS save file / open file dialogs.
 5. **Automated Unit Tests**:
    - Manifest creation, archive parsing, format compliance validation.
@@ -24,13 +24,13 @@
 ---
 
 ## Implementation Checklist
-- [ ] Create archive packaging service `src/main/services/export/vault-archive.ts`.
-- [ ] Create format conversion exporter `src/main/services/export/pack-exporter.ts` (Telegram, Discord, WhatsApp).
-- [ ] Register IPC handlers (`export:createBackup`, `export:restoreBackup`, `export:exportStickerPack`).
-- [ ] Expose export APIs in `main.preload.ts`.
-- [ ] Create `ExportModal.tsx` and `ImportModal.tsx` in Manager UI.
-- [ ] Write unit tests in `tests/unit/pack-exporter.test.ts`.
-- [ ] Run test suite (`npm run test`) and production build (`npm run build`).
+- [x] Create archive packaging service `src/main/services/export/vault-backup.ts` and `src/main/services/export/vault-restore.ts`.
+- [x] Create format conversion exporter `src/main/services/export/pack-spec.ts`, `src/main/services/export/pack-converter.ts`, and `src/main/services/export/pack-exporter.ts` (Telegram, Discord, WhatsApp).
+- [x] Register IPC handlers (`export:createBackup`, `export:restoreBackup`, `export:exportStickerPack`) in `src/main/ipc/export-handlers.ts`.
+- [x] Expose export APIs in `main.preload.ts` and `picker.preload.ts`.
+- [x] Create `ExportModal.tsx`, `ImportModal.tsx`, `VaultBackupTab.tsx`, and `StickerPackTab.tsx` in Manager UI.
+- [x] Write unit tests in `tests/unit/pack-spec.test.ts`, `tests/unit/pack-converter.test.ts`, and `tests/unit/vault-archive.test.ts`.
+- [x] Run test suite (`npm run test`) and production build (`npm run build`).
 
 ---
 

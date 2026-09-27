@@ -114,3 +114,7 @@ export function getDatabaseDAL(): StickerDatabaseDAL {
   }
   return defaultDalInstance;
 }
+
+export function setDatabaseDAL(instance: StickerDatabaseDAL | null): void {
+  defaultDalInstance = instance;
+}
