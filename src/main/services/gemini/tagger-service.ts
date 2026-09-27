@@ -74,3 +74,31 @@ export async function tagStickerItem(
     return false;
   }
 }
+
+export async function batchTagUntaggedItems(
+  onProgress?: (progress: { processed: number; total: number; filename: string }) => void,
+  dal: StickerDatabaseDAL = getDatabaseDAL()
+): Promise<{ processed: number; succeeded: number; failed: number }> {
+  const untagged = dal.getUntaggedItems();
+  const total = untagged.length;
+  let processed = 0;
+  let succeeded = 0;
+  let failed = 0;
+
+  for (const item of untagged) {
+    if (onProgress) {
+      onProgress({ processed, total, filename: item.filename });
+    }
+
+    try {
+      const ok = await tagStickerItem(item.id, dal);
+      if (ok) succeeded++;
+      else failed++;
+    } catch {
+      failed++;
+    }
+    processed++;
+  }
+
+  return { processed, succeeded, failed };
+}

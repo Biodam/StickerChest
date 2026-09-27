@@ -13,6 +13,9 @@ interface HeaderProps {
   onClearCharacter?: () => void;
   onClearTag?: () => void;
   modelName?: string;
+  untaggedCount?: number;
+  onBatchAiTag?: () => void;
+  isTagging?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,6 +30,9 @@ export const Header: React.FC<HeaderProps> = ({
   onClearCharacter,
   onClearTag,
   modelName = 'gemini-3.8-flash',
+  untaggedCount = 0,
+  onBatchAiTag,
+  isTagging = false,
 }) => {
   const hasFilterChips = Boolean(selectedFranchise || selectedCharacter || selectedTag);
 
@@ -53,11 +59,24 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Stats & AI status */}
+        {/* Stats, Batch AI Tag & AI status */}
         <div className="flex items-center space-x-3 text-xs text-gray-400">
           <span className="bg-[#25262b] px-2.5 py-1 rounded-md text-gray-300 font-mono">
             {totalItems} {totalItems === 1 ? 'sticker' : 'stickers'}
           </span>
+
+          {untaggedCount > 0 && onBatchAiTag && (
+            <button
+              onClick={onBatchAiTag}
+              disabled={isTagging}
+              className="flex items-center space-x-1.5 px-3 py-1 rounded-md bg-purple-600 hover:bg-purple-500 text-white font-semibold transition-all shadow-md shadow-purple-600/30 disabled:opacity-50"
+              title="Batch process untagged stickers using Gemini AI"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{isTagging ? 'AI Tagging...' : `Batch AI Tag (${untaggedCount})`}</span>
+            </button>
+          )}
+
           <span className="flex items-center space-x-1.5 text-amber-400/90 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span className="capitalize">{modelName} Vision</span>

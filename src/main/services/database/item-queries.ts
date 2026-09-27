@@ -84,6 +84,15 @@ export function deleteItem(db: Database, id: string): boolean {
   return result.changes > 0;
 }
 
+export function getUntaggedItems(db: Database): { id: string; filename: string }[] {
+  return db.prepare(`
+    SELECT i.id, i.filename FROM items i
+    LEFT JOIN metadata m ON m.item_id = i.id
+    WHERE m.ai_status IS NULL OR m.ai_status != 'completed'
+    ORDER BY i.created_at DESC
+  `).all() as { id: string; filename: string }[];
+}
+
 export function hydrateItem(db: Database, row: ItemRow): StickerItem {
   const variantsRows = db.prepare(`SELECT * FROM variants WHERE item_id = ?`).all(row.id) as VariantRow[];
   const metaRow = db.prepare(`SELECT * FROM metadata WHERE item_id = ?`).get(row.id) as MetadataRow | undefined;

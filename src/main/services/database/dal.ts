@@ -40,6 +40,10 @@ export class StickerDatabaseDAL {
     return itemQueries.deleteItem(this.db, id);
   }
 
+  public getUntaggedItems(): { id: string; filename: string }[] {
+    return itemQueries.getUntaggedItems(this.db);
+  }
+
   // Metadata, Tags, Custom Attributes
   public saveMetadata(input: MetadataUpsertInput): void {
     metaQueries.upsertMetadata(this.db, input);

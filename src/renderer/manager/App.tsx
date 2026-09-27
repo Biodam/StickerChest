@@ -20,6 +20,7 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState<StickerItem | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
+  const [untaggedCount, setUntaggedCount] = useState(0);
 
   const [settings, setSettings] = useState<AppSettings>({
     sourceFolder: '', geminiApiKey: '', geminiModel: 'gemini-3.8-flash',
@@ -29,32 +30,23 @@ export default function App() {
   });
 
   const loadSettings = async () => {
-    if (window.stickerVault?.getSettings) {
-      const data = await window.stickerVault.getSettings();
-      setSettings(data);
-    }
+    if (window.stickerVault?.getSettings) setSettings(await window.stickerVault.getSettings());
   };
 
   const fetchFacets = useCallback(async () => {
-    if (!window.stickerVault?.getFacets) return;
-    try {
-      const data = await window.stickerVault.getFacets();
-      setFacets(data);
-    } catch (err) {
-      console.error('Failed to load facets:', err);
-    }
+    if (window.stickerVault?.getFacets) setFacets(await window.stickerVault.getFacets());
+  }, []);
+
+  const fetchUntagged = useCallback(async () => {
+    if (window.stickerVault?.getUntaggedCount) setUntaggedCount(await window.stickerVault.getUntaggedCount());
   }, []);
 
   const fetchItems = useCallback(async () => {
     if (!window.stickerVault?.searchItems) return;
     const res = await window.stickerVault.searchItems({
-      query: searchQuery,
-      tab: activeTab,
-      sourceOrigin: selectedFranchise || undefined,
-      character: selectedCharacter || undefined,
-      tag: selectedTag || undefined,
-      isAnimated: isAnimatedOnly ? true : undefined,
-      limit: 100,
+      query: searchQuery, tab: activeTab,
+      sourceOrigin: selectedFranchise || undefined, character: selectedCharacter || undefined,
+      tag: selectedTag || undefined, isAnimated: isAnimatedOnly ? true : undefined, limit: 100,
     });
     setItems(res.items);
     setTotalItems(res.total);
@@ -68,9 +60,7 @@ export default function App() {
         prev.metadata?.updatedAt === updated.metadata?.updatedAt &&
         prev.usage.isFavorite === updated.usage.isFavorite &&
         prev.usage.copyCount === updated.usage.copyCount
-      ) {
-        return prev;
-      }
+      ) return prev;
       return updated;
     });
   }, [searchQuery, activeTab, isAnimatedOnly, selectedFranchise, selectedCharacter, selectedTag]);
@@ -78,7 +68,8 @@ export default function App() {
   useEffect(() => {
     loadSettings();
     fetchFacets();
-  }, [fetchFacets]);
+    fetchUntagged();
+  }, [fetchFacets, fetchUntagged]);
 
   useEffect(() => {
     fetchItems();
@@ -86,15 +77,15 @@ export default function App() {
 
   useEffect(() => {
     if (!window.stickerVault?.onIngestionProgress) return;
-    const unsubscribe = window.stickerVault.onIngestionProgress((event) => {
+    return window.stickerVault.onIngestionProgress((event) => {
       setProgress(event);
       if (event.status === 'idle') {
         fetchItems();
         fetchFacets();
+        fetchUntagged();
       }
     });
-    return unsubscribe;
-  }, [fetchItems, fetchFacets]);
+  }, [fetchItems, fetchFacets, fetchUntagged]);
 
   const handleToggleFavorite = async (itemId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -110,6 +101,7 @@ export default function App() {
       if (fresh) setSelectedItem(fresh);
       fetchItems();
       fetchFacets();
+      fetchUntagged();
     }
   };
 
@@ -119,7 +111,13 @@ export default function App() {
       if (fresh) setSelectedItem(fresh);
       fetchItems();
       fetchFacets();
+      fetchUntagged();
     }
+  };
+
+  const handleBatchAiTag = async () => {
+    if (!settings.geminiApiKey) return setSettingsOpen(true);
+    await window.stickerVault?.batchTagUntagged?.();
   };
 
   const handleCopyItem = (itemId: string, tier: ImageTier) => {
@@ -134,40 +132,25 @@ export default function App() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#121316] text-[#f1f3f5]">
       <Sidebar
-        activeTab={activeTab}
-        isAnimatedOnly={isAnimatedOnly}
-        onSelectTab={setActiveTab}
-        onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
-        onSyncFolder={handleSyncFolder}
-        onOpenSettings={() => setSettingsOpen(true)}
+        activeTab={activeTab} isAnimatedOnly={isAnimatedOnly}
+        onSelectTab={setActiveTab} onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
+        onSyncFolder={handleSyncFolder} onOpenSettings={() => setSettingsOpen(true)}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
-        facets={facets}
-        selectedFranchise={selectedFranchise}
-        selectedCharacter={selectedCharacter}
-        selectedTag={selectedTag}
-        onSelectFranchise={setSelectedFranchise}
-        onSelectCharacter={setSelectedCharacter}
+        facets={facets} selectedFranchise={selectedFranchise}
+        selectedCharacter={selectedCharacter} selectedTag={selectedTag}
+        onSelectFranchise={setSelectedFranchise} onSelectCharacter={setSelectedCharacter}
         onSelectTag={setSelectedTag}
-        onClearAllFilters={() => {
-          setSelectedFranchise(null);
-          setSelectedCharacter(null);
-          setSelectedTag(null);
-        }}
+        onClearAllFilters={() => { setSelectedFranchise(null); setSelectedCharacter(null); setSelectedTag(null); }}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
-          searchQuery={searchQuery}
-          totalItems={totalItems}
-          onSearchChange={setSearchQuery}
-          onClearSearch={() => setSearchQuery('')}
-          selectedFranchise={selectedFranchise}
-          selectedCharacter={selectedCharacter}
-          selectedTag={selectedTag}
-          onClearFranchise={() => setSelectedFranchise(null)}
-          onClearCharacter={() => setSelectedCharacter(null)}
-          onClearTag={() => setSelectedTag(null)}
-          modelName={settings.geminiModel}
+          searchQuery={searchQuery} totalItems={totalItems}
+          onSearchChange={setSearchQuery} onClearSearch={() => setSearchQuery('')}
+          selectedFranchise={selectedFranchise} selectedCharacter={selectedCharacter} selectedTag={selectedTag}
+          onClearFranchise={() => setSelectedFranchise(null)} onClearCharacter={() => setSelectedCharacter(null)}
+          onClearTag={() => setSelectedTag(null)} modelName={settings.geminiModel}
+          untaggedCount={untaggedCount} onBatchAiTag={handleBatchAiTag} isTagging={progress?.status === 'tagging'}
         />
 
         <IngestionBanner progress={progress} onDismiss={() => setProgress(null)} />

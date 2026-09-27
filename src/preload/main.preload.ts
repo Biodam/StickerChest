@@ -19,6 +19,8 @@ const api: StickerVaultAPI = {
   showItemInFolder: (filePath) => ipcRenderer.invoke('vault:showItemInFolder', filePath),
 
   tagItemWithGemini: (itemId) => ipcRenderer.invoke('gemini:tagItem', itemId),
+  batchTagUntagged: () => ipcRenderer.invoke('gemini:batchTag'),
+  getUntaggedCount: () => ipcRenderer.invoke('gemini:getUntaggedCount'),
   testGeminiKey: (apiKey, model) => ipcRenderer.invoke('gemini:testKey', apiKey, model),
 
   getSettings: () => ipcRenderer.invoke('settings:get'),

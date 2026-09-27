@@ -106,25 +106,24 @@ export async function ingestImageFile(
     fileSizeBytes: thumbRes.fileSizeBytes,
   });
 
-  // 8. If new item, tag with AI if key available, or create manual metadata record
-  if (!existing) {
-    if (autoTagAi && getGeminiApiKey()) {
-      tagStickerItem(itemId, dal).catch((aiErr) => {
-        console.warn(`Background auto-tagging error for ${itemId}:`, aiErr);
-      });
-    } else {
-      const cleanName = path.parse(filename).name.replace(/[-_]/g, ' ');
-      dal.saveMetadata({
-        itemId,
-        character: null,
-        sourceOrigin: null,
-        action: null,
-        feeling: null,
-        description: null,
-        tags: [cleanName.toLowerCase()],
-        aiStatus: 'manual_only',
-      });
-    }
+  // 8. If new item or existing untagged item, tag with AI if key available
+  const needsAiTag = !existing || existing.metadata?.aiStatus !== 'completed';
+  if (needsAiTag && autoTagAi && getGeminiApiKey()) {
+    tagStickerItem(itemId, dal).catch((aiErr) => {
+      console.warn(`Background auto-tagging error for ${itemId}:`, aiErr);
+    });
+  } else if (!existing) {
+    const cleanName = path.parse(filename).name.replace(/[-_]/g, ' ');
+    dal.saveMetadata({
+      itemId,
+      character: null,
+      sourceOrigin: null,
+      action: null,
+      feeling: null,
+      description: null,
+      tags: [cleanName.toLowerCase()],
+      aiStatus: 'manual_only',
+    });
   }
 
   return { itemId, isNew: !existing, sha256Hash: hash };

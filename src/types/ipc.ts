@@ -26,6 +26,8 @@ export interface StickerVaultAPI {
 
   // AI Tagging
   tagItemWithGemini: (itemId: string) => Promise<boolean>;
+  batchTagUntagged: () => Promise<{ started: boolean; total: number }>;
+  getUntaggedCount: () => Promise<number>;
   testGeminiKey: (apiKey: string, model?: string) => Promise<{ valid: boolean; message?: string }>;
 
   // Settings
