@@ -19,6 +19,8 @@ export const MetadataForm: React.FC<MetadataFormProps> = ({ item, onUpdateMetada
   const locked = item.metadata?.userLockedFields || [];
   const isLocked = (field: string) => locked.includes(field);
 
+  const lastUpdatedAt = item.metadata?.updatedAt;
+
   useEffect(() => {
     setCharacter(item.metadata?.character || '');
     setSourceOrigin(item.metadata?.sourceOrigin || '');
@@ -26,9 +28,16 @@ export const MetadataForm: React.FC<MetadataFormProps> = ({ item, onUpdateMetada
     setFeeling(item.metadata?.feeling || '');
     setDescription(item.metadata?.description || '');
     setSaved(false);
-  }, [item.id, item.metadata]);
+  }, [item.id, lastUpdatedAt]);
 
   const handleSave = () => {
+    const lockedFields: string[] = [...locked];
+    if (character.trim()) lockedFields.push('character');
+    if (sourceOrigin.trim()) lockedFields.push('source_origin');
+    if (action.trim()) lockedFields.push('action');
+    if (feeling.trim()) lockedFields.push('feeling');
+    if (description.trim()) lockedFields.push('description');
+
     onUpdateMetadata(item.id, {
       character: character.trim() || undefined,
       sourceOrigin: sourceOrigin.trim() || undefined,
@@ -36,7 +45,7 @@ export const MetadataForm: React.FC<MetadataFormProps> = ({ item, onUpdateMetada
       feeling: feeling.trim() || undefined,
       description: description.trim() || undefined,
       tags: item.tags,
-      userLockedFields: ['character', 'source_origin', 'action', 'feeling', 'description'],
+      userLockedFields: Array.from(new Set(lockedFields)),
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

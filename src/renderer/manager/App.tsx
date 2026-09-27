@@ -59,11 +59,21 @@ export default function App() {
     setItems(res.items);
     setTotalItems(res.total);
 
-    if (selectedItem) {
-      const updated = res.items.find((i) => i.id === selectedItem.id);
-      if (updated) setSelectedItem(updated);
-    }
-  }, [searchQuery, activeTab, isAnimatedOnly, selectedFranchise, selectedCharacter, selectedTag, selectedItem]);
+    setSelectedItem((prev) => {
+      if (!prev) return null;
+      const updated = res.items.find((i) => i.id === prev.id);
+      if (!updated) return prev;
+      if (
+        prev.updatedAt === updated.updatedAt &&
+        prev.metadata?.updatedAt === updated.metadata?.updatedAt &&
+        prev.usage.isFavorite === updated.usage.isFavorite &&
+        prev.usage.copyCount === updated.usage.copyCount
+      ) {
+        return prev;
+      }
+      return updated;
+    });
+  }, [searchQuery, activeTab, isAnimatedOnly, selectedFranchise, selectedCharacter, selectedTag]);
 
   useEffect(() => {
     loadSettings();
@@ -88,11 +98,16 @@ export default function App() {
 
   const handleToggleFavorite = async (itemId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (await window.stickerVault?.toggleFavorite?.(itemId)) fetchItems();
+    if (await window.stickerVault?.toggleFavorite?.(itemId)) {
+      setSelectedItem((prev) => (prev?.id === itemId ? { ...prev, usage: { ...prev.usage, isFavorite: !prev.usage.isFavorite } } : prev));
+      fetchItems();
+    }
   };
 
   const handleUpdateMetadata = async (itemId: string, meta: any) => {
     if (await window.stickerVault?.updateMetadata?.(itemId, meta)) {
+      const fresh = await window.stickerVault?.getItem?.(itemId);
+      if (fresh) setSelectedItem(fresh);
       fetchItems();
       fetchFacets();
     }
@@ -100,6 +115,8 @@ export default function App() {
 
   const handleTagWithGemini = async (itemId: string) => {
     if (await window.stickerVault?.tagItemWithGemini?.(itemId)) {
+      const fresh = await window.stickerVault?.getItem?.(itemId);
+      if (fresh) setSelectedItem(fresh);
       fetchItems();
       fetchFacets();
     }
