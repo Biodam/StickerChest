@@ -28,7 +28,8 @@
   - `generateThumbnailVariant(inputPath, outputPath, isAnimated)`
 - [x] Ensure animated GIF/WebP frame delays and loop headers are preserved during resize.
 - [x] Create `src/main/services/ingestion/` (`paths.ts`, `file-scanner.ts`, `coordinator.ts`, `folder-watcher.ts`) with batch execution and progress notifications.
-- [x] Write tests in `tests/unit/imaging.test.ts` verifying hashing, image dimensions, variants, deduplication, and database registration.
+- [x] Implement `src/main/services/ingestion/filename-tagger.ts` extracting emotion, character, and action keywords from snake_case, kebab-case, and CamelCase image names.
+- [x] Write tests in `tests/unit/imaging.test.ts` and `tests/unit/filename-tagger.test.ts` verifying hashing, image dimensions, variants, deduplication, and database registration.
 
 ---
 

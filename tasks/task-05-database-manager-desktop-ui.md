@@ -27,7 +27,9 @@
 - [x] Implement filtering controls: All, Recent, Favorites, Animated GIFs, and real-time full-text search.
 - [x] Implement dynamic facet filters in the sidebar: Franchises, Characters, and Tags, frequency-sorted with count badges and active filter chips.
 - [x] Build Settings modal with folder selection dialog and Gemini API key verification.
-- [x] Wire IPC hooks (`settings:get`, `settings:save`, `vault:scan`, `vault:progress`, `db:search`, `db:updateMetadata`) for real-time synchronization.
+- [x] Wire IPC hooks (`settings:get`, `settings:save`, `vault:scan`, `vault:progress`, `db:search`, `db:updateMetadata`, `gemini:batchTag`, `gemini:getUntaggedCount`) for real-time synchronization.
+- [x] Add "Batch AI Tag (N)" action button in Header with live untagged counter and real-time progress banner.
+- [x] Eliminate infinite re-selection loop and isolate form input state so metadata edits and tags persist without reset.
 
 ---
 

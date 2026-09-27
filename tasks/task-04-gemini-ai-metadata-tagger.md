@@ -22,6 +22,8 @@
 - [x] Write fallback parser `src/main/services/gemini/parser.ts` to handle edge cases and markdown code fences.
 - [x] Implement AI tagging coordinator in `tagger-service.ts` and IPC channels in `gemini-handlers.ts`.
 - [x] Protect user-locked fields and user tags (`is_ai_generated = 0`) from AI overwrite during re-tagging or automated ingestion.
+- [x] Implement one-click batch AI tagging for untagged items (`batchTagUntaggedItems` and `gemini:batchTag`).
+- [x] Supply filename context in Gemini vision prompt directives (`buildGeminiTaggingPrompt`) for enhanced character and emotion accuracy.
 - [x] Write unit tests in `tests/unit/gemini.test.ts` verifying parsing, prompt structures, key management, and database FTS indexing.
 
 ---
