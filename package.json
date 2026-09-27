@@ -8,8 +8,12 @@
     "start": "electron .",
     "build": "tsc && vite build",
     "test": "vitest run",
+    "generate-icons": "node scripts/generate-icons.js",
     "package": "npm run build && electron-builder --win --dir",
-    "dist": "npm run build && electron-builder --win"
+    "dist": "npm run build && electron-builder --win",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:all": "npm run build && electron-builder -mwl"
   },
   "keywords": [],
   "author": "",

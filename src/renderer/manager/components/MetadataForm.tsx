@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Check, Lock, Sparkles } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
+import { CustomAttributesEditor } from './CustomAttributesEditor';
 
 interface MetadataFormProps {
+
   item: StickerItem;
   onUpdateMetadata: (itemId: string, metadata: any) => void;
 }
@@ -69,6 +71,19 @@ export const MetadataForm: React.FC<MetadataFormProps> = ({ item, onUpdateMetada
       character: character.trim() || undefined, sourceOrigin: sourceOrigin.trim() || undefined,
       action: action.trim() || undefined, feeling: feeling.trim() || undefined,
       description: description.trim() || undefined, tags: item.tags.filter((t) => t !== tagToRemove), userLockedFields: locked,
+    });
+  };
+
+  const handleCustomAttributesChange = (updatedAttrs: Record<string, string>) => {
+    onUpdateMetadata(item.id, {
+      character: character.trim() || undefined,
+      sourceOrigin: sourceOrigin.trim() || undefined,
+      action: action.trim() || undefined,
+      feeling: feeling.trim() || undefined,
+      description: description.trim() || undefined,
+      tags: item.tags,
+      customAttributes: updatedAttrs,
+      userLockedFields: locked,
     });
   };
 
@@ -197,6 +212,12 @@ export const MetadataForm: React.FC<MetadataFormProps> = ({ item, onUpdateMetada
           </button>
         </form>
       </div>
+
+      <CustomAttributesEditor
+        attributes={item.customAttributes || {}}
+        onChange={handleCustomAttributesChange}
+      />
     </div>
   );
 };
+

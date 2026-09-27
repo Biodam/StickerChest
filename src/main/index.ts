@@ -4,6 +4,7 @@ import { app, BrowserWindow, protocol, net } from 'electron';
 import { pathToFileURL } from 'url';
 import { createMainWindow } from './windows/mainWindow';
 import { createPickerWindow } from './windows/pickerWindow';
+import { createTray, destroyTray, isAppQuitting, setAppQuitting } from './windows/tray';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts/globalShortcuts';
 import { registerIpcHandlers } from './ipc';
 import { resolveVaultPath } from './services/ingestion/paths';
@@ -87,6 +88,9 @@ app.whenReady().then(() => {
   createMainWindow();
   createPickerWindow();
 
+  // Create system tray companion
+  createTray();
+
   // Register global shortcuts (e.g. Alt+Shift+V to toggle floating picker)
   registerGlobalShortcuts();
 
@@ -98,14 +102,21 @@ app.whenReady().then(() => {
   });
 });
 
+app.on('before-quit', () => {
+  setAppQuitting(true);
+});
+
 app.on('will-quit', () => {
   console.log('[App] will-quit');
   unregisterGlobalShortcuts();
+  destroyTray();
 });
 
 app.on('window-all-closed', () => {
   console.log('[App] window-all-closed');
-  if (process.platform !== 'darwin') {
+  // If not explicitly quitting via Tray or exit menu, keep app alive in background for Quick Picker
+  if (isAppQuitting()) {
     app.quit();
   }
 });
+

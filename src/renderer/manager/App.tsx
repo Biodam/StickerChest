@@ -5,6 +5,8 @@ import { StickerGrid } from './components/StickerGrid';
 import { InspectorDrawer } from './components/InspectorDrawer';
 import { SettingsModal } from './components/SettingsModal';
 import { IngestionBanner } from './components/IngestionBanner';
+import { BulkActionBar } from './components/BulkActionBar';
+import { useSelection } from './hooks/useSelection';
 import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
 
 export default function App() {
@@ -21,6 +23,8 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
   const [untaggedCount, setUntaggedCount] = useState(0);
+
+  const { selectedIds, handleSelect, clearSelection } = useSelection();
 
   const [settings, setSettings] = useState<AppSettings>({
     sourceFolder: '', geminiApiKey: '', geminiModel: 'gemini-3.8-flash',
@@ -105,28 +109,40 @@ export default function App() {
     }
   };
 
-  const handleTagWithGemini = async (itemId: string) => {
-    if (await window.stickerVault?.tagItemWithGemini?.(itemId)) {
-      const fresh = await window.stickerVault?.getItem?.(itemId);
-      if (fresh) setSelectedItem(fresh);
-      fetchItems();
-      fetchFacets();
-      fetchUntagged();
+  const handleDropFiles = async (filePaths: string[]) => {
+    await window.stickerVault?.ingestFiles?.(filePaths);
+    fetchItems();
+    fetchFacets();
+    fetchUntagged();
+  };
+
+  const handleBulkFavorite = async (favorite: boolean) => {
+    await window.stickerVault?.bulkToggleFavorite?.(Array.from(selectedIds), favorite);
+    fetchItems();
+  };
+
+  const handleBulkAddTag = async (tag: string) => {
+    await window.stickerVault?.bulkAddTags?.(Array.from(selectedIds), [tag]);
+    fetchItems();
+    fetchFacets();
+  };
+
+  const handleBulkAiTag = async () => {
+    for (const id of selectedIds) {
+      await window.stickerVault?.tagItemWithGemini?.(id);
     }
+    fetchItems();
+    fetchFacets();
+    fetchUntagged();
   };
 
-  const handleBatchAiTag = async () => {
-    if (!settings.geminiApiKey) return setSettingsOpen(true);
-    await window.stickerVault?.batchTagUntagged?.();
-  };
-
-  const handleCopyItem = (itemId: string, tier: ImageTier) => {
-    window.stickerVault?.copyItemToClipboard?.(itemId, tier);
-  };
-
-  const handleSyncFolder = async () => {
-    if (!settings.sourceFolder) return setSettingsOpen(true);
-    await window.stickerVault?.scanSourceFolder?.(false);
+  const handleBulkDelete = async () => {
+    await window.stickerVault?.deleteItems?.(Array.from(selectedIds));
+    clearSelection();
+    setSelectedItem(null);
+    fetchItems();
+    fetchFacets();
+    fetchUntagged();
   };
 
   return (
@@ -134,7 +150,8 @@ export default function App() {
       <Sidebar
         activeTab={activeTab} isAnimatedOnly={isAnimatedOnly}
         onSelectTab={setActiveTab} onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
-        onSyncFolder={handleSyncFolder} onOpenSettings={() => setSettingsOpen(true)}
+        onSyncFolder={async () => settings.sourceFolder ? window.stickerVault?.scanSourceFolder?.(false) : setSettingsOpen(true)}
+        onOpenSettings={() => setSettingsOpen(true)}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
         facets={facets} selectedFranchise={selectedFranchise}
         selectedCharacter={selectedCharacter} selectedTag={selectedTag}
@@ -150,31 +167,51 @@ export default function App() {
           selectedFranchise={selectedFranchise} selectedCharacter={selectedCharacter} selectedTag={selectedTag}
           onClearFranchise={() => setSelectedFranchise(null)} onClearCharacter={() => setSelectedCharacter(null)}
           onClearTag={() => setSelectedTag(null)} modelName={settings.geminiModel}
-          untaggedCount={untaggedCount} onBatchAiTag={handleBatchAiTag} isTagging={progress?.status === 'tagging'}
+          untaggedCount={untaggedCount}
+          onBatchAiTag={async () => settings.geminiApiKey ? window.stickerVault?.batchTagUntagged?.() : setSettingsOpen(true)}
+          isTagging={progress?.status === 'tagging'}
         />
 
         <IngestionBanner progress={progress} onDismiss={() => setProgress(null)} />
 
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
           <StickerGrid
             items={items}
             selectedItem={selectedItem}
+            selectedItemIds={selectedIds}
             searchQuery={searchQuery}
-            onSelectItem={setSelectedItem}
+            onSelectItem={(it, e) => handleSelect(it, items, e, setSelectedItem)}
             onToggleFavorite={handleToggleFavorite}
             onOpenSettings={() => setSettingsOpen(true)}
+            onDropFiles={handleDropFiles}
           />
 
-          {selectedItem && (
+          {selectedItem && selectedIds.size <= 1 && (
             <InspectorDrawer
               item={selectedItem}
               onClose={() => setSelectedItem(null)}
               onToggleFavorite={() => handleToggleFavorite(selectedItem.id)}
-              onTagWithGemini={handleTagWithGemini}
-              onCopyItem={handleCopyItem}
+              onTagWithGemini={async (id) => {
+                await window.stickerVault?.tagItemWithGemini?.(id);
+                const fresh = await window.stickerVault?.getItem?.(id);
+                if (fresh) setSelectedItem(fresh);
+                fetchItems();
+                fetchFacets();
+                fetchUntagged();
+              }}
+              onCopyItem={(id, tier) => window.stickerVault?.copyItemToClipboard?.(id, tier)}
               onUpdateMetadata={handleUpdateMetadata}
             />
           )}
+
+          <BulkActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={clearSelection}
+            onBulkFavorite={handleBulkFavorite}
+            onBulkAddTag={handleBulkAddTag}
+            onBulkAiTag={handleBulkAiTag}
+            onBulkDelete={handleBulkDelete}
+          />
         </div>
       </div>
 

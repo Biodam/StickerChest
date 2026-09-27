@@ -7,6 +7,7 @@ import * as metaQueries from './metadata-queries';
 import * as searchQueries from './search-queries';
 import * as usageQueries from './usage-queries';
 import * as facetQueries from './facet-queries';
+import * as bulkQueries from './bulk-queries';
 
 export class StickerDatabaseDAL {
   private customDb?: Database;
@@ -59,6 +60,27 @@ export class StickerDatabaseDAL {
 
   public setCustomAttributes(itemId: string, attributes: Record<string, string>): void {
     metaQueries.setCustomAttributes(this.db, itemId, attributes);
+  }
+
+  // Bulk Operations
+  public deleteItems(ids: string[]): number {
+    return bulkQueries.bulkDeleteItems(this.db, ids);
+  }
+
+  public bulkAddTags(itemIds: string[], tags: string[]): void {
+    bulkQueries.bulkAddTags(this.db, itemIds, tags);
+  }
+
+  public bulkRemoveTags(itemIds: string[], tags: string[]): void {
+    bulkQueries.bulkRemoveTags(this.db, itemIds, tags);
+  }
+
+  public bulkToggleFavorite(itemIds: string[], favorite: boolean): void {
+    bulkQueries.bulkToggleFavorite(this.db, itemIds, favorite);
+  }
+
+  public bulkSetCustomAttribute(itemIds: string[], key: string, value: string): void {
+    bulkQueries.bulkSetCustomAttribute(this.db, itemIds, key, value);
   }
 
   // Search & Retrieval

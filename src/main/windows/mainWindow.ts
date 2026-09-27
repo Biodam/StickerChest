@@ -1,5 +1,8 @@
 import { app, BrowserWindow, shell } from 'electron';
 import path from 'path';
+import fs from 'fs';
+
+import { isAppQuitting } from './tray';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -13,6 +16,7 @@ export function createMainWindow(): BrowserWindow {
   const appPath = app.getAppPath();
   const preloadPath = path.join(appPath, 'dist-electron/preload/main.preload.js');
   const indexPath = path.join(appPath, 'dist/src/renderer/manager/index.html');
+  const iconPath = path.join(process.cwd(), 'resources', 'icon.png');
 
   console.log('[MainWindow] appPath:', appPath);
   console.log('[MainWindow] preloadPath:', preloadPath);
@@ -25,6 +29,7 @@ export function createMainWindow(): BrowserWindow {
     minWidth: 900,
     minHeight: 600,
     backgroundColor: '#121316',
+    icon: fs.existsSync(iconPath) ? iconPath : undefined,
     show: false,
     webPreferences: {
       preload: preloadPath,
@@ -32,6 +37,14 @@ export function createMainWindow(): BrowserWindow {
       contextIsolation: true,
       nodeIntegration: false,
     },
+  });
+
+  mainWindow.on('close', (event) => {
+    if (!isAppQuitting()) {
+      event.preventDefault();
+      mainWindow?.hide();
+      console.log('[MainWindow] Minimized to tray');
+    }
   });
 
   mainWindow.once('ready-to-show', () => {

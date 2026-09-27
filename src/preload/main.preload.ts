@@ -10,6 +10,15 @@ const api: StickerVaultAPI = {
 
   copyItemToClipboard: (itemId, tier) => ipcRenderer.invoke('clipboard:copyItem', itemId, tier),
 
+  // Bulk Operations
+  deleteItems: (itemIds) => ipcRenderer.invoke('db:deleteItems', itemIds),
+  bulkAddTags: (itemIds, tags) => ipcRenderer.invoke('db:bulkAddTags', itemIds, tags),
+  bulkRemoveTags: (itemIds, tags) => ipcRenderer.invoke('db:bulkRemoveTags', itemIds, tags),
+  bulkToggleFavorite: (itemIds, favorite) => ipcRenderer.invoke('db:bulkToggleFavorite', itemIds, favorite),
+  bulkSetCustomAttribute: (itemIds, key, value) => ipcRenderer.invoke('db:bulkSetCustomAttribute', itemIds, key, value),
+
+  // Vault & Ingestion
+  ingestFiles: (filePaths) => ipcRenderer.invoke('vault:ingestFiles', filePaths),
   scanSourceFolder: (forceReprocess, folderPath) => ipcRenderer.invoke('vault:scan', folderPath, forceReprocess),
   onIngestionProgress: (callback) => {
     const handler = (_event: any, data: any) => callback(data);

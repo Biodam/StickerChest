@@ -9,7 +9,15 @@
     "dist-electron/**/*",
     "package.json"
   ],
+  "extraResources": [
+    {
+      "from": "resources",
+      "to": "resources",
+      "filter": ["**/*"]
+    }
+  ],
   "win": {
+    "icon": "resources/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -25,9 +33,12 @@
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
-    "createStartMenuShortcut": true
+    "createStartMenuShortcut": true,
+    "shortcutName": "StickerVault",
+    "uninstallDisplayName": "StickerVault"
   },
   "mac": {
+    "icon": "resources/icon.png",
     "target": [
       {
         "target": "dmg",
@@ -40,7 +51,28 @@
     ],
     "category": "public.app-category.utilities"
   },
+  "dmg": {
+    "title": "StickerVault Installer",
+    "iconSize": 128,
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
   "linux": {
+    "icon": "resources/icon.png",
     "target": ["AppImage", "tar.gz"],
     "category": "Utility"
   }

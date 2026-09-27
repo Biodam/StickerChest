@@ -69,4 +69,56 @@ export function registerDbIpcHandlers(): void {
       return false;
     }
   });
+
+  // Bulk Handlers
+  ipcMain.handle('db:deleteItems', async (_event, itemIds: string[]) => {
+    try {
+      const count = dal.deleteItems(itemIds);
+      return count > 0;
+    } catch (err: any) {
+      console.error('IPC db:deleteItems error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('db:bulkAddTags', async (_event, itemIds: string[], tags: string[]) => {
+    try {
+      dal.bulkAddTags(itemIds, tags);
+      return true;
+    } catch (err: any) {
+      console.error('IPC db:bulkAddTags error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('db:bulkRemoveTags', async (_event, itemIds: string[], tags: string[]) => {
+    try {
+      dal.bulkRemoveTags(itemIds, tags);
+      return true;
+    } catch (err: any) {
+      console.error('IPC db:bulkRemoveTags error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('db:bulkToggleFavorite', async (_event, itemIds: string[], favorite: boolean) => {
+    try {
+      dal.bulkToggleFavorite(itemIds, favorite);
+      return true;
+    } catch (err: any) {
+      console.error('IPC db:bulkToggleFavorite error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('db:bulkSetCustomAttribute', async (_event, itemIds: string[], key: string, value: string) => {
+    try {
+      dal.bulkSetCustomAttribute(itemIds, key, value);
+      return true;
+    } catch (err: any) {
+      console.error('IPC db:bulkSetCustomAttribute error:', err);
+      return false;
+    }
+  });
 }
+

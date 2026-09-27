@@ -19,7 +19,15 @@ export interface StickerVaultAPI {
   // Clipboard
   copyItemToClipboard: (itemId: string, tier?: ImageTier) => Promise<boolean>;
 
+  // Bulk Operations
+  deleteItems: (itemIds: string[]) => Promise<boolean>;
+  bulkAddTags: (itemIds: string[], tags: string[]) => Promise<boolean>;
+  bulkRemoveTags: (itemIds: string[], tags: string[]) => Promise<boolean>;
+  bulkToggleFavorite: (itemIds: string[], favorite: boolean) => Promise<boolean>;
+  bulkSetCustomAttribute: (itemIds: string[], key: string, value: string) => Promise<boolean>;
+
   // Vault & Ingestion
+  ingestFiles: (filePaths: string[]) => Promise<{ ingested: number; duplicates: number; errors: number }>;
   scanSourceFolder: (forceReprocess?: boolean, folderPath?: string) => Promise<{ started: boolean }>;
   onIngestionProgress: (callback: (progress: IngestionProgressEvent) => void) => () => void;
   showItemInFolder: (filePath: string) => Promise<boolean>;
