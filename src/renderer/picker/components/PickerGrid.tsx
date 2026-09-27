@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Star } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
 import { getVaultImageUrl } from '../../shared/image-url';
 
@@ -13,6 +14,23 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
   selectedIndex,
   onSelectItem,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll selected item into view
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const selectedElement = containerRef.current.querySelector(
+      `[data-index="${selectedIndex}"]`
+    ) as HTMLElement | null;
+
+    if (selectedElement) {
+      selectedElement.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    }
+  }, [selectedIndex]);
+
   if (items.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center text-gray-500 select-none">
@@ -23,7 +41,7 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-2.5">
+    <div ref={containerRef} className="flex-1 overflow-y-auto p-2.5 scroll-smooth">
       <div className="grid grid-cols-4 gap-2">
         {items.map((item, index) => {
           const imageUrl = getVaultImageUrl(
@@ -37,6 +55,7 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
           return (
             <button
               key={item.id}
+              data-index={index}
               onClick={() => onSelectItem(item)}
               title={`${title} ${item.metadata?.feeling ? `(${item.metadata.feeling})` : ''}`}
               className={`relative aspect-square rounded-xl p-2 flex items-center justify-center transition-all bg-[#25262b]/60 hover:bg-[#2c2e33] ${
@@ -51,6 +70,11 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
                 loading="lazy"
                 className="max-w-full max-h-full object-contain pointer-events-none transition-transform hover:scale-110 duration-150"
               />
+              {item.usage?.isFavorite && (
+                <div className="absolute top-1 right-1 text-yellow-400 bg-black/60 rounded-full p-0.5 pointer-events-none">
+                  <Star className="w-2.5 h-2.5 fill-current" />
+                </div>
+              )}
             </button>
           );
         })}

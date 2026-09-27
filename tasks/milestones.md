@@ -29,7 +29,7 @@ This document tracks high-level progress across the core development milestones 
 | **M8** | **Companion Polish & Advanced Usability** | System Tray companion, close-to-tray 24/7 mode, drag-and-drop ingestion, grid multi-select & bulk actions, NSFW blur & star ratings | 🟢 Completed |
 | **M9** | **Multiplatform Installers & Release Pipeline** | Windows NSIS installer & portable exe, macOS DMG & zip bundle (arm64/x64), branded icon assets, GitHub Actions CI release workflow | 🟢 Completed |
 | **M10** | **Quick Picker Auto-Paste Integration** | Paste directly into active input field on select, native OS keystroke simulation (Windows/macOS/Linux), auto-paste settings toggle | 🟢 Completed |
-| **M11** | **Quick Picker Keyboard Navigation** | Window-level keyboard controls, 2D arrow grid navigation with auto-scroll into view, Home/End/PageUp/Down, Ctrl+1/2/3 tabs, Ctrl+T tier toggle, Ctrl+S favorite toggle, two-stage Escape | ⏳ Planned |
+| **M11** | **Quick Picker Keyboard Navigation** | Window-level keyboard controls, 2D arrow grid navigation with auto-scroll into view, Home/End/PageUp/Down, Ctrl+1/2/3 tabs, Ctrl+T tier toggle, Ctrl+S favorite toggle, two-stage Escape | 🟢 Completed |
 
 ---
 
@@ -45,6 +45,6 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 08: Companion Polish & Advanced Usability](file:///c:/Projects/sticker-database-manager/tasks/task-08-companion-polish-and-advanced-usability.md)
 - [x] [Task 09: Multiplatform Installers & Release Pipeline](file:///c:/Projects/sticker-database-manager/tasks/task-09-multiplatform-installers-and-release-pipeline.md)
 - [x] [Task 10: Quick Picker Auto-Paste Integration](file:///c:/Projects/sticker-database-manager/tasks/task-10-quick-picker-auto-paste.md)
-- [ ] [Task 11: Quick Picker Keyboard Navigation](file:///c:/Projects/sticker-database-manager/tasks/task-11-quick-picker-keyboard-navigation.md)
+- [x] [Task 11: Quick Picker Keyboard Navigation](file:///c:/Projects/sticker-database-manager/tasks/task-11-quick-picker-keyboard-navigation.md)
 
 

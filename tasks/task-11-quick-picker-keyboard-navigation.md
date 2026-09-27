@@ -1,6 +1,6 @@
 # Task 11: Quick Picker Full Keyboard Interaction
 
-**Status**: ⏳ Planned  
+**Status**: 🟢 Completed  
 **Milestone**: M11  
 **Estimated Complexity**: Medium
 
@@ -34,16 +34,16 @@
 ---
 
 ## Implementation Checklist
-- [ ] Create keyboard navigation hook / handler `src/renderer/picker/hooks/usePickerKeyboard.ts` encapsulating grid navigation, shortcuts, boundary limits, and action dispatching.
-- [ ] Implement DOM auto-scroll into view for selected sticker in `src/renderer/picker/components/PickerGrid.tsx`.
-- [ ] Implement two-stage `Escape` handling (clear search vs hide picker).
-- [ ] Implement `Ctrl+1`, `Ctrl+2`, `Ctrl+3` tab switching and `Ctrl+T` tier toggling.
-- [ ] Implement `Enter` (auto-paste) vs `Shift+Enter` (copy-only) action dispatching.
-- [ ] Implement `Ctrl+S` favorite toggling via IPC for the selected sticker.
-- [ ] Refactor `src/renderer/picker/App.tsx` to integrate window-level keyboard listener.
-- [ ] Update `src/renderer/picker/components/PickerFooter.tsx` with keyboard shortcut badge legend.
-- [ ] Add unit tests in `tests/unit/picker-keyboard.test.ts`.
-- [ ] Run test suite (`npm run test`) and production build (`npm run build`).
+- [x] Create keyboard navigation helper `src/renderer/picker/keyboard-navigation.ts` and hook `src/renderer/picker/hooks/usePickerKeyboard.ts` encapsulating grid navigation, shortcuts, boundary limits, and action dispatching.
+- [x] Implement DOM auto-scroll into view for selected sticker in `src/renderer/picker/components/PickerGrid.tsx`.
+- [x] Implement two-stage `Escape` handling (clear search vs hide picker).
+- [x] Implement `Ctrl+1`, `Ctrl+2`, `Ctrl+3` tab switching and `Ctrl+T` tier toggling.
+- [x] Implement `Enter` (auto-paste) vs `Shift+Enter` (copy-only) action dispatching.
+- [x] Implement `Ctrl+S` favorite toggling via IPC for the selected sticker.
+- [x] Refactor `src/renderer/picker/App.tsx` to integrate window-level keyboard listener.
+- [x] Update `src/renderer/picker/components/PickerFooter.tsx` with keyboard shortcut badge legend.
+- [x] Add unit tests in `tests/unit/picker-keyboard.test.ts` (15 passing tests).
+- [x] Run test suite (`npm run test`: 66/66 passing) and production build (`npm run build`).
 
 ---
 
@@ -52,3 +52,4 @@
 2. Update `tasks/milestones.md` (M11 status).
 3. Run tests: `npm run test && npm run build`.
 4. Commit: `git commit -m "feat(picker): implement full keyboard navigation and shortcuts in quick selector"`.
+

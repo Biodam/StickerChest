@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { PickerSearch } from './components/PickerSearch';
 import { PickerTabs } from './components/PickerTabs';
 import { PickerGrid } from './components/PickerGrid';
 import { PickerFooter } from './components/PickerFooter';
 import { StickerItem, ImageTier } from '../../types/models';
+import { PickerTab } from './keyboard-navigation';
+import { usePickerKeyboard } from './hooks/usePickerKeyboard';
 
 export default function PickerApp() {
-  const [activeTab, setActiveTab] = useState<'recent' | 'favorites' | 'all'>('recent');
+  const [activeTab, setActiveTab] = useState<PickerTab>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<StickerItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [copyTier, setCopyTier] = useState<ImageTier>('sticker');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchItems = useCallback(async () => {
     if (!window.stickerVault?.searchItems) return;
@@ -27,44 +30,64 @@ export default function PickerApp() {
     fetchItems();
   }, [fetchItems]);
 
-  const handleSelectItem = async (item: StickerItem) => {
-    if (window.stickerVault?.copyAndPasteItem) {
-      await window.stickerVault.copyAndPasteItem(item.id, copyTier);
-    } else if (window.stickerVault?.copyItemToClipboard) {
-      await window.stickerVault.copyItemToClipboard(item.id, copyTier);
+  const handleSelectItem = async (item: StickerItem, isShiftPressed: boolean = false) => {
+    if (isShiftPressed) {
+      // Shift+Enter: Copy only without auto-paste
+      await window.stickerVault?.copyItemToClipboard?.(item.id, copyTier);
       await window.stickerVault?.hidePicker?.();
+    } else {
+      // Enter / Click: Default action (auto-paste workflow if enabled, or clipboard copy)
+      if (window.stickerVault?.copyAndPasteItem) {
+        await window.stickerVault.copyAndPasteItem(item.id, copyTier);
+      } else if (window.stickerVault?.copyItemToClipboard) {
+        await window.stickerVault.copyItemToClipboard(item.id, copyTier);
+        await window.stickerVault?.hidePicker?.();
+      }
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      window.stickerVault?.hidePicker?.();
-    } else if (e.key === 'ArrowRight') {
-      setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
-    } else if (e.key === 'ArrowLeft') {
-      setSelectedIndex((prev) => Math.max(prev - 1, 0));
-    } else if (e.key === 'ArrowDown') {
-      setSelectedIndex((prev) => Math.min(prev + 4, items.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      setSelectedIndex((prev) => Math.max(prev - 4, 0));
-    } else if (e.key === 'Enter') {
-      if (items[selectedIndex]) {
-        handleSelectItem(items[selectedIndex]);
-      }
-    }
+  const handleToggleFavorite = async (item: StickerItem) => {
+    if (!window.stickerVault?.toggleFavorite) return;
+    await window.stickerVault.toggleFavorite(item.id);
+    const updatedStatus = !item.usage?.isFavorite;
+
+    setItems((prev) =>
+      prev
+        .map((it) =>
+          it.id === item.id
+            ? { ...it, usage: { ...it.usage, isFavorite: updatedStatus } }
+            : it
+        )
+        .filter((it) => (activeTab === 'favorites' ? it.usage?.isFavorite : true))
+    );
   };
 
   const handleToggleTier = () => {
     setCopyTier((prev) => (prev === 'sticker' ? 'emoji' : 'sticker'));
   };
 
+  // Register window-level keyboard listener & controls
+  usePickerKeyboard({
+    items,
+    selectedIndex,
+    setSelectedIndex,
+    searchQuery,
+    setSearchQuery,
+    activeTab,
+    setActiveTab,
+    onToggleTier: handleToggleTier,
+    onSelectItem: handleSelectItem,
+    onToggleFavorite: handleToggleFavorite,
+    searchInputRef,
+  });
+
   return (
     <div className="w-[420px] h-[520px] bg-[#1a1b1e]/95 backdrop-blur-xl border border-[#2c2e33] rounded-2xl shadow-2xl flex flex-col overflow-hidden text-[#f1f3f5]">
       <PickerSearch
+        ref={searchInputRef}
         value={searchQuery}
         onChange={setSearchQuery}
         onClear={() => setSearchQuery('')}
-        onKeyDown={handleKeyDown}
       />
 
       <PickerTabs
@@ -77,7 +100,7 @@ export default function PickerApp() {
       <PickerGrid
         items={items}
         selectedIndex={selectedIndex}
-        onSelectItem={handleSelectItem}
+        onSelectItem={(item) => handleSelectItem(item, false)}
       />
 
       <PickerFooter
