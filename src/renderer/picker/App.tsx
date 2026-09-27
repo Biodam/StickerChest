@@ -28,9 +28,12 @@ export default function PickerApp() {
   }, [fetchItems]);
 
   const handleSelectItem = async (item: StickerItem) => {
-    if (!window.stickerVault?.copyItemToClipboard) return;
-    await window.stickerVault.copyItemToClipboard(item.id, copyTier);
-    await window.stickerVault?.hidePicker?.();
+    if (window.stickerVault?.copyAndPasteItem) {
+      await window.stickerVault.copyAndPasteItem(item.id, copyTier);
+    } else if (window.stickerVault?.copyItemToClipboard) {
+      await window.stickerVault.copyItemToClipboard(item.id, copyTier);
+      await window.stickerVault?.hidePicker?.();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

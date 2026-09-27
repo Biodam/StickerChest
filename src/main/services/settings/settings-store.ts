@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   syncIntervalMinutes: 15,
   autoAiTagOnIngest: true,
   cloudDriveMode: true,
+  autoPasteOnSelect: true,
 };
 
 let cachedSettings: AppSettings | null = null;

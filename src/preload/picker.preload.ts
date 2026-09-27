@@ -9,6 +9,7 @@ const api: StickerVaultAPI = {
   updateMetadata: (itemId, metadata) => ipcRenderer.invoke('db:updateMetadata', itemId, metadata),
 
   copyItemToClipboard: (itemId, tier) => ipcRenderer.invoke('clipboard:copyItem', itemId, tier),
+  copyAndPasteItem: (itemId, tier) => ipcRenderer.invoke('clipboard:copyAndPasteItem', itemId, tier),
 
   // Bulk Operations
   deleteItems: (itemIds) => ipcRenderer.invoke('db:deleteItems', itemIds),

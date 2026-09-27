@@ -58,3 +58,27 @@ export async function copyStickerToClipboard(
     return false;
   }
 }
+
+export async function copyAndPasteSticker(
+  itemId: string,
+  preferredTier: ImageTier = 'sticker'
+): Promise<boolean> {
+  const copied = await copyStickerToClipboard(itemId, preferredTier);
+  if (!copied) return false;
+
+  const { hidePickerWindow } = await import('../../windows/pickerWindow');
+  const { loadSettings } = await import('../settings/settings-store');
+  const { simulatePasteKeystroke } = await import('./paste-simulator');
+
+  hidePickerWindow();
+
+  const settings = loadSettings();
+  if (settings.autoPasteOnSelect !== false) {
+    // Wait briefly for OS to restore focus to previously active application
+    await new Promise((resolve) => setTimeout(resolve, 80));
+    await simulatePasteKeystroke();
+  }
+
+  return true;
+}
+

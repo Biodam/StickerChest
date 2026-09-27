@@ -18,6 +18,7 @@ export interface StickerVaultAPI {
 
   // Clipboard
   copyItemToClipboard: (itemId: string, tier?: ImageTier) => Promise<boolean>;
+  copyAndPasteItem: (itemId: string, tier?: ImageTier) => Promise<boolean>;
 
   // Bulk Operations
   deleteItems: (itemIds: string[]) => Promise<boolean>;

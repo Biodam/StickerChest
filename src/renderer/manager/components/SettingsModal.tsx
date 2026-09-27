@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Folder, Key, Sparkles, Check, AlertCircle, RefreshCw, Cloud } from 'lucide-react';
+import { X, Folder, Key, Sparkles, Check, AlertCircle, RefreshCw, Cloud, Clipboard } from 'lucide-react';
 import { AppSettings } from '../../../types/models';
 
 interface SettingsModalProps {
@@ -26,6 +26,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   );
   const [syncInterval, setSyncInterval] = useState(settings.syncIntervalMinutes ?? 15);
   const [autoTag, setAutoTag] = useState(settings.autoAiTagOnIngest ?? true);
+  const [autoPaste, setAutoPaste] = useState(settings.autoPasteOnSelect ?? true);
   const [testStatus, setTestStatus] = useState<{ testing: boolean; valid?: boolean; message?: string }>({
     testing: false,
   });
@@ -37,6 +38,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setModel(m);
     setSyncInterval(settings.syncIntervalMinutes ?? 15);
     setAutoTag(settings.autoAiTagOnIngest ?? true);
+    setAutoPaste(settings.autoPasteOnSelect ?? true);
     setTestStatus({ testing: false });
   }, [settings, isOpen]);
 
@@ -62,6 +64,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       geminiModel: model,
       syncIntervalMinutes: syncInterval,
       autoAiTagOnIngest: autoTag,
+      autoPasteOnSelect: autoPaste,
     });
     onClose();
   };
@@ -150,6 +153,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span className="text-gray-300">Auto-tag on import</span>
               </label>
             </div>
+          </div>
+
+          {/* Quick Picker & Auto-Paste Behavior */}
+          <div className="p-3 bg-[#121316] border border-[#2c2e33] rounded-xl space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-gray-200 font-medium flex items-center space-x-1.5">
+                <Clipboard className="w-3.5 h-3.5 text-blue-400" />
+                <span>Quick Picker Auto-Paste</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoPaste}
+                  onChange={(e) => setAutoPaste(e.target.checked)}
+                  className="rounded border-[#2c2e33] text-blue-600 focus:ring-0 bg-[#121316] w-4 h-4"
+                />
+                <span className="text-xs text-gray-300 font-medium">Auto-paste on select</span>
+              </label>
+            </div>
+            <p className="text-[10px] text-gray-400 leading-normal">
+              When you select a sticker in the floating Quick Picker (<kbd className="px-1 py-0.5 bg-[#25262b] rounded text-gray-300 text-[10px]">Alt+Shift+V</kbd>), StickerVault automatically pastes it directly into your active chat or document input field.
+            </p>
           </div>
 
           {/* Gemini AI Settings (Optional) */}

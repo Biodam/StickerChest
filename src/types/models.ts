@@ -99,4 +99,6 @@ export interface AppSettings {
   syncIntervalMinutes: number;
   autoAiTagOnIngest: boolean;
   cloudDriveMode: boolean;
+  autoPasteOnSelect: boolean;
 }
+

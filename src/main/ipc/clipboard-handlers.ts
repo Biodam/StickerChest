@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { copyStickerToClipboard } from '../services/clipboard/clipboard-service';
+import { copyStickerToClipboard, copyAndPasteSticker } from '../services/clipboard/clipboard-service';
 import { ImageTier } from '../../types/models';
 
 export function registerClipboardIpcHandlers(): void {
@@ -11,4 +11,14 @@ export function registerClipboardIpcHandlers(): void {
       return false;
     }
   });
+
+  ipcMain.handle('clipboard:copyAndPasteItem', async (_event, itemId: string, tier?: ImageTier) => {
+    try {
+      return await copyAndPasteSticker(itemId, tier || 'sticker');
+    } catch (err: any) {
+      console.error('IPC clipboard:copyAndPasteItem error:', err);
+      return false;
+    }
+  });
 }
+
