@@ -7,7 +7,7 @@
 ---
 
 ## Objectives
-1. Provide a fluid, 100% mouse-free keyboard navigation experience within the Quick Picker companion panel (`Alt+Shift+V`), matching the ergonomics of Spotlight, Raycast, and Alfred.
+1. Provide a fluid, 100% mouse-free keyboard navigation experience within the Quick Picker companion panel (`Win+/` / `Control+/`), matching the ergonomics of Spotlight, Raycast, and Alfred.
 2. **Window-Level Keydown Capture & Input Routing**:
    - Listen for keyboard events at the window level so shortcuts function consistently regardless of whether the search input, tabs, or grid currently have DOM focus.
    - Route alphanumeric typing into the search input automatically when navigating the grid.

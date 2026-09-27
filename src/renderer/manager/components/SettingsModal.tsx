@@ -173,7 +173,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </label>
             </div>
             <p className="text-[10px] text-gray-400 leading-normal">
-              When you select a sticker in the floating Quick Picker (<kbd className="px-1 py-0.5 bg-[#25262b] rounded text-gray-300 text-[10px]">Alt+Shift+V</kbd>), StickerVault automatically pastes it directly into your active chat or document input field.
+              When you select a sticker in the floating Quick Picker (<kbd className="px-1 py-0.5 bg-[#25262b] rounded text-gray-300 text-[10px]">Win + /</kbd>), StickerVault automatically pastes it directly into your active chat or document input field.
             </p>
           </div>
 
@@ -241,7 +241,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* Global Shortcut Notice */}
           <div className="p-3 rounded-xl bg-[#121316] border border-[#2c2e33] text-gray-400 text-[11px]">
             <span className="font-semibold text-gray-300 block mb-0.5">Quick Picker Global Hotkey</span>
-            <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[#25262b] border border-[#2c2e33] text-white font-mono">Alt + Shift + V</kbd> (Windows) or <kbd className="px-1.5 py-0.5 rounded bg-[#25262b] border border-[#2c2e33] text-white font-mono">Opt + Shift + V</kbd> (macOS) anywhere to summon picker.</span>
+            <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[#25262b] border border-[#2c2e33] text-white font-mono">Win + /</kbd> (Windows) or <kbd className="px-1.5 py-0.5 rounded bg-[#25262b] border border-[#2c2e33] text-white font-mono">Ctrl + /</kbd> (macOS) anywhere to summon picker.</span>
           </div>
         </div>
 

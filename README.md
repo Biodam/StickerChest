@@ -35,19 +35,41 @@
 - ⚡ **SQLite 3 + FTS5 Full-Text Search**:
   - Sub-5ms search across characters, series, feelings, actions, and tags with BM25 ranking and prefix matching.
 - 🖥️ **Dual-Window Desktop Experience**:
-  - **Main Manager Window**: Complete database explorer, metadata editor, ingestion monitor, and configuration.
-  - **Quick Picker Companion Panel**: Global shortcut (`Alt + Shift + V` / `Option + Shift + V`) summons a lightweight, floating, borderless modal (similar to the Windows `Win + .` emoji panel) featuring **Recent**, **Favorites**, and **All** tabs, search-as-you-type, and one-click copy directly into your system clipboard for instant pasting into Discord, Slack, Telegram, etc.
+- ⌨️ **Quick Picker Auto-Paste & Full Keyboard Interaction**:
+  - Global summon (`Win + /` on Windows, `Control + /` on macOS).
+  - **Auto-Paste**: Select a sticker to automatically copy and paste it into your active input field (Discord, Slack, WhatsApp, browser) with simulated keystrokes.
+  - **Full Keyboard Navigation**: 2D arrow keys (`↑↓←→`), Home/End, PageUp/Down, tab switching (`Ctrl+1/2/3`), resolution toggle (`Ctrl+T`), and star bookmarking (`Ctrl+S`).
+- 🔔 **System Tray & 24/7 Companion Daemon**:
+  - Closing the Manager window hides it to the system tray, keeping the Quick Picker active and summoned instantly with zero startup lag.
+- 📦 **Bulk Tagging & Drag-and-Drop Ingestion**:
+  - Drag and drop images directly into the Manager window to ingest without re-scanning folders.
+  - Multi-select stickers (`Ctrl+Click`, `Shift+Click`, `Ctrl+A`) for batch tagging, favoriting, or deleting.
+
+---
+
+## 📦 Downloads & Releases
+
+Prebuilt multiplatform installers for Windows and macOS are published under [GitHub Releases](https://github.com/Biodam/sticker-database-manager/releases):
+
+| Platform | Format | Installer Download |
+|---|---|---|
+| **Windows** | Setup Installer | [`StickerVault.Setup.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault.Setup.0.0.1.exe) |
+| **Windows** | Portable Executable | [`StickerVault.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault.0.0.1.exe) |
+| **macOS (Apple Silicon)** | Disk Image (DMG) | [`StickerVault-0.0.1-arm64.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault-0.0.1-arm64.dmg) |
+| **macOS (Intel)** | Disk Image (DMG) | [`StickerVault-0.0.1.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault-0.0.1.dmg) |
 
 ---
 
 ## 📂 Project Architecture & Documentation
 
 - **[`AGENTS.md`](file:///c:/Projects/sticker-database-manager/AGENTS.md)**: Agent instructions, modularity rules, file size limits, and naming conventions.
+- **[`docs/standards/keyboard-shortcuts.md`](file:///c:/Projects/sticker-database-manager/docs/standards/keyboard-shortcuts.md)**: Complete keyboard shortcut manual for Quick Picker and Manager.
+- **[`docs/standards/packaging-and-releases.md`](file:///c:/Projects/sticker-database-manager/docs/standards/packaging-and-releases.md)**: Multiplatform installer configurations, CI/CD pipeline, and quota protection.
 - **[`docs/standards/image-standards.md`](file:///c:/Projects/sticker-database-manager/docs/standards/image-standards.md)**: Sizing tiers, animated GIF handling, aspect ratio and format standards.
 - **[`docs/standards/metadata-definitions.md`](file:///c:/Projects/sticker-database-manager/docs/standards/metadata-definitions.md)**: Metadata taxonomy, Gemini prompt schema, custom attributes, and search ranking.
 - **[`docs/standards/database-schema.md`](file:///c:/Projects/sticker-database-manager/docs/standards/database-schema.md)**: SQLite 3 tables, triggers, and FTS5 virtual table specifications.
 - **[`docs/standards/cloud-drive-compatibility.md`](file:///c:/Projects/sticker-database-manager/docs/standards/cloud-drive-compatibility.md)**: Google Drive Desktop & OneDrive compatibility, file stability locks, and periodic sync.
-- **[`docs/architecture/system-overview.md`](file:///c:/Projects/sticker-database-manager/docs/architecture/system-overview.md)**: Electron multi-process design, IPC channels, window lifecycle, and clipboard dispatch.
+- **[`docs/architecture/system-overview.md`](file:///c:/Projects/sticker-database-manager/docs/architecture/system-overview.md)**: Electron multi-process design, IPC channels, window lifecycle, and auto-paste engine.
 - **[`tasks/milestones.md`](file:///c:/Projects/sticker-database-manager/tasks/milestones.md)**: Milestone roadmap tracking development progress.
 
 ---
@@ -73,7 +95,7 @@
 ### Installation
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/Biodam/sticker-database-manager.git
 cd sticker-database-manager
 
 # Install dependencies
@@ -83,12 +105,20 @@ npm install
 npm run dev
 ```
 
-### Running Tests
+### Running Tests & Verification
 ```bash
+# Run unit & integration test suite
 npm run test
+
+# Compile production bundles
+npm run build
+
+# Inspect GitHub Actions quota & repository visibility
+npm run check-quota
 ```
 
 ---
 
 ## 📄 License
 MIT License
+

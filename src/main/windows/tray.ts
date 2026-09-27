@@ -2,6 +2,7 @@ import { app, Menu, Tray, nativeImage } from 'electron';
 import path from 'path';
 import { getMainWindow, createMainWindow } from './mainWindow';
 import { togglePickerWindow } from './pickerWindow';
+import { getRegisteredShortcut, formatShortcutForDisplay } from '../shortcuts/globalShortcuts';
 
 let tray: Tray | null = null;
 let isQuitting = false;
@@ -49,7 +50,7 @@ export function createTray(): Tray {
       },
     },
     {
-      label: 'Quick Picker (Alt+Shift+V)',
+      label: `Quick Picker (${formatShortcutForDisplay(getRegisteredShortcut())})`,
       click: () => {
         togglePickerWindow();
       },

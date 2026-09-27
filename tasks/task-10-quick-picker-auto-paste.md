@@ -7,7 +7,7 @@
 ---
 
 ## Objectives
-1. Automatically paste the selected sticker into the user's current active input field (chat, document, browser) upon selecting it in the Quick Picker (`Alt+Shift+V`).
+1. Automatically paste the selected sticker into the user's current active input field (chat, document, browser) upon selecting it in the Quick Picker (`Win+/` / `Control+/`).
 2. Implement cross-platform native paste keystroke simulation:
    - Windows: VBScript `SendKeys "^v"` executed via `cscript //nologo` with PowerShell fallback.
    - macOS: AppleScript `osascript -e 'tell application "System Events" to keystroke "v" using command down'`.

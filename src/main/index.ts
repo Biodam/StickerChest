@@ -8,6 +8,7 @@ import { createTray, destroyTray, isAppQuitting, setAppQuitting } from './window
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts/globalShortcuts';
 import { registerIpcHandlers } from './ipc';
 import { resolveVaultPath } from './services/ingestion/paths';
+import { loadSettings } from './services/settings/settings-store';
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
@@ -91,8 +92,9 @@ app.whenReady().then(() => {
   // Create system tray companion
   createTray();
 
-  // Register global shortcuts (e.g. Alt+Shift+V to toggle floating picker)
-  registerGlobalShortcuts();
+  // Register global shortcuts (e.g. Win+/ on Windows, Control+/ on macOS to toggle floating picker)
+  const settings = loadSettings();
+  registerGlobalShortcuts(settings.globalShortcut);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

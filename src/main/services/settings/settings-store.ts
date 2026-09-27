@@ -3,7 +3,7 @@ import path from 'path';
 import { app } from 'electron';
 import { AppSettings } from '../../../types/models';
 import { setGeminiApiKey, setGeminiModel } from '../gemini/client';
-import { registerGlobalShortcuts } from '../../shortcuts/globalShortcuts';
+import { DEFAULT_GLOBAL_SHORTCUT, registerGlobalShortcuts } from '../../shortcuts/globalShortcuts';
 import { getIngestionService } from '../ingestion/folder-watcher';
 import { setCustomVaultRoot, ensureVaultDirectories } from '../ingestion/paths';
 import { switchDatabase } from '../database/connection';
@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   sourceFolder: '',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: 'gemini-3.8-flash',
-  globalShortcut: 'Alt+Shift+V',
+  globalShortcut: DEFAULT_GLOBAL_SHORTCUT,
   preferredCopyTier: 'sticker',
   autoStartAtLogin: false,
   syncIntervalMinutes: 15,
@@ -52,6 +52,11 @@ export function loadSettings(): AppSettings {
   // Auto-upgrade deprecated gemini-2.5-flash model
   if (loaded.geminiModel === 'gemini-2.5-flash') {
     loaded.geminiModel = 'gemini-3.8-flash';
+  }
+
+  // Auto-upgrade legacy Alt+Shift+V default to modern Super+/ or Control+/
+  if (loaded.globalShortcut === 'Alt+Shift+V') {
+    loaded.globalShortcut = DEFAULT_GLOBAL_SHORTCUT;
   }
 
   cachedSettings = loaded;

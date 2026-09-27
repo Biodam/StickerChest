@@ -21,7 +21,7 @@
 
 ## Implementation Checklist
 - [x] Configure Electron `BrowserWindow` with `frame: false`, `alwaysOnTop: true`, `skipTaskbar: true`, `transparent: true`.
-- [x] Implement `globalShortcut.register` in main process with customizable keybind (`Alt+Shift+V`).
+- [x] Implement `globalShortcut.register` in main process with customizable keybind (`Win+/` on Windows, `Control+/` on macOS).
 - [x] Implement focus/blur auto-hide listeners and Escape key dismiss.
 - [x] Build the Picker React UI (`src/renderer/picker/`):
   - Top search input (`PickerSearch.tsx`) with immediate debounced FTS query.

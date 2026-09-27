@@ -24,12 +24,15 @@ This document tracks high-level progress across the core development milestones 
 | **M3** | **Ingestion & Resizing Pipeline** | SHA-256 deduplication, Sharp multi-tier resizing (emoji, sticker, thumb), GIF support | 🟢 Completed |
 | **M4** | **Gemini AI Metadata Tagger** | GenAI SDK integration, vision prompt schema, batch queue, manual metadata override | 🟢 Completed |
 | **M5** | **Manager Desktop UI** | Library grid, search/filter sidebar, inspector drawer, bulk tagger, settings | 🟢 Completed |
-| **M6** | **Quick Picker Companion Panel** | Frameless floating modal, global hotkey (`Alt+Shift+V`), Recent/Favs/All tabs, copy to clipboard | 🟢 Completed |
+| **M6** | **Quick Picker Companion Panel** | Frameless floating modal, global hotkey (`Win+/` / `Control+/`), Recent/Favs/All tabs, copy to clipboard | 🟢 Completed |
 | **M7** | **Testing, Verification & Packaging** | Unit/integration test suites, cross-platform build scripts (Windows & macOS) | 🟢 Completed |
 | **M8** | **Companion Polish & Advanced Usability** | System Tray companion, close-to-tray 24/7 mode, drag-and-drop ingestion, grid multi-select & bulk actions, NSFW blur & star ratings | 🟢 Completed |
 | **M9** | **Multiplatform Installers & Release Pipeline** | Windows NSIS installer & portable exe, macOS DMG & zip bundle (arm64/x64), branded icon assets, GitHub Actions CI release workflow | 🟢 Completed |
 | **M10** | **Quick Picker Auto-Paste Integration** | Paste directly into active input field on select, native OS keystroke simulation (Windows/macOS/Linux), auto-paste settings toggle | 🟢 Completed |
 | **M11** | **Quick Picker Keyboard Navigation** | Window-level keyboard controls, 2D arrow grid navigation with auto-scroll into view, Home/End/PageUp/Down, Ctrl+1/2/3 tabs, Ctrl+T tier toggle, Ctrl+S favorite toggle, two-stage Escape | 🟢 Completed |
+| **M12** | **Animated Sticker & GIF Controls** | Hover-to-play vs always-play, viewport-aware offscreen animation pausing, frame-by-frame scrubber & telemetry in Inspector | ⏳ Planned |
+| **M13** | **Vault Backup & Pack Exporter** | Full portable `.stickervault` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | ⏳ Planned |
+| **M14** | **Custom Global Hotkeys & UI Themes** | Interactive global summon hotkey rebinding in Settings; curated theme engine (OLED Black, Slate, Cyberpunk, Catppuccin, Light) | ⏳ Planned |
 
 ---
 
@@ -46,5 +49,9 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 09: Multiplatform Installers & Release Pipeline](file:///c:/Projects/sticker-database-manager/tasks/task-09-multiplatform-installers-and-release-pipeline.md)
 - [x] [Task 10: Quick Picker Auto-Paste Integration](file:///c:/Projects/sticker-database-manager/tasks/task-10-quick-picker-auto-paste.md)
 - [x] [Task 11: Quick Picker Keyboard Navigation](file:///c:/Projects/sticker-database-manager/tasks/task-11-quick-picker-keyboard-navigation.md)
+- [ ] [Task 12: Animated Sticker & GIF Controls](file:///c:/Projects/sticker-database-manager/tasks/task-12-animated-sticker-and-gif-controls.md)
+- [ ] [Task 13: Vault Backup & Pack Exporter](file:///c:/Projects/sticker-database-manager/tasks/task-13-vault-backup-and-pack-export.md)
+- [ ] [Task 14: Custom Global Hotkeys & UI Themes](file:///c:/Projects/sticker-database-manager/tasks/task-14-custom-hotkeys-and-visual-themes.md)
+
 
 
