@@ -74,14 +74,23 @@ Renderers communicate securely with the Main process using `contextBridge` with 
 
 | Channel | Direction | Payload | Return / Action |
 |---|---|---|---|
-| `db:search` | Invoke | `{ query: string, tab: 'recent'\|'favorites'\|'all', limit: number, offset: number }` | Paginated sticker items with metadata & variants |
-| `db:toggleFavorite` | Invoke | `{ itemId: string, isFavorite: boolean }` | Success boolean |
-| `db:updateMetadata` | Invoke | `{ itemId: string, metadata: Partial<ItemMetadata> }` | Updated item record |
-| `clipboard:copyItem` | Invoke | `{ itemId: string, tier: 'sticker'\|'emoji' }` | Writes image buffer to clipboard, increments usage |
-| `vault:scan` | Invoke | `{ folderPath?: string, forceReprocess?: boolean }` | Ingestion job ID & initial status |
-| `vault:onProgress` | Event | None (Main -> Renderer push) | Scan/Resizing/AI tagging progress events |
-| `gemini:testKey` | Invoke | `{ apiKey: string }` | Validation status |
-| `window:hidePicker` | Invoke | None | Closes/hides the floating picker |
+| `db:search` | Invoke | `{ query: string, tab: 'recent'\|'favorites'\|'all', limit: number, ... }` | Paginated sticker items with metadata & variants |
+| `db:getFacets` | Invoke | None | Frequency-ranked franchises, characters, and tags |
+| `db:getItem` | Invoke | `id: string` | Full sticker record by ID |
+| `db:toggleFavorite` | Invoke | `itemId: string` | Toggle favorite boolean state |
+| `db:updateMetadata` | Invoke | `{ itemId: string, metadata: ... }` | Updates metadata, locks fields, returns boolean |
+| `clipboard:copyItem` | Invoke | `{ itemId: string, tier: 'sticker'\|'emoji' }` | Writes image to OS clipboard, updates usage |
+| `vault:scan` | Invoke | `{ folderPath?: string, forceReprocess?: boolean }` | Starts folder scan & returns `{ started: boolean }` |
+| `vault:showItemInFolder` | Invoke | `filePath: string` | Opens native file explorer focusing file |
+| `vault:progress` | Event | `IngestionProgressEvent` (Main $\rightarrow$ Renderer) | Ingestion/resizing/tagging progress |
+| `gemini:tagItem` | Invoke | `itemId: string` | Triggers AI vision tagging for single item |
+| `gemini:batchTag` | Invoke | None | Starts background batch AI tagging for untagged items |
+| `gemini:getUntaggedCount` | Invoke | None | Count of untagged/pending items |
+| `gemini:testKey` | Invoke | `{ apiKey: string, model?: string }` | Validates Gemini API key and model |
+| `settings:get` / `save` | Invoke | Settings object | Loads or saves application settings |
+| `dialog:selectFolder` | Invoke | None | Native folder selection dialog |
+| `window:hidePicker` | Invoke | None | Hides floating companion modal |
+| `window:openManager` | Invoke | None | Focuses or creates Main Manager window |
 
 ---
 

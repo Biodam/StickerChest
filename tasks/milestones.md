@@ -26,6 +26,8 @@ This document tracks high-level progress across the core development milestones 
 | **M5** | **Manager Desktop UI** | Library grid, search/filter sidebar, inspector drawer, bulk tagger, settings | 🟢 Completed |
 | **M6** | **Quick Picker Companion Panel** | Frameless floating modal, global hotkey (`Alt+Shift+V`), Recent/Favs/All tabs, copy to clipboard | 🟢 Completed |
 | **M7** | **Testing, Verification & Packaging** | Unit/integration test suites, cross-platform build scripts (Windows & macOS) | 🟢 Completed |
+| **M8** | **Companion Polish & Advanced Usability** | System Tray companion, close-to-tray 24/7 mode, drag-and-drop ingestion, grid multi-select & bulk actions, NSFW blur & star ratings | 🟡 Planned |
+| **M9** | **Multiplatform Installers & Release Pipeline** | Windows NSIS installer & portable exe, macOS DMG & zip bundle (arm64/x64), branded icon assets, GitHub Actions CI release workflow | 🟡 Planned |
 
 ---
 
@@ -38,3 +40,5 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 05: Database Manager Desktop UI](file:///c:/Projects/sticker-database-manager/tasks/task-05-database-manager-desktop-ui.md)
 - [x] [Task 06: Quick Picker Companion Panel](file:///c:/Projects/sticker-database-manager/tasks/task-06-quick-picker-companion-panel.md)
 - [x] [Task 07: Testing, Packaging & CI](file:///c:/Projects/sticker-database-manager/tasks/task-07-testing-packaging-and-ci.md)
+- [ ] [Task 08: Companion Polish & Advanced Usability](file:///c:/Projects/sticker-database-manager/tasks/task-08-companion-polish-and-advanced-usability.md)
+- [ ] [Task 09: Multiplatform Installers & Release Pipeline](file:///c:/Projects/sticker-database-manager/tasks/task-09-multiplatform-installers-and-release-pipeline.md)
