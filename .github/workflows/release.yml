@@ -5,24 +5,29 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag name (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+      draft:
+        description: 'Publish as draft release'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
 
 jobs:
-  build-release:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, macos-latest]
-
+  build-windows:
+    name: Build Windows Installers (x64)
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -37,29 +42,86 @@ jobs:
       - name: Generate master application icons
         run: npm run generate-icons
 
-      - name: Build Windows Installers (NSIS + Portable)
-        if: runner.os == 'Windows'
+      - name: Build Windows NSIS & Portable executables
         run: npm run dist:win
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build macOS Installers (DMG + Zip)
-        if: runner.os == 'macOS'
-        run: npm run dist:mac
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish Release Assets
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      - name: Upload Windows Installers
+        uses: actions/upload-artifact@v4
         with:
-          draft: true
-          prerelease: false
-          generate_release_notes: true
-          files: |
+          name: windows-installers
+          path: |
             release/*.exe
+            release/latest.yml
+          if-no-files-found: error
+
+  build-macos:
+    name: Build macOS Installers (arm64 + x64)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit & integration tests
+        run: npm test
+
+      - name: Generate master application icons
+        run: npm run generate-icons
+
+      - name: Build macOS DMG & Zip bundles
+        run: npm run dist:mac
+
+      - name: Upload macOS Installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installers
+          path: |
             release/*.dmg
             release/*.zip
-            release/latest*.yml
+            release/latest-mac.yml
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all installer artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Determine Release Tag
+        id: tag_info
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag_name || 'v1.0.0' }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag_info.outputs.tag }}
+          name: StickerVault ${{ steps.tag_info.outputs.tag }}
+          draft: ${{ inputs.draft || false }}
+          prerelease: false
+          generate_release_notes: true
+          fail_on_unmatched_files: false
+          files: |
+            release-artifacts/*.exe
+            release-artifacts/*.dmg
+            release-artifacts/*.zip
+            release-artifacts/latest*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
