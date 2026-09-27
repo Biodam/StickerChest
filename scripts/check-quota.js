@@ -15,7 +15,8 @@ export async function checkQuota(options = {}) {
   try {
     const raw = execSync('gh repo view --json isPrivate,visibility,owner,name', {
       encoding: 'utf-8',
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 2500,
     });
     repoInfo = JSON.parse(raw);
   } catch (err) {
@@ -34,7 +35,8 @@ export async function checkQuota(options = {}) {
     try {
       const rawBilling = execSync(`gh api /users/${repoInfo.owner.login}/settings/billing/actions`, {
         encoding: 'utf-8',
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: 2500,
       });
       billingData = JSON.parse(rawBilling);
     } catch {
@@ -66,23 +68,26 @@ export async function checkQuota(options = {}) {
     console.log('\n💡 Note: To display live billing quota, run: gh auth refresh -h github.com -s user');
   }
 
-  // Check active runs
+  // Check active runs only if gh CLI succeeded earlier
   let activeRunsCount = 0;
-  try {
-    const rawRuns = execSync('gh run list --limit 5 --json databaseId,name,status,headBranch', {
-      encoding: 'utf-8',
-      stdio: ['ignore', 'pipe', 'pipe']
-    });
-    const runs = JSON.parse(rawRuns);
-    const inProgress = runs.filter(r => r.status === 'in_progress' || r.status === 'queued');
-    activeRunsCount = inProgress.length;
+  if (repoInfo) {
+    try {
+      const rawRuns = execSync('gh run list --limit 5 --json databaseId,name,status,headBranch', {
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: 2500,
+      });
+      const runs = JSON.parse(rawRuns);
+      const inProgress = runs.filter(r => r.status === 'in_progress' || r.status === 'queued');
+      activeRunsCount = inProgress.length;
 
-    if (inProgress.length > 0) {
-      console.log(`\n⏳ Notice: ${inProgress.length} workflow run(s) currently in progress or queued:`);
-      inProgress.forEach(r => console.log(`   - [#${r.databaseId}] ${r.name} (${r.status}) on ${r.headBranch}`));
+      if (inProgress.length > 0) {
+        console.log(`\n⏳ Notice: ${inProgress.length} workflow run(s) currently in progress or queued:`);
+        inProgress.forEach(r => console.log(`   - [#${r.databaseId}] ${r.name} (${r.status}) on ${r.headBranch}`));
+      }
+    } catch {
+      // Non-fatal if gh run list fails
     }
-  } catch {
-    // Non-fatal if gh run list fails
   }
 
   console.log('\n------------------------------------------------------------');

@@ -13,11 +13,11 @@ describe('GitHub Actions Quota & Visibility Preflight Checker', () => {
     expect(typeof result.isPrivate).toBe('boolean');
     expect(result.isPublic).toBe(!result.isPrivate);
     expect(typeof result.activeRuns).toBe('number');
-  });
+  }, 20000);
 
   it('should confirm repository is public as configured', async () => {
     const result = await checkQuota({ strict: false });
     expect(result.isPublic).toBe(true);
     expect(result.isPrivate).toBe(false);
-  });
+  }, 20000);
 });
