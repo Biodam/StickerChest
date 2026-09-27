@@ -4,6 +4,10 @@ import path from 'path';
 export default defineConfig({
   test: {
     environment: 'node',
+    pool: 'forks',
+    forks: {
+      singleFork: true,
+    },
     include: ['tests/**/*.test.ts'],
   },
   resolve: {
