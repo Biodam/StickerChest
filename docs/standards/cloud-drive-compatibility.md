@@ -1,6 +1,6 @@
 # Cloud Drive Compatibility & Periodic Sync Specifications
 
-This document defines how StickerVault handles cloud-synced storage folders, specifically **Google Drive for Desktop**, **OneDrive**, and **Dropbox**, alongside the periodic background ingestion engine.
+This document defines how Sticker Chest handles cloud-synced storage folders, specifically **Google Drive for Desktop**, **OneDrive**, and **Dropbox**, alongside the periodic background ingestion engine.
 
 ---
 
@@ -20,7 +20,7 @@ Google Drive for Desktop uses a virtual file system rather than standard local d
 
 ---
 
-## 2. StickerVault Cloud Compatibility Solution
+## 2. Sticker Chest Cloud Compatibility Solution
 
 To ensure 100% reliable ingestion of stickers placed into a Google Drive folder:
 
@@ -61,13 +61,13 @@ To guarantee no files are missed when Google Drive syncs in the background:
 
 ## 3. Portable Vault Architecture & Multi-Device Sync
 
-StickerVault organizes the selected cloud folder so it can be opened across multiple PCs and Macs without re-importing or re-processing:
+Sticker Chest organizes the selected cloud folder so it can be opened across multiple PCs and Macs without re-importing or re-processing:
 
 ```
 <SelectedVaultFolder>/
 ├── sources/               # User source images and GIFs (supports arbitrary subfolders)
-└── .stickervault/         # Hidden sync folder for database & processed variants
-    ├── stickervault.db    # SQLite 3 Database (WAL mode, schema & FTS5)
+└── .stickerchest/         # Hidden sync folder for database & processed variants
+    ├── stickerchest.db    # SQLite 3 Database (WAL mode, schema & FTS5)
     └── variants/
         ├── sticker/       # 512x512 WebP / animated WebP
         ├── emoji/         # 128x128 WebP / animated WebP
@@ -76,9 +76,9 @@ StickerVault organizes the selected cloud folder so it can be opened across mult
 
 ### 3.1 Cross-Platform Relative Paths & Custom Protocol
 To ensure seamless interoperability between Windows (`G:\My Drive\Vault`) and macOS (`~/Library/CloudStorage/GoogleDrive-...`):
-- All database records store paths relative to the vault root (e.g. `.stickervault/variants/sticker/<hash>.webp` and `sources/reactions/cat.gif`).
-- The custom protocol handler (`vault://media?path=<encoded_path>`) cleanly parses paths on both Windows and macOS without host-segment delimiter loss (such as drive letters without colon).
-- `resolveVaultPath()` intelligently resolves relative paths, absolute paths, variant tier locations (`.stickervault/variants/<tier>/`, `vault/<tier>/`), and userData fallbacks.
+- All database records store paths relative to the vault root (e.g. `.stickerchest/variants/sticker/<hash>.webp` and `sources/reactions/cat.gif`).
+- The custom protocol handler (`chest://media?path=<encoded_path>`) cleanly parses paths on both Windows and macOS without host-segment delimiter loss (such as drive letters without colon).
+- `resolveVaultPath()` intelligently resolves relative paths, absolute paths, variant tier locations (`.stickerchest/variants/<tier>/`, `vault/<tier>/`), and userData fallbacks.
 - Opening the same Google Drive folder on Mac or Windows immediately loads all stickers, tags, metadata, and pre-rendered thumbnails with zero reprocessing.
 
 ### 3.2 Offline Local Mode

@@ -1,4 +1,4 @@
-# StickerVault — Sticker & Emoji Database Manager
+# Sticker Chest — Sticker & Emoji Database Manager
 
 > ⚠️ **DISCLAIMER: AI-GENERATED APPLICATION**  
 > This software is **entirely AI-generated** by Antigravity (Google DeepMind). All architecture, source code, documentation, and task plans were produced autonomously under prompt direction.
@@ -19,7 +19,7 @@
 
 ## 🌟 Overview
 
-**StickerVault** is a local-first, cross-platform desktop application (Windows & macOS, extensible to Linux) designed to manage, auto-resize, AI-tag, and instantly summon curated sticker and emoji collections.
+**Sticker Chest** is a local-first, cross-platform desktop application (Windows & macOS, extensible to Linux) designed to manage, auto-resize, AI-tag, and instantly summon curated sticker and emoji collections.
 
 ### Core Capabilities
 
@@ -53,10 +53,10 @@ Prebuilt multiplatform installers for Windows and macOS are published under [Git
 
 | Platform | Format | Installer Download |
 |---|---|---|
-| **Windows** | Setup Installer | [`StickerVault.Setup.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault.Setup.0.0.1.exe) |
-| **Windows** | Portable Executable | [`StickerVault.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault.0.0.1.exe) |
-| **macOS (Apple Silicon)** | Disk Image (DMG) | [`StickerVault-0.0.1-arm64.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault-0.0.1-arm64.dmg) |
-| **macOS (Intel)** | Disk Image (DMG) | [`StickerVault-0.0.1.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerVault-0.0.1.dmg) |
+| **Windows** | Setup Installer | [`StickerChest.Setup.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest.Setup.0.0.1.exe) |
+| **Windows** | Portable Executable | [`StickerChest.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest.0.0.1.exe) |
+| **macOS (Apple Silicon)** | Disk Image (DMG) | [`StickerChest-0.0.1-arm64.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest-0.0.1-arm64.dmg) |
+| **macOS (Intel)** | Disk Image (DMG) | [`StickerChest-0.0.1.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest-0.0.1.dmg) |
 
 ---
 

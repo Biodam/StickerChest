@@ -11,6 +11,7 @@ import { resolveVaultPath } from './services/ingestion/paths';
 import { loadSettings } from './services/settings/settings-store';
 
 protocol.registerSchemesAsPrivileged([
+  { scheme: 'chest', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
   { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
 ]);
 
@@ -23,8 +24,8 @@ process.on('unhandledRejection', (reason) => {
 });
 
 app.whenReady().then(() => {
-  // Register custom protocol for local vault images
-  protocol.handle('vault', async (request) => {
+  // Register custom protocol for local chest images
+  const handleMediaRequest = async (request: Request) => {
     try {
       let targetPath: string | null = null;
       try {
@@ -35,7 +36,7 @@ app.whenReady().then(() => {
       }
 
       if (!targetPath) {
-        let raw = request.url.replace(/^vault:\/\//i, '');
+        let raw = request.url.replace(/^(?:chest|vault):\/\//i, '');
         if (raw.startsWith('media/')) {
           raw = raw.slice('media/'.length);
         } else if (raw.startsWith('media?path=')) {
@@ -51,14 +52,14 @@ app.whenReady().then(() => {
 
       const resolved = resolveVaultPath(targetPath);
       if (!resolved || !fs.existsSync(resolved)) {
-        console.warn('[VaultProtocol] Image file not found:', resolved, 'from request:', request.url);
+        console.warn('[ChestProtocol] Image file not found:', resolved, 'from request:', request.url);
         return new Response('Not Found', { status: 404 });
       }
 
       try {
         return await net.fetch(pathToFileURL(resolved).toString());
       } catch (fetchErr) {
-        console.warn('[VaultProtocol] net.fetch failed, reading file directly:', fetchErr);
+        console.warn('[ChestProtocol] net.fetch failed, reading file directly:', fetchErr);
         const buffer = await fs.promises.readFile(resolved);
         const ext = path.extname(resolved).toLowerCase();
         const mimeTypes: Record<string, string> = {
@@ -77,10 +78,13 @@ app.whenReady().then(() => {
         });
       }
     } catch (err) {
-      console.error('[VaultProtocol] Handler error:', err);
+      console.error('[ChestProtocol] Handler error:', err);
       return new Response('Internal Error', { status: 500 });
     }
-  });
+  };
+
+  protocol.handle('chest', handleMediaRequest);
+  protocol.handle('vault', handleMediaRequest);
 
   // Register IPC handlers
   registerIpcHandlers();

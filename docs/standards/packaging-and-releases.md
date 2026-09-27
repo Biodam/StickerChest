@@ -1,20 +1,20 @@
 # Multiplatform Packaging & Release Pipeline
 
-This document specifies the packaging configurations, installer formats, automated GitHub Actions release pipelines, and cost protection safeguards for StickerVault.
+This document specifies the packaging configurations, installer formats, automated GitHub Actions release pipelines, and cost protection safeguards for Sticker Chest.
 
 ---
 
 ## 1. Supported Platform Targets & Artifacts
 
-StickerVault produces production-ready native installers and standalone portable binaries:
+Sticker Chest produces production-ready native installers and standalone portable binaries:
 
 | Platform | Format | Output File | Features |
 |---|---|---|---|
-| **Windows (x64)** | **NSIS Installer** | `StickerVault.Setup.<version>.exe` | Desktop shortcut, Start menu entry, custom install directory, clean uninstaller. |
-| **Windows (x64)** | **Portable Exe** | `StickerVault.<version>.exe` | Standalone executable for USB drives or zero-install environments. |
-| **macOS (arm64)** | **Apple Disk Image** | `StickerVault-<version>-arm64.dmg` | Native Apple Silicon (M1/M2/M3/M4) DMG with drag-to-`/Applications` symlink. |
-| **macOS (x64)** | **Apple Disk Image** | `StickerVault-<version>.dmg` | Native Intel x64 DMG with drag-to-`/Applications` symlink. |
-| **macOS (Dual)** | **Zipped Bundle** | `StickerVault-<version>-*.zip` | Standalone zipped `.app` bundles for direct execution. |
+| **Windows (x64)** | **NSIS Installer** | `StickerChest.Setup.<version>.exe` | Desktop shortcut, Start menu entry, custom install directory, clean uninstaller. |
+| **Windows (x64)** | **Portable Exe** | `StickerChest.<version>.exe` | Standalone executable for USB drives or zero-install environments. |
+| **macOS (arm64)** | **Apple Disk Image** | `StickerChest-<version>-arm64.dmg` | Native Apple Silicon (M1/M2/M3/M4) DMG with drag-to-`/Applications` symlink. |
+| **macOS (x64)** | **Apple Disk Image** | `StickerChest-<version>.dmg` | Native Intel x64 DMG with drag-to-`/Applications` symlink. |
+| **macOS (Dual)** | **Zipped Bundle** | `StickerChest-<version>-*.zip` | Standalone zipped `.app` bundles for direct execution. |
 | **Updates** | **Auto-Update YAML** | `latest.yml`, `latest-mac.yml` | Distribution manifests for electron-updater compatibility. |
 
 ---

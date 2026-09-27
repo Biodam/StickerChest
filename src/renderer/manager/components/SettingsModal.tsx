@@ -113,7 +113,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span>Multi-Device Sync Ready (Google Drive / OneDrive / iCloud)</span>
               </div>
               <p className="text-[10px] text-gray-400 leading-relaxed">
-                StickerVault saves database &amp; resized variants in <code className="text-blue-300">.stickervault/</code> inside your selected folder. Use the same folder across Windows and Mac without re-importing!
+                Sticker Chest saves database &amp; resized variants in <code className="text-blue-300">.stickerchest/</code> inside your selected folder. Use the same folder across Windows and Mac without re-importing!
               </p>
             </div>
           </div>
@@ -173,7 +173,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </label>
             </div>
             <p className="text-[10px] text-gray-400 leading-normal">
-              When you select a sticker in the floating Quick Picker (<kbd className="px-1 py-0.5 bg-[#25262b] rounded text-gray-300 text-[10px]">Win + /</kbd>), StickerVault automatically pastes it directly into your active chat or document input field.
+              When you select a sticker in the floating Quick Picker (<kbd className="px-1 py-0.5 bg-[#25262b] rounded text-gray-300 text-[10px]">Win + /</kbd>), Sticker Chest automatically pastes it directly into your active chat or document input field.
             </p>
           </div>
 

@@ -45,10 +45,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* App Branding */}
       <div className="p-4 border-b border-[#2c2e33] flex items-center space-x-2.5 flex-shrink-0">
         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30 text-sm">
-          SV
+          SC
         </div>
         <div>
-          <h1 className="font-semibold text-sm tracking-wide text-white">StickerVault</h1>
+          <h1 className="font-semibold text-sm tracking-wide text-white">Sticker Chest</h1>
           <p className="text-[11px] text-gray-400">Database Manager</p>
         </div>
       </div>

@@ -70,7 +70,7 @@ export function loadSettings(): AppSettings {
   if (loaded.sourceFolder) {
     setCustomVaultRoot(loaded.sourceFolder);
     ensureVaultDirectories();
-    const dbPath = path.join(loaded.sourceFolder, '.stickervault', 'stickervault.db');
+    const dbPath = path.join(loaded.sourceFolder, '.stickerchest', 'stickerchest.db');
     switchDatabase(dbPath);
     getIngestionService().startWatching(loaded.sourceFolder, loaded.syncIntervalMinutes);
   }
@@ -109,7 +109,7 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
   if (partial.sourceFolder && partial.sourceFolder !== current.sourceFolder) {
     setCustomVaultRoot(partial.sourceFolder);
     ensureVaultDirectories();
-    const dbPath = path.join(partial.sourceFolder, '.stickervault', 'stickervault.db');
+    const dbPath = path.join(partial.sourceFolder, '.stickerchest', 'stickerchest.db');
     switchDatabase(dbPath);
     getIngestionService().startWatching(partial.sourceFolder, updated.syncIntervalMinutes);
   }

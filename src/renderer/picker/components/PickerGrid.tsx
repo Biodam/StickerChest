@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Star } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
-import { getVaultImageUrl } from '../../shared/image-url';
+import { getChestImageUrl } from '../../shared/image-url';
 
 interface PickerGridProps {
   items: StickerItem[];
@@ -44,7 +44,7 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
     <div ref={containerRef} className="flex-1 overflow-y-auto p-2.5 scroll-smooth">
       <div className="grid grid-cols-4 gap-2">
         {items.map((item, index) => {
-          const imageUrl = getVaultImageUrl(
+          const imageUrl = getChestImageUrl(
             item.variants.thumb?.filePath ||
             item.variants.emoji?.filePath ||
             item.originalPath

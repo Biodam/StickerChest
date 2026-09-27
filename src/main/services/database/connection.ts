@@ -12,14 +12,14 @@ export function getDatabasePath(): string {
 
   try {
     const userData = app.getPath('userData');
-    return path.join(userData, 'stickervault.db');
+    return path.join(userData, 'stickerchest.db');
   } catch {
     // Fallback for tests or runner outside Electron lifecycle
     const fallbackDir = path.resolve(process.cwd(), '.data');
     if (!fs.existsSync(fallbackDir)) {
       fs.mkdirSync(fallbackDir, { recursive: true });
     }
-    return path.join(fallbackDir, 'stickervault.db');
+    return path.join(fallbackDir, 'stickerchest.db');
   }
 }
 

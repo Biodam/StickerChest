@@ -16,7 +16,7 @@ export function createPickerWindow(): BrowserWindow {
   console.log('[PickerWindow] indexPath:', indexPath);
 
   pickerWindow = new BrowserWindow({
-    title: 'StickerVault Quick Picker',
+    title: 'Sticker Chest Quick Picker',
     width: 420,
     height: 520,
     frame: false,

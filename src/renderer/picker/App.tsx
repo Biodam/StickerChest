@@ -8,6 +8,7 @@ import { PickerTab } from './keyboard-navigation';
 import { usePickerKeyboard } from './hooks/usePickerKeyboard';
 
 export default function PickerApp() {
+  const api = window.stickerChest || window.stickerVault;
   const [activeTab, setActiveTab] = useState<PickerTab>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<StickerItem[]>([]);
@@ -16,15 +17,15 @@ export default function PickerApp() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchItems = useCallback(async () => {
-    if (!window.stickerVault?.searchItems) return;
-    const res = await window.stickerVault.searchItems({
+    if (!api?.searchItems) return;
+    const res = await api.searchItems({
       query: searchQuery,
       tab: activeTab,
       limit: 48,
     });
     setItems(res.items);
     setSelectedIndex(0);
-  }, [searchQuery, activeTab]);
+  }, [api, searchQuery, activeTab]);
 
   useEffect(() => {
     fetchItems();
@@ -33,22 +34,22 @@ export default function PickerApp() {
   const handleSelectItem = async (item: StickerItem, isShiftPressed: boolean = false) => {
     if (isShiftPressed) {
       // Shift+Enter: Copy only without auto-paste
-      await window.stickerVault?.copyItemToClipboard?.(item.id, copyTier);
-      await window.stickerVault?.hidePicker?.();
+      await api?.copyItemToClipboard?.(item.id, copyTier);
+      await api?.hidePicker?.();
     } else {
       // Enter / Click: Default action (auto-paste workflow if enabled, or clipboard copy)
-      if (window.stickerVault?.copyAndPasteItem) {
-        await window.stickerVault.copyAndPasteItem(item.id, copyTier);
-      } else if (window.stickerVault?.copyItemToClipboard) {
-        await window.stickerVault.copyItemToClipboard(item.id, copyTier);
-        await window.stickerVault?.hidePicker?.();
+      if (api?.copyAndPasteItem) {
+        await api.copyAndPasteItem(item.id, copyTier);
+      } else if (api?.copyItemToClipboard) {
+        await api.copyItemToClipboard(item.id, copyTier);
+        await api?.hidePicker?.();
       }
     }
   };
 
   const handleToggleFavorite = async (item: StickerItem) => {
-    if (!window.stickerVault?.toggleFavorite) return;
-    await window.stickerVault.toggleFavorite(item.id);
+    if (!api?.toggleFavorite) return;
+    await api.toggleFavorite(item.id);
     const updatedStatus = !item.usage?.isFavorite;
 
     setItems((prev) =>
@@ -104,7 +105,7 @@ export default function PickerApp() {
       />
 
       <PickerFooter
-        onOpenManager={() => window.stickerVault?.openManager?.()}
+        onOpenManager={() => api?.openManager?.()}
       />
     </div>
   );

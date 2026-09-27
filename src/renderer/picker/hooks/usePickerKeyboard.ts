@@ -47,7 +47,7 @@ export function usePickerKeyboard({
           setSearchQuery('');
           searchInputRef.current?.focus();
         } else {
-          window.stickerVault?.hidePicker?.();
+          (window.stickerChest || window.stickerVault)?.hidePicker?.();
         }
         return;
       }

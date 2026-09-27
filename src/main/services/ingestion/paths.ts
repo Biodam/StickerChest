@@ -29,8 +29,8 @@ export function ensureVaultDirectories(): void {
     fs.mkdirSync(sourcesDir, { recursive: true });
   }
 
-  // 2. .stickervault internal metadata & variants directory
-  const metaDir = path.join(root, '.stickervault');
+  // 2. .stickerchest internal metadata & variants directory
+  const metaDir = path.join(root, '.stickerchest');
   if (!fs.existsSync(metaDir)) {
     fs.mkdirSync(metaDir, { recursive: true });
   }
@@ -46,7 +46,7 @@ export function ensureVaultDirectories(): void {
 
 export function getVariantOutputPath(hash: string, tier: ImageTier, ext = '.webp'): string {
   const root = getVaultRoot();
-  return path.join(root, '.stickervault', 'variants', tier, `${hash}${ext}`);
+  return path.join(root, '.stickerchest', 'variants', tier, `${hash}${ext}`);
 }
 
 export function getRelativePath(fullPath: string): string {
@@ -83,6 +83,9 @@ export function resolveVaultPath(storedPath: string): string {
     const tier = tierMatch[1].toLowerCase();
     const file = tierMatch[2];
 
+    const cand0 = path.resolve(root, '.stickerchest', 'variants', tier, file);
+    if (fs.existsSync(cand0)) return cand0;
+
     const cand1 = path.resolve(root, '.stickervault', 'variants', tier, file);
     if (fs.existsSync(cand1)) return cand1;
 
@@ -94,6 +97,9 @@ export function resolveVaultPath(storedPath: string): string {
 
     try {
       const userData = app.getPath('userData');
+      const appData0 = path.resolve(userData, 'vault', '.stickerchest', 'variants', tier, file);
+      if (fs.existsSync(appData0)) return appData0;
+
       const appData1 = path.resolve(userData, 'vault', tier, file);
       if (fs.existsSync(appData1)) return appData1;
 
@@ -104,8 +110,8 @@ export function resolveVaultPath(storedPath: string): string {
     }
   }
 
-  // 4. Handle cross-platform path migration markers (.stickervault, sources, vault)
-  for (const marker of ['.stickervault', 'sources', 'vault']) {
+  // 4. Handle cross-platform path migration markers (.stickerchest, .stickervault, sources, vault)
+  for (const marker of ['.stickerchest', '.stickervault', 'sources', 'vault']) {
     const idx = normalized.indexOf(marker);
     if (idx !== -1) {
       const candidate = path.resolve(root, normalized.substring(idx));

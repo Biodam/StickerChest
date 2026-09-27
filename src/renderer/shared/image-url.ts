@@ -1,4 +1,7 @@
-export function getVaultImageUrl(filePath: string | undefined | null): string {
+export function getChestImageUrl(filePath: string | undefined | null): string {
   if (!filePath) return '';
-  return `vault://media?path=${encodeURIComponent(filePath)}`;
+  return `chest://media?path=${encodeURIComponent(filePath)}`;
 }
+
+export const getVaultImageUrl = getChestImageUrl;
+

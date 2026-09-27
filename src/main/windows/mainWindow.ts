@@ -23,7 +23,7 @@ export function createMainWindow(): BrowserWindow {
   console.log('[MainWindow] indexPath:', indexPath);
 
   mainWindow = new BrowserWindow({
-    title: 'StickerVault — Database Manager',
+    title: 'Sticker Chest — Database Manager',
     width: 1200,
     height: 800,
     minWidth: 900,

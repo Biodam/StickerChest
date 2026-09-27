@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Copy, Sparkles, Star, Check } from 'lucide-react';
 import { StickerItem, ImageTier } from '../../../types/models';
-import { getVaultImageUrl } from '../../shared/image-url';
+import { getChestImageUrl } from '../../shared/image-url';
 import { MetadataForm } from './MetadataForm';
 
 interface InspectorDrawerProps {
@@ -31,7 +31,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
       ? item.originalPath
       : item.variants.sticker?.filePath || item.originalPath;
 
-  const previewUrl = getVaultImageUrl(previewPath);
+  const previewUrl = getChestImageUrl(previewPath);
 
   const handleCopy = () => {
     onCopyItem(item.id, selectedTier);
@@ -40,8 +40,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   };
 
   const handleShowInFolder = () => {
-    if (window.stickerVault?.showItemInFolder) {
-      window.stickerVault.showItemInFolder(item.originalPath);
+    const api = window.stickerChest || window.stickerVault;
+    if (api?.showItemInFolder) {
+      api.showItemInFolder(item.originalPath);
     }
   };
 

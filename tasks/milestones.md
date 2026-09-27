@@ -1,4 +1,4 @@
-# Milestones Roadmap: StickerVault
+# Milestones Roadmap: Sticker Chest
 
 This document tracks high-level progress across the core development milestones of the project.
 
@@ -31,7 +31,7 @@ This document tracks high-level progress across the core development milestones 
 | **M10** | **Quick Picker Auto-Paste Integration** | Paste directly into active input field on select, native OS keystroke simulation (Windows/macOS/Linux), auto-paste settings toggle | 🟢 Completed |
 | **M11** | **Quick Picker Keyboard Navigation** | Window-level keyboard controls, 2D arrow grid navigation with auto-scroll into view, Home/End/PageUp/Down, Ctrl+1/2/3 tabs, Ctrl+T tier toggle, Ctrl+S favorite toggle, two-stage Escape | 🟢 Completed |
 | **M12** | **Animated Sticker & GIF Controls** | Hover-to-play vs always-play, viewport-aware offscreen animation pausing, frame-by-frame scrubber & telemetry in Inspector | ⏳ Planned |
-| **M13** | **Vault Backup & Pack Exporter** | Full portable `.stickervault` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | ⏳ Planned |
+| **M13** | **Chest Backup & Pack Exporter** | Full portable `.stickerchest` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | ⏳ Planned |
 | **M14** | **Custom Global Hotkeys & UI Themes** | Interactive global summon hotkey rebinding in Settings; curated theme engine (OLED Black, Slate, Cyberpunk, Catppuccin, Light) | ⏳ Planned |
 
 ---

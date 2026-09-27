@@ -10,6 +10,7 @@ import { useSelection } from './hooks/useSelection';
 import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
 
 export default function App() {
+  const api = window.stickerChest || window.stickerVault;
   const [activeTab, setActiveTab] = useState<'all' | 'recent' | 'favorites'>('all');
   const [isAnimatedOnly, setIsAnimatedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,20 +36,20 @@ export default function App() {
   });
 
   const loadSettings = async () => {
-    if (window.stickerVault?.getSettings) setSettings(await window.stickerVault.getSettings());
+    if (api?.getSettings) setSettings(await api.getSettings());
   };
 
   const fetchFacets = useCallback(async () => {
-    if (window.stickerVault?.getFacets) setFacets(await window.stickerVault.getFacets());
-  }, []);
+    if (api?.getFacets) setFacets(await api.getFacets());
+  }, [api]);
 
   const fetchUntagged = useCallback(async () => {
-    if (window.stickerVault?.getUntaggedCount) setUntaggedCount(await window.stickerVault.getUntaggedCount());
-  }, []);
+    if (api?.getUntaggedCount) setUntaggedCount(await api.getUntaggedCount());
+  }, [api]);
 
   const fetchItems = useCallback(async () => {
-    if (!window.stickerVault?.searchItems) return;
-    const res = await window.stickerVault.searchItems({
+    if (!api?.searchItems) return;
+    const res = await api.searchItems({
       query: searchQuery, tab: activeTab,
       sourceOrigin: selectedFranchise || undefined, character: selectedCharacter || undefined,
       tag: selectedTag || undefined, isAnimated: isAnimatedOnly ? true : undefined, limit: 100,
@@ -81,8 +82,8 @@ export default function App() {
   }, [fetchItems]);
 
   useEffect(() => {
-    if (!window.stickerVault?.onIngestionProgress) return;
-    return window.stickerVault.onIngestionProgress((event) => {
+    if (!api?.onIngestionProgress) return;
+    return api.onIngestionProgress((event) => {
       setProgress(event);
       if (event.status === 'idle') {
         fetchItems();
@@ -90,19 +91,19 @@ export default function App() {
         fetchUntagged();
       }
     });
-  }, [fetchItems, fetchFacets, fetchUntagged]);
+  }, [api, fetchItems, fetchFacets, fetchUntagged]);
 
   const handleToggleFavorite = async (itemId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (await window.stickerVault?.toggleFavorite?.(itemId)) {
+    if (await api?.toggleFavorite?.(itemId)) {
       setSelectedItem((prev) => (prev?.id === itemId ? { ...prev, usage: { ...prev.usage, isFavorite: !prev.usage.isFavorite } } : prev));
       fetchItems();
     }
   };
 
   const handleUpdateMetadata = async (itemId: string, meta: any) => {
-    if (await window.stickerVault?.updateMetadata?.(itemId, meta)) {
-      const fresh = await window.stickerVault?.getItem?.(itemId);
+    if (await api?.updateMetadata?.(itemId, meta)) {
+      const fresh = await api?.getItem?.(itemId);
       if (fresh) setSelectedItem(fresh);
       fetchItems();
       fetchFacets();
@@ -111,26 +112,26 @@ export default function App() {
   };
 
   const handleDropFiles = async (filePaths: string[]) => {
-    await window.stickerVault?.ingestFiles?.(filePaths);
+    await api?.ingestFiles?.(filePaths);
     fetchItems();
     fetchFacets();
     fetchUntagged();
   };
 
   const handleBulkFavorite = async (favorite: boolean) => {
-    await window.stickerVault?.bulkToggleFavorite?.(Array.from(selectedIds), favorite);
+    await api?.bulkToggleFavorite?.(Array.from(selectedIds), favorite);
     fetchItems();
   };
 
   const handleBulkAddTag = async (tag: string) => {
-    await window.stickerVault?.bulkAddTags?.(Array.from(selectedIds), [tag]);
+    await api?.bulkAddTags?.(Array.from(selectedIds), [tag]);
     fetchItems();
     fetchFacets();
   };
 
   const handleBulkAiTag = async () => {
     for (const id of selectedIds) {
-      await window.stickerVault?.tagItemWithGemini?.(id);
+      await api?.tagItemWithGemini?.(id);
     }
     fetchItems();
     fetchFacets();
@@ -138,7 +139,7 @@ export default function App() {
   };
 
   const handleBulkDelete = async () => {
-    await window.stickerVault?.deleteItems?.(Array.from(selectedIds));
+    await api?.deleteItems?.(Array.from(selectedIds));
     clearSelection();
     setSelectedItem(null);
     fetchItems();
@@ -151,7 +152,7 @@ export default function App() {
       <Sidebar
         activeTab={activeTab} isAnimatedOnly={isAnimatedOnly}
         onSelectTab={setActiveTab} onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
-        onSyncFolder={async () => settings.sourceFolder ? window.stickerVault?.scanSourceFolder?.(false) : setSettingsOpen(true)}
+        onSyncFolder={async () => settings.sourceFolder ? api?.scanSourceFolder?.(false) : setSettingsOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
         facets={facets} selectedFranchise={selectedFranchise}
@@ -169,7 +170,7 @@ export default function App() {
           onClearFranchise={() => setSelectedFranchise(null)} onClearCharacter={() => setSelectedCharacter(null)}
           onClearTag={() => setSelectedTag(null)} modelName={settings.geminiModel}
           untaggedCount={untaggedCount}
-          onBatchAiTag={async () => settings.geminiApiKey ? window.stickerVault?.batchTagUntagged?.() : setSettingsOpen(true)}
+          onBatchAiTag={async () => settings.geminiApiKey ? api?.batchTagUntagged?.() : setSettingsOpen(true)}
           isTagging={progress?.status === 'tagging'}
         />
 
@@ -193,14 +194,14 @@ export default function App() {
               onClose={() => setSelectedItem(null)}
               onToggleFavorite={() => handleToggleFavorite(selectedItem.id)}
               onTagWithGemini={async (id) => {
-                await window.stickerVault?.tagItemWithGemini?.(id);
-                const fresh = await window.stickerVault?.getItem?.(id);
+                await api?.tagItemWithGemini?.(id);
+                const fresh = await api?.getItem?.(id);
                 if (fresh) setSelectedItem(fresh);
                 fetchItems();
                 fetchFacets();
                 fetchUntagged();
               }}
-              onCopyItem={(id, tier) => window.stickerVault?.copyItemToClipboard?.(id, tier)}
+              onCopyItem={(id, tier) => api?.copyItemToClipboard?.(id, tier)}
               onUpdateMetadata={handleUpdateMetadata}
             />
           )}
@@ -222,11 +223,11 @@ export default function App() {
         onClose={() => setSettingsOpen(false)}
         onSaveSettings={async (up) => {
           setSettings((prev) => ({ ...prev, ...up }));
-          await window.stickerVault?.saveSettings?.(up);
-          if (up.sourceFolder && up.sourceFolder !== settings.sourceFolder) window.stickerVault?.scanSourceFolder?.(false);
+          await api?.saveSettings?.(up);
+          if (up.sourceFolder && up.sourceFolder !== settings.sourceFolder) api?.scanSourceFolder?.(false);
         }}
-        onSelectFolder={async () => window.stickerVault?.selectFolderDialog?.() || null}
-        onTestKey={async (k, m) => window.stickerVault?.testGeminiKey?.(k, m) || { valid: false }}
+        onSelectFolder={async () => api?.selectFolderDialog?.() || null}
+        onTestKey={async (k, m) => api?.testGeminiKey?.(k, m) || { valid: false }}
       />
     </div>
   );

@@ -1,12 +1,12 @@
 # System Overview & Architecture Design
 
-This document details the multi-process architecture, IPC communications, window lifecycles, and backend service contracts for StickerVault.
+This document details the multi-process architecture, IPC communications, window lifecycles, and backend service contracts for Sticker Chest.
 
 ---
 
 ## 1. Process Architecture
 
-StickerVault uses an Electron architecture splitting responsibilities cleanly between a main Node.js process and two separate Webview renderers:
+Sticker Chest uses an Electron architecture splitting responsibilities cleanly between a main Node.js process and two separate Webview renderers:
 
 ```mermaid
 graph TB
@@ -70,7 +70,7 @@ graph TB
 - **Role**: Maintains the Quick Picker companion ready in memory even when the Main Manager window is closed.
 - **Attributes**:
   - Native system tray icon (`resources/tray-icon.png` / `tray-icon@2x.png`).
-  - Context menu: *Show Quick Picker*, *Open Manager*, *Scan Vault Now*, separator, *Quit StickerVault*.
+  - Context menu: *Show Quick Picker*, *Open Manager*, *Scan Chest Now*, separator, *Quit Sticker Chest*.
   - Left-click triggers the Quick Picker companion immediately.
 - **Window Interception**:
   - Closing the Manager window hides it rather than terminating the Electron process, ensuring 24/7 companion availability with zero startup lag.

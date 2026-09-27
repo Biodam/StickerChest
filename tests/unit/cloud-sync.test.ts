@@ -68,7 +68,7 @@ describe('Cloud Drive Compatibility & Periodic Sync', () => {
 
     ensureVaultDirectories();
     expect(fs.existsSync(path.join(testDir, 'sources'))).toBe(true);
-    expect(fs.existsSync(path.join(testDir, '.stickervault', 'variants', 'sticker'))).toBe(true);
+    expect(fs.existsSync(path.join(testDir, '.stickerchest', 'variants', 'sticker'))).toBe(true);
 
     const fullPath = path.join(testDir, 'sources', 'reaction.gif');
     const rel = getRelativePath(fullPath);
@@ -82,7 +82,7 @@ describe('Cloud Drive Compatibility & Periodic Sync', () => {
     const { switchDatabase, getDatabase, closeDatabase } = await import(
       '../../src/main/services/database/connection'
     );
-    const customDbPath = path.join(testDir, '.stickervault', 'stickervault.db');
+    const customDbPath = path.join(testDir, '.stickerchest', 'stickerchest.db');
 
     const newDb = switchDatabase(customDbPath);
     expect(newDb).toBeDefined();

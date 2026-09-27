@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import path from 'path';
 import fs from 'fs';
-import { getVaultImageUrl } from '../../src/renderer/shared/image-url';
+import { getChestImageUrl, getVaultImageUrl } from '../../src/renderer/shared/image-url';
 import { setCustomVaultRoot, resolveVaultPath } from '../../src/main/services/ingestion/paths';
 
-describe('Vault Image URL & Path Resolution', () => {
+describe('Chest Image URL & Path Resolution', () => {
   const testDir = path.resolve(process.cwd(), '.url-test-assets');
-  const stickerVariantDir = path.join(testDir, '.stickervault', 'variants', 'sticker');
+  const stickerVariantDir = path.join(testDir, '.stickerchest', 'variants', 'sticker');
   const dummyVariant = path.join(stickerVariantDir, 'sample_hash.webp');
 
   beforeAll(() => {
@@ -25,17 +25,20 @@ describe('Vault Image URL & Path Resolution', () => {
     }
   });
 
-  it('should encode image file paths into vault query URL', () => {
-    expect(getVaultImageUrl(null)).toBe('');
-    expect(getVaultImageUrl(undefined)).toBe('');
-    expect(getVaultImageUrl('')).toBe('');
+  it('should encode image file paths into chest query URL', () => {
+    expect(getChestImageUrl(null)).toBe('');
+    expect(getChestImageUrl(undefined)).toBe('');
+    expect(getChestImageUrl('')).toBe('');
 
     const windowsPath = 'C:\\Users\\user\\vault\\thumb\\test.webp';
-    const url = getVaultImageUrl(windowsPath);
-    expect(url).toBe(`vault://media?path=${encodeURIComponent(windowsPath)}`);
+    const url = getChestImageUrl(windowsPath);
+    expect(url).toBe(`chest://media?path=${encodeURIComponent(windowsPath)}`);
 
     const parsed = new URL(url);
     expect(parsed.searchParams.get('path')).toBe(windowsPath);
+
+    // Verify backward compatibility alias
+    expect(getVaultImageUrl(windowsPath)).toBe(url);
   });
 
   it('should resolve absolute existing paths directly', () => {
@@ -43,8 +46,8 @@ describe('Vault Image URL & Path Resolution', () => {
     expect(resolved).toBe(dummyVariant);
   });
 
-  it('should resolve variant tier relative paths to .stickervault variants', () => {
-    const relativeStored = '.stickervault/variants/sticker/sample_hash.webp';
+  it('should resolve variant tier relative paths to .stickerchest variants', () => {
+    const relativeStored = '.stickerchest/variants/sticker/sample_hash.webp';
     const resolved = resolveVaultPath(relativeStored);
     expect(resolved).toBe(dummyVariant);
 
@@ -61,3 +64,4 @@ describe('Vault Image URL & Path Resolution', () => {
     expect(target).toBe('C:/Users/fabio/vault/test.webp');
   });
 });
+

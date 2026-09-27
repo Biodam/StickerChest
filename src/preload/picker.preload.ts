@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { StickerVaultAPI } from '../types/ipc';
+import { StickerChestAPI } from '../types/ipc';
 
-const api: StickerVaultAPI = {
+const api: StickerChestAPI = {
   searchItems: (options) => ipcRenderer.invoke('db:search', options),
   getFacets: () => ipcRenderer.invoke('db:getFacets'),
   getItem: (id) => ipcRenderer.invoke('db:getItem', id),
@@ -41,4 +41,5 @@ const api: StickerVaultAPI = {
   openManager: () => ipcRenderer.invoke('window:openManager'),
 };
 
+contextBridge.exposeInMainWorld('stickerChest', api);
 contextBridge.exposeInMainWorld('stickerVault', api);

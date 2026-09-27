@@ -1,6 +1,6 @@
 import { StickerItem, SearchFilterOptions, IngestionProgressEvent, AppSettings, ImageTier, LibraryFacets } from './models';
 
-export interface StickerVaultAPI {
+export interface StickerChestAPI {
   // Database & Search
   searchItems: (options: SearchFilterOptions) => Promise<{ items: StickerItem[]; total: number }>;
   getFacets: () => Promise<LibraryFacets>;
@@ -27,7 +27,7 @@ export interface StickerVaultAPI {
   bulkToggleFavorite: (itemIds: string[], favorite: boolean) => Promise<boolean>;
   bulkSetCustomAttribute: (itemIds: string[], key: string, value: string) => Promise<boolean>;
 
-  // Vault & Ingestion
+  // Chest & Ingestion
   ingestFiles: (filePaths: string[]) => Promise<{ ingested: number; duplicates: number; errors: number }>;
   scanSourceFolder: (forceReprocess?: boolean, folderPath?: string) => Promise<{ started: boolean }>;
   onIngestionProgress: (callback: (progress: IngestionProgressEvent) => void) => () => void;
@@ -49,8 +49,11 @@ export interface StickerVaultAPI {
   openManager: () => Promise<void>;
 }
 
+export type StickerVaultAPI = StickerChestAPI;
+
 declare global {
   interface Window {
-    stickerVault: StickerVaultAPI;
+    stickerChest: StickerChestAPI;
+    stickerVault?: StickerChestAPI;
   }
 }

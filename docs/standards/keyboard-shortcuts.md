@@ -1,6 +1,6 @@
 # Keyboard Shortcuts & Navigation Standards
 
-This document defines the complete keyboard interaction specification, shortcut mappings, and ergonomics for StickerVault across desktop operating systems (Windows, macOS, Linux).
+This document defines the complete keyboard interaction specification, shortcut mappings, and ergonomics for Sticker Chest across desktop operating systems (Windows, macOS, Linux).
 
 ---
 

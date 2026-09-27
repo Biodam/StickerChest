@@ -1,6 +1,6 @@
 {
-  "appId": "com.antigravity.stickervault",
-  "productName": "StickerVault",
+  "appId": "com.antigravity.stickerchest",
+  "productName": "Sticker Chest",
   "directories": {
     "output": "release"
   },
@@ -34,8 +34,8 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "StickerVault",
-    "uninstallDisplayName": "StickerVault"
+    "shortcutName": "Sticker Chest",
+    "uninstallDisplayName": "Sticker Chest"
   },
   "mac": {
     "icon": "resources/icon.png",
@@ -52,7 +52,7 @@
     "category": "public.app-category.utilities"
   },
   "dmg": {
-    "title": "StickerVault Installer",
+    "title": "Sticker Chest Installer",
     "iconSize": 128,
     "contents": [
       {

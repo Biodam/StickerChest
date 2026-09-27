@@ -37,7 +37,7 @@ export function createTray(): Tray {
   const icon = nativeImage.createFromPath(iconPath);
 
   tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
-  tray.setToolTip('StickerVault — Companion & Quick Picker');
+  tray.setToolTip('Sticker Chest — Companion & Quick Picker');
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -57,7 +57,7 @@ export function createTray(): Tray {
     },
     { type: 'separator' },
     {
-      label: 'Quit StickerVault',
+      label: 'Quit Sticker Chest',
       click: () => {
         quitApp();
       },

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star, Film, ShieldAlert, Check } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
-import { getVaultImageUrl } from '../../shared/image-url';
+import { getChestImageUrl } from '../../shared/image-url';
 
 interface StickerCardProps {
   item: StickerItem;
@@ -18,7 +18,7 @@ export const StickerCard: React.FC<StickerCardProps> = ({
   onSelect,
   onToggleFavorite,
 }) => {
-  const imageUrl = getVaultImageUrl(item.variants.thumb?.filePath || item.originalPath);
+  const imageUrl = getChestImageUrl(item.variants.thumb?.filePath || item.originalPath);
   const title = item.metadata?.character || item.filename;
   const subtitle = item.metadata?.feeling || item.metadata?.action || (item.tags[0] ? `#${item.tags[0]}` : null);
   const isNsfw = item.customAttributes?.nsfw === 'true';
