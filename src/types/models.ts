@@ -89,6 +89,8 @@ export interface IngestionProgressEvent {
   error?: string;
 }
 
+export type ThemeId = 'slate_dark' | 'oled_black' | 'cyberpunk' | 'catppuccin' | 'paper_light';
+
 export interface AppSettings {
   sourceFolder: string;
   geminiApiKey: string;
@@ -101,5 +103,6 @@ export interface AppSettings {
   cloudDriveMode: boolean;
   autoPasteOnSelect: boolean;
   animationPlaybackMode?: 'always' | 'hover' | 'reduced_motion';
+  theme?: ThemeId;
 }
 

@@ -43,6 +43,7 @@ export interface StickerChestAPI {
   getSettings: () => Promise<AppSettings>;
   saveSettings: (settings: Partial<AppSettings>) => Promise<boolean>;
   selectFolderDialog: () => Promise<string | null>;
+  onThemeChanged: (callback: (theme: string) => void) => () => void;
 
   // Vault Backup, Restore & Pack Exporters
   createVaultBackup: (customFilePath?: string) => Promise<{ canceled: boolean; success?: boolean; totalItems?: number; outputPath?: string; error?: string }>;

@@ -1,0 +1,110 @@
+/* Themes Engine for Sticker Chest */
+
+:root,
+[data-theme="slate_dark"] {
+  --theme-bg-app: #121316;
+  --theme-bg-surface: #1a1b1e;
+  --theme-bg-card: #25262b;
+  --theme-bg-hover: #2c2e33;
+  --theme-border: #2c2e33;
+  --theme-border-strong: #373a40;
+  --theme-text-main: #f1f3f5;
+  --theme-text-muted: #909296;
+  --theme-accent: #3b82f6;
+  --theme-accent-glow: rgba(59, 130, 246, 0.25);
+  color-scheme: dark;
+}
+
+[data-theme="oled_black"] {
+  --theme-bg-app: #000000;
+  --theme-bg-surface: #0a0a0a;
+  --theme-bg-card: #121212;
+  --theme-bg-hover: #1f1f1f;
+  --theme-border: #262626;
+  --theme-border-strong: #404040;
+  --theme-text-main: #ffffff;
+  --theme-text-muted: #a3a3a3;
+  --theme-accent: #00d2ff;
+  --theme-accent-glow: rgba(0, 210, 255, 0.3);
+  color-scheme: dark;
+}
+
+[data-theme="cyberpunk"] {
+  --theme-bg-app: #0d0221;
+  --theme-bg-surface: #150833;
+  --theme-bg-card: #240046;
+  --theme-bg-hover: #3c096c;
+  --theme-border: #5a189a;
+  --theme-border-strong: #7209b7;
+  --theme-text-main: #f72585;
+  --theme-text-muted: #4cc9f0;
+  --theme-accent: #f72585;
+  --theme-accent-glow: rgba(247, 37, 133, 0.4);
+  color-scheme: dark;
+}
+
+[data-theme="catppuccin"] {
+  --theme-bg-app: #1e1e2e;
+  --theme-bg-surface: #181825;
+  --theme-bg-card: #313244;
+  --theme-bg-hover: #45475a;
+  --theme-border: #45475a;
+  --theme-border-strong: #585b70;
+  --theme-text-main: #cdd6f4;
+  --theme-text-muted: #a6adc8;
+  --theme-accent: #cba6f7;
+  --theme-accent-glow: rgba(203, 166, 247, 0.3);
+  color-scheme: dark;
+}
+
+[data-theme="paper_light"] {
+  --theme-bg-app: #f4f5f7;
+  --theme-bg-surface: #ffffff;
+  --theme-bg-card: #f8f9fa;
+  --theme-bg-hover: #e9ecef;
+  --theme-border: #dee2e6;
+  --theme-border-strong: #ced4da;
+  --theme-text-main: #212529;
+  --theme-text-muted: #6c757d;
+  --theme-accent: #2563eb;
+  --theme-accent-glow: rgba(37, 99, 235, 0.2);
+  color-scheme: light;
+}
+
+/* Dynamic theme overrides for base containers */
+[data-theme] body,
+[data-theme] .bg-\[\#121316\] {
+  background-color: var(--theme-bg-app) !important;
+  color: var(--theme-text-main);
+}
+
+[data-theme] aside,
+[data-theme] header,
+[data-theme] .bg-\[\#1a1b1e\],
+[data-theme] .bg-\[\#141517\] {
+  background-color: var(--theme-bg-surface) !important;
+}
+
+[data-theme] .bg-\[\#25262b\],
+[data-theme] .bg-\[\#1e2025\]\/95 {
+  background-color: var(--theme-bg-card) !important;
+}
+
+[data-theme] .border-\[\#2c2e33\] {
+  border-color: var(--theme-border) !important;
+}
+
+[data-theme="paper_light"] .text-white,
+[data-theme="paper_light"] .text-gray-200,
+[data-theme="paper_light"] .text-gray-300 {
+  color: var(--theme-text-main) !important;
+}
+
+[data-theme="paper_light"] .text-gray-400,
+[data-theme="paper_light"] .text-gray-500 {
+  color: var(--theme-text-muted) !important;
+}
+
+[data-theme="paper_light"] ::-webkit-scrollbar-thumb {
+  background: #ced4da;
+}

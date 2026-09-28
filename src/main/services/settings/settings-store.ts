@@ -7,6 +7,8 @@ import { DEFAULT_GLOBAL_SHORTCUT, registerGlobalShortcuts } from '../../shortcut
 import { getIngestionService } from '../ingestion/folder-watcher';
 import { setCustomVaultRoot, ensureVaultDirectories } from '../ingestion/paths';
 import { switchDatabase } from '../database/connection';
+import { getMainWindow } from '../../windows/mainWindow';
+import { getPickerWindow } from '../../windows/pickerWindow';
 
 const DEFAULT_SETTINGS: AppSettings = {
   sourceFolder: '',
@@ -20,6 +22,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   cloudDriveMode: true,
   autoPasteOnSelect: true,
   animationPlaybackMode: 'hover',
+  theme: 'slate_dark',
 };
 
 let cachedSettings: AppSettings | null = null;
@@ -62,6 +65,10 @@ export function loadSettings(): AppSettings {
 
   if (!loaded.animationPlaybackMode) {
     loaded.animationPlaybackMode = 'hover';
+  }
+
+  if (!loaded.theme) {
+    loaded.theme = 'slate_dark';
   }
 
   cachedSettings = loaded;
@@ -107,6 +114,14 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
   }
   if (partial.globalShortcut !== undefined) {
     registerGlobalShortcuts(partial.globalShortcut);
+  }
+  if (partial.theme !== undefined) {
+    try {
+      getMainWindow()?.webContents.send('theme:changed', updated.theme);
+      getPickerWindow()?.webContents.send('theme:changed', updated.theme);
+    } catch {
+      // Ignore if windows not initialized
+    }
   }
   if (partial.syncIntervalMinutes !== undefined) {
     getIngestionService().setPeriodicInterval(partial.syncIntervalMinutes);

@@ -36,6 +36,11 @@ const api: StickerChestAPI = {
   getSettings: () => ipcRenderer.invoke('settings:get'),
   saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),
   selectFolderDialog: () => ipcRenderer.invoke('dialog:selectFolder'),
+  onThemeChanged: (callback) => {
+    const handler = (_event: any, theme: string) => callback(theme);
+    ipcRenderer.on('theme:changed', handler);
+    return () => ipcRenderer.removeListener('theme:changed', handler);
+  },
 
   // Vault Backup, Restore & Pack Exporters
   createVaultBackup: (customFilePath) => ipcRenderer.invoke('export:createBackup', customFilePath),

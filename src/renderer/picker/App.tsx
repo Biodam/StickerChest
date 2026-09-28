@@ -31,6 +31,18 @@ export default function PickerApp() {
     fetchItems();
   }, [fetchItems]);
 
+  useEffect(() => {
+    api?.getSettings?.().then((settings) => {
+      if (settings?.theme) {
+        document.documentElement.setAttribute('data-theme', settings.theme);
+      }
+    });
+
+    return api?.onThemeChanged?.((theme) => {
+      document.documentElement.setAttribute('data-theme', theme);
+    });
+  }, [api]);
+
   const handleSelectItem = async (item: StickerItem, isShiftPressed: boolean = false) => {
     if (isShiftPressed) {
       // Shift+Enter: Copy only without auto-paste

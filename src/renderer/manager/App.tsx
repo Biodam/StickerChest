@@ -40,7 +40,13 @@ export default function App() {
   });
 
   const loadSettings = async () => {
-    if (api?.getSettings) setSettings(await api.getSettings());
+    if (api?.getSettings) {
+      const s = await api.getSettings();
+      setSettings(s);
+      if (s.theme) {
+        document.documentElement.setAttribute('data-theme', s.theme);
+      }
+    }
   };
 
   const fetchFacets = useCallback(async () => {
@@ -80,6 +86,13 @@ export default function App() {
     fetchFacets();
     fetchUntagged();
   }, [fetchFacets, fetchUntagged]);
+
+  useEffect(() => {
+    return api?.onThemeChanged?.((theme) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      setSettings((prev) => ({ ...prev, theme: theme as any }));
+    });
+  }, [api]);
 
   useEffect(() => {
     fetchItems();
