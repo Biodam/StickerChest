@@ -3,6 +3,9 @@ import path from 'path';
 
 let pickerWindow: BrowserWindow | null = null;
 
+const PICKER_WIDTH = 460;
+const PICKER_HEIGHT = 560;
+
 export function createPickerWindow(): BrowserWindow {
   if (pickerWindow && !pickerWindow.isDestroyed()) {
     return pickerWindow;
@@ -17,8 +20,8 @@ export function createPickerWindow(): BrowserWindow {
 
   pickerWindow = new BrowserWindow({
     title: 'Sticker Chest Quick Picker',
-    width: 420,
-    height: 520,
+    width: PICKER_WIDTH,
+    height: PICKER_HEIGHT,
     frame: false,
     transparent: true,
     resizable: false,
@@ -68,10 +71,8 @@ export function showPickerWindow(): void {
   const currentDisplay = screen.getDisplayNearestPoint(cursorPoint);
   const { x, y, width, height } = currentDisplay.workArea;
 
-  const winWidth = 420;
-  const winHeight = 520;
-  const posX = Math.round(x + (width - winWidth) / 2);
-  const posY = Math.round(y + (height - winHeight) / 2);
+  const posX = Math.round(x + (width - PICKER_WIDTH) / 2);
+  const posY = Math.round(y + (height - PICKER_HEIGHT) / 2);
 
   pickerWindow.setPosition(posX, posY);
   pickerWindow.show();

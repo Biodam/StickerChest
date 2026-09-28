@@ -85,8 +85,9 @@ export function usePickerKeyboard({
       // 5. Enter to select & copy/paste
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (items[selectedIndex]) {
-          onSelectItem(items[selectedIndex], e.shiftKey);
+        const target = items[selectedIndex] || items[0];
+        if (target) {
+          onSelectItem(target, e.shiftKey);
         }
         return;
       }

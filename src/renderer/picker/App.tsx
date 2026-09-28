@@ -43,21 +43,32 @@ export default function PickerApp() {
     });
   }, [api]);
 
-  const handleSelectItem = async (item: StickerItem, isShiftPressed: boolean = false) => {
-    if (isShiftPressed) {
-      // Shift+Enter: Copy only without auto-paste
-      await api?.copyItemToClipboard?.(item.id, copyTier);
-      await api?.hidePicker?.();
-    } else {
-      // Enter / Click: Default action (auto-paste workflow if enabled, or clipboard copy)
-      if (api?.copyAndPasteItem) {
-        await api.copyAndPasteItem(item.id, copyTier);
-      } else if (api?.copyItemToClipboard) {
-        await api.copyItemToClipboard(item.id, copyTier);
+  const handleSelectItem = useCallback(
+    async (item: StickerItem, isShiftPressed: boolean = false) => {
+      if (!item) return;
+
+      // 1. Immediately hide the picker window to return OS focus to user's target app
+      try {
         await api?.hidePicker?.();
+      } catch (e) {
+        console.warn('Could not hide picker:', e);
       }
-    }
-  };
+
+      // 2. Perform copy & auto-paste
+      try {
+        if (isShiftPressed) {
+          await api?.copyItemToClipboard?.(item.id, copyTier);
+        } else if (api?.copyAndPasteItem) {
+          await api.copyAndPasteItem(item.id, copyTier);
+        } else if (api?.copyItemToClipboard) {
+          await api.copyItemToClipboard(item.id, copyTier);
+        }
+      } catch (err) {
+        console.error('Failed to copy and paste sticker:', err);
+      }
+    },
+    [api, copyTier]
+  );
 
   const handleToggleFavorite = async (item: StickerItem) => {
     if (!api?.toggleFavorite) return;
@@ -95,7 +106,7 @@ export default function PickerApp() {
   });
 
   return (
-    <div className="w-[420px] h-[520px] bg-[#1a1b1e]/95 backdrop-blur-xl border border-[#2c2e33] rounded-2xl shadow-2xl flex flex-col overflow-hidden text-[#f1f3f5]">
+    <div className="w-[460px] h-[560px] bg-[#1a1b1e]/95 backdrop-blur-xl border border-[#2c2e33] rounded-2xl shadow-2xl flex flex-col overflow-hidden text-[#f1f3f5]">
       <PickerSearch
         ref={searchInputRef}
         value={searchQuery}

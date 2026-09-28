@@ -9,9 +9,13 @@ function getWindowsPasteScriptPath(): string {
   if (cachedVbsPath && fs.existsSync(cachedVbsPath)) {
     return cachedVbsPath;
   }
-  const vbsPath = path.join(os.tmpdir(), 'stickervault_paste.vbs');
+  const vbsPath = path.join(os.tmpdir(), 'stickerchest_paste.vbs');
   try {
-    fs.writeFileSync(vbsPath, 'Set w = CreateObject("WScript.Shell")\r\nw.SendKeys "^v"\r\n', 'utf-8');
+    fs.writeFileSync(
+      vbsPath,
+      'Set w = CreateObject("WScript.Shell")\r\nWScript.Sleep 30\r\nw.SendKeys "^v"\r\n',
+      'utf-8'
+    );
     cachedVbsPath = vbsPath;
   } catch (err) {
     console.error('[PasteSimulator] Failed to write paste script:', err);
@@ -29,14 +33,17 @@ export function simulatePasteKeystroke(): Promise<boolean> {
         execFile('cscript', ['//nologo', scriptPath], (err) => {
           if (err) {
             console.warn('[PasteSimulator] cscript failed, falling back to powershell:', err.message);
-            exec('powershell -WindowStyle Hidden -Command "[System.Windows.Forms.SendKeys]::SendWait(\'^v\')"', (psErr) => {
-              if (psErr) {
-                console.error('[PasteSimulator] Windows paste simulation failed:', psErr);
-                resolve(false);
-              } else {
-                resolve(true);
+            exec(
+              'powershell -WindowStyle Hidden -Command "(New-Object -ComObject WScript.Shell).SendKeys(\'^v\')"',
+              (psErr) => {
+                if (psErr) {
+                  console.error('[PasteSimulator] Windows paste simulation failed:', psErr);
+                  resolve(false);
+                } else {
+                  resolve(true);
+                }
               }
-            });
+            );
           } else {
             resolve(true);
           }

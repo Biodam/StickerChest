@@ -1,7 +1,11 @@
 import { clipboard, nativeImage } from 'electron';
 import fs from 'fs';
+import sharp from 'sharp';
 import { getDatabaseDAL } from '../database/dal';
 import { ImageTier } from '../../../types/models';
+import { hidePickerWindow } from '../../windows/pickerWindow';
+import { loadSettings } from '../settings/settings-store';
+import { simulatePasteKeystroke } from './paste-simulator';
 
 export async function copyStickerToClipboard(
   itemId: string,
@@ -31,26 +35,49 @@ export async function copyStickerToClipboard(
 
   try {
     const buffer = fs.readFileSync(targetPath);
-    const mimeType = targetPath.endsWith('.png')
-      ? 'image/png'
-      : targetPath.endsWith('.gif')
-      ? 'image/gif'
-      : 'image/webp';
+    const ext = targetPath.toLowerCase();
 
-    // Support both modern Electron 44 ClipboardItem API and nativeImage writeImage
-    if (typeof (clipboard as any).writeImage === 'function') {
-      const img = nativeImage.createFromBuffer(buffer);
-      (clipboard as any).writeImage(img);
-    } else if (typeof (clipboard as any).write === 'function') {
-      const blob = new Blob([buffer], { type: mimeType });
-      const ClipboardItemConstructor = (globalThis as any).ClipboardItem || (clipboard as any).ClipboardItem;
-      if (ClipboardItemConstructor) {
-        const clipItem = new ClipboardItemConstructor({ [mimeType]: blob });
-        await (clipboard as any).write([clipItem]);
+    // Standardize to PNG buffer for universal cross-application OS clipboard compatibility
+    let pngBuffer: Buffer;
+    if (ext.endsWith('.png')) {
+      pngBuffer = buffer;
+    } else {
+      pngBuffer = await sharp(buffer).png().toBuffer();
+    }
+
+    let written = false;
+
+    // 1. Try modern Electron 44+ Async ClipboardItem API
+    try {
+      const electronModule = await import('electron');
+      const ItemClass = (electronModule as any).ClipboardItem || (globalThis as any).ClipboardItem;
+      if (ItemClass && typeof clipboard.write === 'function') {
+        const formats: Record<string, Blob> = {
+          'image/png': new Blob([new Uint8Array(pngBuffer)], { type: 'image/png' }),
+        };
+        if (ext.endsWith('.gif')) {
+          formats['image/gif'] = new Blob([new Uint8Array(buffer)], { type: 'image/gif' });
+        }
+        const clipItem = new ItemClass(formats);
+        await clipboard.write([clipItem]);
+        written = true;
+      }
+    } catch (modernErr) {
+      console.warn('[ClipboardService] Modern clipboard.write fallback needed:', modernErr);
+    }
+
+    // 2. Fallback to nativeImage writeImage or writeBuffer
+    if (!written) {
+      if (typeof (clipboard as any).writeImage === 'function' && typeof nativeImage?.createFromBuffer === 'function') {
+        const img = nativeImage.createFromBuffer(pngBuffer);
+        (clipboard as any).writeImage(img);
+        written = true;
+      } else if (typeof (clipboard as any).writeBuffer === 'function') {
+        (clipboard as any).writeBuffer('image/png', pngBuffer);
+        written = true;
       }
     }
 
-    // Increment copy count and update last_copied_at
     dal.recordItemUsage(itemId);
     return true;
   } catch (err) {
@@ -63,22 +90,24 @@ export async function copyAndPasteSticker(
   itemId: string,
   preferredTier: ImageTier = 'sticker'
 ): Promise<boolean> {
+  // Ensure picker window hides immediately so OS focus returns to previously active window
+  try {
+    hidePickerWindow();
+  } catch (err) {
+    console.warn('[ClipboardService] Could not hide picker window:', err);
+  }
+
   const copied = await copyStickerToClipboard(itemId, preferredTier);
   if (!copied) return false;
 
-  const { hidePickerWindow } = await import('../../windows/pickerWindow');
-  const { loadSettings } = await import('../settings/settings-store');
-  const { simulatePasteKeystroke } = await import('./paste-simulator');
-
-  hidePickerWindow();
-
   const settings = loadSettings();
   if (settings.autoPasteOnSelect !== false) {
-    // Wait briefly for OS to restore focus to previously active application
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    // 150ms settling delay allows Windows/macOS to restore focus to target app before keystroke
+    await new Promise((resolve) => setTimeout(resolve, 150));
     await simulatePasteKeystroke();
   }
 
   return true;
 }
+
 

@@ -41,8 +41,8 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto p-2.5 scroll-smooth">
-      <div className="grid grid-cols-4 gap-2">
+    <div ref={containerRef} className="flex-1 overflow-y-auto p-4 scroll-smooth">
+      <div className="grid grid-cols-4 gap-3.5">
         {items.map((item, index) => {
           const isSelected = index === selectedIndex;
           const title = item.metadata?.character || item.filename;
@@ -53,10 +53,10 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
               data-index={index}
               onClick={() => onSelectItem(item)}
               title={`${title} ${item.metadata?.feeling ? `(${item.metadata.feeling})` : ''}`}
-              className={`group relative aspect-square rounded-xl p-2 flex items-center justify-center transition-all bg-[#25262b]/60 hover:bg-[#2c2e33] ${
+              className={`group relative aspect-square rounded-xl p-3 flex items-center justify-center transition-all bg-[#25262b]/60 hover:bg-[#2c2e33] ${
                 isSelected
-                  ? 'ring-2 ring-blue-500 bg-blue-600/20 shadow-md shadow-blue-500/30'
-                  : 'border border-[#2c2e33]/60'
+                  ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-[#1a1b1e] bg-blue-600/20 shadow-lg shadow-blue-500/20'
+                  : 'border border-[#2c2e33]/70 hover:border-[#3b3e45]'
               }`}
             >
               <AnimatedStickerImage
@@ -64,7 +64,7 @@ export const PickerGrid: React.FC<PickerGridProps> = ({
                 isHovered={false}
                 isSelected={isSelected}
                 alt={title}
-                className="max-w-full max-h-full object-contain pointer-events-none transition-transform group-hover:scale-110 duration-150"
+                className="max-w-full max-h-full object-contain pointer-events-none transition-transform group-hover:scale-105 duration-150"
               />
 
               {/* GIF indicator badge */}
