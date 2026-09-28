@@ -3,7 +3,7 @@ import { X, Sparkles } from 'lucide-react';
 import { AppSettings, ThemeId } from '../../../types/models';
 import { FolderSyncCard } from './settings/FolderSyncCard';
 import { GeminiAiCard } from './settings/GeminiAiCard';
-import { AutoPasteCard, AnimationCard } from './settings/BehaviorCards';
+import { AutoStartCard, AutoPasteCard, AnimationCard } from './settings/BehaviorCards';
 import { GoogleDriveCard } from './settings/GoogleDriveCard';
 import { HotkeyRecorder } from './HotkeyRecorder';
 import { ThemeSelector } from './ThemeSelector';
@@ -32,6 +32,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   );
   const [syncInterval, setSyncInterval] = useState(settings.syncIntervalMinutes ?? 15);
   const [autoTag, setAutoTag] = useState(settings.autoAiTagOnIngest ?? true);
+  const [autoStart, setAutoStart] = useState(settings.autoStartAtLogin ?? false);
   const [autoPaste, setAutoPaste] = useState(settings.autoPasteOnSelect ?? true);
   const [hotkey, setHotkey] = useState(settings.globalShortcut || 'Super+/');
   const [theme, setTheme] = useState<ThemeId>(settings.theme || 'slate_dark');
@@ -51,6 +52,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setModel(m);
     setSyncInterval(settings.syncIntervalMinutes ?? 15);
     setAutoTag(settings.autoAiTagOnIngest ?? true);
+    setAutoStart(settings.autoStartAtLogin ?? false);
     setAutoPaste(settings.autoPasteOnSelect ?? true);
     setHotkey(settings.globalShortcut || 'Super+/');
     setTheme(settings.theme || 'slate_dark');
@@ -85,6 +87,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       geminiModel: model,
       syncIntervalMinutes: syncInterval,
       autoAiTagOnIngest: autoTag,
+      autoStartAtLogin: autoStart,
       autoPasteOnSelect: autoPaste,
       globalShortcut: hotkey,
       theme,
@@ -136,6 +139,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             autoTag={autoTag}
             onChangeAutoTag={setAutoTag}
           />
+
+          {/* Start on System Login */}
+          <AutoStartCard autoStart={autoStart} onChangeAutoStart={setAutoStart} />
 
           {/* Quick Picker & Auto-Paste Behavior */}
           <AutoPasteCard autoPaste={autoPaste} onChangeAutoPaste={setAutoPaste} />

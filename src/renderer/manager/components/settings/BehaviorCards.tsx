@@ -1,5 +1,33 @@
 import React from 'react';
-import { Clipboard, Film } from 'lucide-react';
+import { Clipboard, Film, Power } from 'lucide-react';
+
+interface AutoStartCardProps {
+  autoStart: boolean;
+  onChangeAutoStart: (val: boolean) => void;
+}
+
+export const AutoStartCard: React.FC<AutoStartCardProps> = ({ autoStart, onChangeAutoStart }) => (
+  <div className="p-3 bg-[#121316] border border-[#2c2e33] rounded-xl space-y-2">
+    <div className="flex items-center justify-between">
+      <label className="text-gray-200 font-medium flex items-center space-x-1.5">
+        <Power className="w-3.5 h-3.5 text-emerald-400" />
+        <span>Start with System (Windows / macOS)</span>
+      </label>
+      <label className="flex items-center space-x-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={autoStart}
+          onChange={(e) => onChangeAutoStart(e.target.checked)}
+          className="rounded border-[#2c2e33] text-blue-600 focus:ring-0 bg-[#121316] w-4 h-4"
+        />
+        <span className="text-xs text-gray-300 font-medium">Start on system login</span>
+      </label>
+    </div>
+    <p className="text-[10px] text-gray-400 leading-normal">
+      Automatically launches Sticker Chest minimized to the system tray when your computer boots up, so your global hotkey is always available.
+    </p>
+  </div>
+);
 
 interface AutoPasteCardProps {
   autoPaste: boolean;

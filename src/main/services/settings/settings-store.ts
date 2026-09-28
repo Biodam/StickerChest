@@ -75,6 +75,17 @@ export function loadSettings(): AppSettings {
     loaded.theme = 'slate_dark';
   }
 
+  try {
+    if (app && app.getLoginItemSettings) {
+      const login = app.getLoginItemSettings();
+      if (login && typeof login.openAtLogin === 'boolean') {
+        loaded.autoStartAtLogin = login.openAtLogin;
+      }
+    }
+  } catch {
+    // Ignore in test environments
+  }
+
   cachedSettings = loaded;
 
   if (loaded.geminiApiKey) {
@@ -118,6 +129,17 @@ export function saveSettings(partial: Partial<AppSettings>): AppSettings {
   }
   if (partial.globalShortcut !== undefined) {
     registerGlobalShortcuts(partial.globalShortcut);
+  }
+  if (partial.autoStartAtLogin !== undefined) {
+    try {
+      if (app && app.setLoginItemSettings) {
+        app.setLoginItemSettings({
+          openAtLogin: partial.autoStartAtLogin,
+        });
+      }
+    } catch (err) {
+      console.warn('Could not update login item settings:', err);
+    }
   }
   if (partial.theme !== undefined) {
     try {

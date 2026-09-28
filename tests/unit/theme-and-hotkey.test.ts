@@ -140,4 +140,13 @@ describe('Visual Theme System & Persistence', () => {
     expect(settings.theme).toBeDefined();
     expect(themes).toContain(settings.theme);
   });
+
+  it('should persist autoStartAtLogin preference in settings', () => {
+    saveSettings({ autoStartAtLogin: true });
+    expect(loadSettings().autoStartAtLogin).toBe(true);
+
+    saveSettings({ autoStartAtLogin: false });
+    expect(loadSettings().autoStartAtLogin).toBe(false);
+  });
 });
+
