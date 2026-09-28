@@ -15,6 +15,7 @@ describe('AboutService', () => {
     expect(typeof info.nodeVersion).toBe('string');
     expect(typeof info.vaultPath).toBe('string');
     expect(typeof info.databasePath).toBe('string');
+    expect(typeof info.logPath).toBe('string');
     expect(typeof info.totalStickers).toBe('number');
     expect(info.totalStickers).toBeGreaterThanOrEqual(0);
   });

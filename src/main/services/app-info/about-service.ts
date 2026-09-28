@@ -3,6 +3,7 @@ import os from 'os';
 import { AboutInfo } from '../../../types/models';
 import { getVaultRoot } from '../ingestion/paths';
 import { getDatabaseDAL } from '../database/dal';
+import { logger } from '../logger/logger';
 
 export function getAboutInfo(): AboutInfo {
   let totalStickers = 0;
@@ -16,6 +17,7 @@ export function getAboutInfo(): AboutInfo {
 
   const vault = getVaultRoot();
   const databasePath = `${vault}/.stickerchest/stickerchest.db`;
+  const logPath = logger.getLogPath();
 
   let appVersion = '0.0.5';
   try {
@@ -39,6 +41,7 @@ export function getAboutInfo(): AboutInfo {
     osRelease: `${os.type()} ${os.release()}`,
     vaultPath: vault,
     databasePath,
+    logPath,
     totalStickers,
   };
 }

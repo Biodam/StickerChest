@@ -9,8 +9,12 @@ import { registerClipboardIpcHandlers } from './clipboard-handlers';
 import { registerExportIpcHandlers } from './export-handlers';
 import { registerSyncIpcHandlers } from './sync-handlers';
 import { registerAboutIpcHandlers } from './about-handlers';
+import { registerLoggerIpcHandlers } from './logger-handlers';
 
 export function registerIpcHandlers(): void {
+  // Logger handlers
+  registerLoggerIpcHandlers();
+
   // App & About handlers
   registerAboutIpcHandlers();
   // Database handlers

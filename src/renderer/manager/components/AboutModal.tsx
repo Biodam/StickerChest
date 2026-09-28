@@ -113,6 +113,18 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
               </div>
+
+              {info?.logPath && (
+                <div className="flex items-start space-x-2">
+                  <ExternalLink className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[11px] text-gray-400">Diagnostic Paste Logs</div>
+                    <div className="text-gray-200 font-mono text-[11px] truncate" title={info.logPath}>
+                      {info.logPath}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

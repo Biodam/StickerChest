@@ -72,6 +72,10 @@ const api: StickerChestAPI = {
 
   hidePicker: () => ipcRenderer.invoke('window:hidePicker'),
   openManager: () => ipcRenderer.invoke('window:openManager'),
+
+  logMessage: (level, tag, message, meta) => ipcRenderer.invoke('logger:log', level, tag, message, meta),
+  getRecentLogs: (maxLines) => ipcRenderer.invoke('logger:getRecentLogs', maxLines),
+  getLogPath: () => ipcRenderer.invoke('logger:getLogPath'),
 };
 
 contextBridge.exposeInMainWorld('stickerChest', api);

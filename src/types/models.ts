@@ -145,6 +145,7 @@ export interface AboutInfo {
   osRelease: string;
   vaultPath: string;
   databasePath: string;
+  logPath: string;
   totalStickers: number;
 }
 

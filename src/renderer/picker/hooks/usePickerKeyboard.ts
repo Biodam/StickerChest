@@ -86,8 +86,19 @@ export function usePickerKeyboard({
       if (e.key === 'Enter') {
         e.preventDefault();
         const target = items[selectedIndex] || items[0];
+        (window.stickerChest || window.stickerVault)?.logMessage?.(
+          'INFO',
+          'PickerKeyboard',
+          `Enter key pressed: selectedIndex=${selectedIndex}, totalItems=${items.length}, target=${target ? `${target.id} (${target.filename})` : 'none'}, isShift=${e.shiftKey}`
+        );
         if (target) {
           onSelectItem(target, e.shiftKey);
+        } else {
+          (window.stickerChest || window.stickerVault)?.logMessage?.(
+            'WARN',
+            'PickerKeyboard',
+            'Enter pressed but no sticker was selected or available in list'
+          );
         }
         return;
       }

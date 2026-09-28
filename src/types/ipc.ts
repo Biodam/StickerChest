@@ -80,6 +80,11 @@ export interface StickerChestAPI {
   // Window Controls
   hidePicker: () => Promise<void>;
   openManager: () => Promise<void>;
+
+  // Diagnostics & Logging
+  logMessage?: (level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG', tag: string, message: string, meta?: any) => Promise<boolean>;
+  getRecentLogs?: (maxLines?: number) => Promise<string[]>;
+  getLogPath?: () => Promise<string>;
 }
 
 export type StickerVaultAPI = StickerChestAPI;

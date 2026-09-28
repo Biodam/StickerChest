@@ -48,19 +48,30 @@ export default function PickerApp() {
     async (item: StickerItem, isShiftPressed: boolean = false) => {
       if (!item) return;
 
+      api?.logMessage?.(
+        'INFO',
+        'PickerApp',
+        `handleSelectItem called for ${item.id} (${item.filename}), tier=${copyTier}, isShift=${isShiftPressed}`
+      );
+
       try {
         if (isShiftPressed) {
           // Shift+Enter: copy only without auto-paste, then dismiss
+          api?.logMessage?.('INFO', 'PickerApp', 'Invoking copyItemToClipboard (shiftPressed)...');
           await api?.copyItemToClipboard?.(item.id, copyTier);
           await api?.hidePicker?.();
         } else if (api?.copyAndPasteItem) {
           // Enter: main process handles clipboard copy, window hiding, and virtual paste
-          await api.copyAndPasteItem(item.id, copyTier);
+          api?.logMessage?.('INFO', 'PickerApp', 'Invoking copyAndPasteItem via IPC...');
+          const result = await api.copyAndPasteItem(item.id, copyTier);
+          api?.logMessage?.('INFO', 'PickerApp', `copyAndPasteItem IPC finished with result: ${result}`);
         } else if (api?.copyItemToClipboard) {
+          api?.logMessage?.('WARN', 'PickerApp', 'copyAndPasteItem missing on API, falling back to copyItemToClipboard');
           await api.copyItemToClipboard(item.id, copyTier);
           await api?.hidePicker?.();
         }
-      } catch (err) {
+      } catch (err: any) {
+        api?.logMessage?.('ERROR', 'PickerApp', `Failed to copy and paste sticker: ${err.message}`, err);
         console.error('Failed to copy and paste sticker:', err);
       }
     },
