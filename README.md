@@ -49,14 +49,14 @@
 
 ## 📦 Downloads & Releases
 
-Prebuilt multiplatform installers for Windows and macOS are published under [GitHub Releases](https://github.com/Biodam/sticker-database-manager/releases):
+Prebuilt multiplatform installers for Windows and macOS are published under [GitHub Releases](https://github.com/Biodam/StickerChest/releases):
 
 | Platform | Format | Installer Download |
 |---|---|---|
-| **Windows** | Setup Installer | [`StickerChest.Setup.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest.Setup.0.0.1.exe) |
-| **Windows** | Portable Executable | [`StickerChest.0.0.1.exe`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest.0.0.1.exe) |
-| **macOS (Apple Silicon)** | Disk Image (DMG) | [`StickerChest-0.0.1-arm64.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest-0.0.1-arm64.dmg) |
-| **macOS (Intel)** | Disk Image (DMG) | [`StickerChest-0.0.1.dmg`](https://github.com/Biodam/sticker-database-manager/releases/download/v0.0.1/StickerChest-0.0.1.dmg) |
+| **Windows** | Setup Installer | [`Sticker.Chest.Setup.0.0.2.exe`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest.Setup.0.0.2.exe) |
+| **Windows** | Portable Executable | [`Sticker.Chest.0.0.2.exe`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest.0.0.2.exe) |
+| **macOS (Apple Silicon)** | Disk Image (DMG) | [`Sticker.Chest-0.0.2-arm64.dmg`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest-0.0.2-arm64.dmg) |
+| **macOS (Intel)** | Disk Image (DMG) | [`Sticker.Chest-0.0.2.dmg`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest-0.0.2.dmg) |
 
 ---
 
@@ -95,8 +95,8 @@ Prebuilt multiplatform installers for Windows and macOS are published under [Git
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/Biodam/sticker-database-manager.git
-cd sticker-database-manager
+git clone https://github.com/Biodam/StickerChest.git
+cd StickerChest
 
 # Install dependencies
 npm install

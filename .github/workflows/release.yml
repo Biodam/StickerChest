@@ -150,7 +150,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag_info.outputs.tag }}
-          name: StickerVault ${{ steps.tag_info.outputs.tag }}
+          name: StickerChest ${{ steps.tag_info.outputs.tag }}
           draft: ${{ inputs.draft || false }}
           prerelease: false
           generate_release_notes: true
