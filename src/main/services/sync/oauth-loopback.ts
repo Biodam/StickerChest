@@ -4,7 +4,7 @@ import { createPkcePair, buildAuthorizationUrl, GOOGLE_TOKEN_ENDPOINT } from './
 import { getTokenVault, StoredTokens } from './token-vault';
 
 export const DEFAULT_GDRIVE_CLIENT_ID =
-  process.env.GDRIVE_CLIENT_ID || '1035284849202-placeholder.apps.googleusercontent.com';
+  process.env.GDRIVE_CLIENT_ID || '74155265273-kuhjen26hso406vpvaljoe5lvhl4h4tt.apps.googleusercontent.com';
 
 const SUCCESS_HTML = `
 <!DOCTYPE html>

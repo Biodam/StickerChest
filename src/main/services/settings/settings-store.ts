@@ -25,7 +25,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   theme: 'slate_dark',
   googleDriveSyncEnabled: false,
   googleDriveAutoSync: true,
-  googleDriveClientId: '',
+  googleDriveClientId: '74155265273-kuhjen26hso406vpvaljoe5lvhl4h4tt.apps.googleusercontent.com',
 };
 
 let cachedSettings: AppSettings | null = null;
