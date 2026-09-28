@@ -57,6 +57,14 @@ export function createTray(): Tray {
     },
     { type: 'separator' },
     {
+      label: 'About Sticker Chest',
+      click: () => {
+        const { openAboutModal } = require('./menu');
+        openAboutModal();
+      },
+    },
+    { type: 'separator' },
+    {
       label: 'Quit Sticker Chest',
       click: () => {
         quitApp();

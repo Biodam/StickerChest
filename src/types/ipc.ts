@@ -7,9 +7,13 @@ import {
   LibraryFacets,
   SyncProgress,
   GoogleDriveAccountInfo,
+  AboutInfo,
 } from './models';
 
 export interface StickerChestAPI {
+  // App & About
+  getAboutInfo: () => Promise<AboutInfo>;
+  onOpenAbout: (callback: () => void) => () => void;
   // Database & Search
   searchItems: (options: SearchFilterOptions) => Promise<{ items: StickerItem[]; total: number }>;
   getFacets: () => Promise<LibraryFacets>;

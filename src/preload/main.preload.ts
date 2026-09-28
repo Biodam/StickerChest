@@ -2,6 +2,13 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { StickerChestAPI } from '../types/ipc';
 
 const api: StickerChestAPI = {
+  getAboutInfo: () => ipcRenderer.invoke('app:getAboutInfo'),
+  onOpenAbout: (callback) => {
+    const handler = () => callback();
+    ipcRenderer.on('app:openAbout', handler);
+    return () => ipcRenderer.removeListener('app:openAbout', handler);
+  },
+
   searchItems: (options) => ipcRenderer.invoke('db:search', options),
   getFacets: () => ipcRenderer.invoke('db:getFacets'),
   getItem: (id) => ipcRenderer.invoke('db:getItem', id),

@@ -132,4 +132,21 @@ export interface AppSettings {
   googleDriveClientSecret?: string;
 }
 
+export interface AboutInfo {
+  appName: string;
+  version: string;
+  commitHash: string;
+  electronVersion: string;
+  chromeVersion: string;
+  nodeVersion: string;
+  v8Version: string;
+  platform: string;
+  arch: string;
+  osRelease: string;
+  vaultPath: string;
+  databasePath: string;
+  totalStickers: number;
+}
+
+
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud } from 'lucide-react';
+import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info } from 'lucide-react';
 import { LibraryFacets } from '../../../types/models';
 import { FacetFilterGroup } from './FacetFilterGroup';
 
@@ -10,6 +10,7 @@ interface SidebarProps {
   onToggleAnimatedOnly: () => void;
   onSyncFolder: () => void;
   onOpenSettings: () => void;
+  onOpenAbout?: () => void;
   onOpenExport?: () => void;
   onOpenImport?: () => void;
   isScanning: boolean;
@@ -30,6 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleAnimatedOnly,
   onSyncFolder,
   onOpenSettings,
+  onOpenAbout,
   onOpenExport,
   onOpenImport,
   isScanning,
@@ -194,13 +196,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        <button
-          onClick={onOpenSettings}
-          className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#25262b] text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
-        >
-          <Settings className="w-3.5 h-3.5" />
-          <span>Settings & API</span>
-        </button>
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            onClick={onOpenSettings}
+            className="flex items-center justify-center space-x-1.5 px-2 py-1.5 rounded-lg hover:bg-[#25262b] text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>Settings</span>
+          </button>
+          <button
+            onClick={onOpenAbout}
+            className="flex items-center justify-center space-x-1.5 px-2 py-1.5 rounded-lg hover:bg-[#25262b] text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
+            title="About Sticker Chest"
+          >
+            <Info className="w-3.5 h-3.5" />
+            <span>About</span>
+          </button>
+        </div>
       </div>
     </aside>
   );

@@ -61,3 +61,4 @@ The heavy-duty Manager desktop application supports standard power-user selectio
 | `Ctrl + A` / `Cmd + A` | Library Grid | Select all currently filtered/visible stickers. |
 | `Escape` | Selection / Modals | Clears bulk selection; closes open modals / inspector. |
 | `Delete` / `Backspace` | Multi-Selection | Triggers bulk delete prompt for selected stickers. |
+| `F1` | Database Manager | Opens Help -> About Sticker Chest dialog. |

@@ -8,8 +8,11 @@ import { registerSettingsIpcHandlers } from './settings-handlers';
 import { registerClipboardIpcHandlers } from './clipboard-handlers';
 import { registerExportIpcHandlers } from './export-handlers';
 import { registerSyncIpcHandlers } from './sync-handlers';
+import { registerAboutIpcHandlers } from './about-handlers';
 
 export function registerIpcHandlers(): void {
+  // App & About handlers
+  registerAboutIpcHandlers();
   // Database handlers
   registerDbIpcHandlers();
 

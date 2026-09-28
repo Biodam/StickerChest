@@ -6,7 +6,14 @@ import renderer from 'vite-plugin-electron-renderer';
 import path from 'path';
 import dotenv from 'dotenv';
 
+import { execSync } from 'child_process';
+
 dotenv.config();
+
+let gitCommitHash = 'unknown';
+try {
+  gitCommitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+} catch {}
 
 export default defineConfig({
   plugins: [
@@ -21,6 +28,7 @@ export default defineConfig({
               process.env.GDRIVE_CLIENT_ID || '74155265273-kuhjen26hso406vpvaljoe5lvhl4h4tt.apps.googleusercontent.com'
             ),
             'process.env.GDRIVE_CLIENT_SECRET': JSON.stringify(process.env.GDRIVE_CLIENT_SECRET || ''),
+            'process.env.GIT_COMMIT_HASH': JSON.stringify(gitCommitHash),
           },
           build: {
             outDir: 'dist-electron/main',

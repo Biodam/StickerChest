@@ -10,6 +10,8 @@ import { registerIpcHandlers } from './ipc';
 import { resolveVaultPath } from './services/ingestion/paths';
 import { loadSettings } from './services/settings/settings-store';
 
+import { setupApplicationMenu } from './windows/menu';
+
 protocol.registerSchemesAsPrivileged([
   { scheme: 'chest', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
   { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
@@ -95,6 +97,9 @@ app.whenReady().then(() => {
 
   // Create system tray companion
   createTray();
+
+  // Setup application menu (File, Edit, View, Help -> About)
+  setupApplicationMenu();
 
   // Register global shortcuts (e.g. Win+/ on Windows, Control+/ on macOS to toggle floating picker)
   const settings = loadSettings();

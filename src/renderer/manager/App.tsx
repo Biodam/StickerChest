@@ -8,6 +8,7 @@ import { IngestionBanner } from './components/IngestionBanner';
 import { BulkActionBar } from './components/BulkActionBar';
 import { ExportModal } from './components/ExportModal';
 import { ImportModal } from './components/ImportModal';
+import { AboutModal } from './components/AboutModal';
 import { useSelection } from './hooks/useSelection';
 import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
 
@@ -24,6 +25,7 @@ export default function App() {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedItem, setSelectedItem] = useState<StickerItem | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
@@ -91,6 +93,12 @@ export default function App() {
     return api?.onThemeChanged?.((theme) => {
       document.documentElement.setAttribute('data-theme', theme);
       setSettings((prev) => ({ ...prev, theme: theme as any }));
+    });
+  }, [api]);
+
+  useEffect(() => {
+    return api?.onOpenAbout?.(() => {
+      setAboutOpen(true);
     });
   }, [api]);
 
@@ -182,6 +190,7 @@ export default function App() {
         onSelectTab={setActiveTab} onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
         onSyncFolder={async () => settings.sourceFolder ? api?.scanSourceFolder?.(false) : setSettingsOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
+        onOpenAbout={() => setAboutOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenImport={() => setImportOpen(true)}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
@@ -276,6 +285,11 @@ export default function App() {
         }}
         onSelectFolder={async () => api?.selectFolderDialog?.() || null}
         onTestKey={async (k, m) => api?.testGeminiKey?.(k, m) || { valid: false }}
+      />
+
+      <AboutModal
+        isOpen={aboutOpen}
+        onClose={() => setAboutOpen(false)}
       />
     </div>
   );
