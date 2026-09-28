@@ -91,6 +91,28 @@ export interface IngestionProgressEvent {
 
 export type ThemeId = 'slate_dark' | 'oled_black' | 'cyberpunk' | 'catppuccin' | 'paper_light';
 
+export type SyncState = 'idle' | 'authenticating' | 'syncing' | 'downloading' | 'error' | 'synced';
+
+export interface SyncProgress {
+  state: SyncState;
+  currentStep?: string;
+  filesTransferred: number;
+  totalFiles: number;
+  bytesTransferred: number;
+  totalBytes: number;
+  lastSyncTimestamp: number | null;
+  errorMessage?: string;
+}
+
+export interface GoogleDriveAccountInfo {
+  connected: boolean;
+  email?: string;
+  displayName?: string;
+  storageUsedBytes?: number;
+  storageTotalBytes?: number;
+  lastSyncTimestamp?: number | null;
+}
+
 export interface AppSettings {
   sourceFolder: string;
   geminiApiKey: string;
@@ -104,5 +126,9 @@ export interface AppSettings {
   autoPasteOnSelect: boolean;
   animationPlaybackMode?: 'always' | 'hover' | 'reduced_motion';
   theme?: ThemeId;
+  googleDriveSyncEnabled?: boolean;
+  googleDriveAutoSync?: boolean;
+  googleDriveClientId?: string;
 }
+
 

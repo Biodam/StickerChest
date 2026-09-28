@@ -33,7 +33,7 @@ This document tracks high-level progress across the core development milestones 
 | **M12** | **Animated Sticker & GIF Controls** | Hover-to-play vs always-play, viewport-aware offscreen animation pausing, frame-by-frame scrubber & telemetry in Inspector | 🟢 Completed |
 | **M13** | **Vault Backup & Pack Exporter** | Full portable `.stickervault` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | 🟢 Completed |
 | **M14** | **Custom Global Hotkeys & UI Themes** | Interactive global summon hotkey rebinding in Settings; curated theme engine (OLED Black, Slate, Cyberpunk, Catppuccin, Light) | 🟢 Completed |
-| **M15** | **Google Drive Cloud Sync & OAuth** | Direct Google OAuth 2.0 PKCE login, isolated `appDataFolder` cloud storage, content-addressable image mirroring & SQLite snapshot sync | ⏳ Planned |
+| **M15** | **Google Drive Cloud Sync & OAuth** | Direct Google OAuth 2.0 PKCE login, isolated `appDataFolder` cloud storage, content-addressable image mirroring & SQLite snapshot sync | 🟢 Completed |
 
 ---
 
@@ -53,7 +53,7 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 12: Animated Sticker & GIF Controls](file:///c:/Projects/sticker-database-manager/tasks/task-12-animated-sticker-and-gif-controls.md)
 - [x] [Task 13: Vault Backup & Pack Exporter](file:///c:/Projects/sticker-database-manager/tasks/task-13-vault-backup-and-pack-export.md)
 - [x] [Task 14: Custom Hotkeys & Visual Themes](file:///c:/Projects/sticker-database-manager/tasks/task-14-custom-hotkeys-and-visual-themes.md)
-- [ ] [Task 15: Google Drive Cloud Sync & OAuth](file:///c:/Projects/sticker-database-manager/tasks/task-15-google-drive-sync-and-oauth.md)
+- [x] [Task 15: Google Drive Cloud Sync & OAuth](file:///c:/Projects/sticker-database-manager/tasks/task-15-google-drive-sync-and-oauth.md)
 
 
 

@@ -52,6 +52,17 @@ const api: StickerChestAPI = {
     return () => ipcRenderer.removeListener('export:progress', handler);
   },
 
+  // Google Drive Cloud Sync
+  syncGetAccountInfo: () => ipcRenderer.invoke('sync:getAccountInfo'),
+  syncConnectGoogleDrive: (clientId) => ipcRenderer.invoke('sync:connectGoogleDrive', clientId),
+  syncDisconnectGoogleDrive: () => ipcRenderer.invoke('sync:disconnectGoogleDrive'),
+  syncTriggerNow: () => ipcRenderer.invoke('sync:triggerSync'),
+  onSyncProgress: (callback) => {
+    const handler = (_event: any, data: any) => callback(data);
+    ipcRenderer.on('sync:progress', handler);
+    return () => ipcRenderer.removeListener('sync:progress', handler);
+  },
+
   hidePicker: () => ipcRenderer.invoke('window:hidePicker'),
   openManager: () => ipcRenderer.invoke('window:openManager'),
 };

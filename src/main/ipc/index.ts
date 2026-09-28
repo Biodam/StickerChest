@@ -7,6 +7,7 @@ import { registerGeminiIpcHandlers } from './gemini-handlers';
 import { registerSettingsIpcHandlers } from './settings-handlers';
 import { registerClipboardIpcHandlers } from './clipboard-handlers';
 import { registerExportIpcHandlers } from './export-handlers';
+import { registerSyncIpcHandlers } from './sync-handlers';
 
 export function registerIpcHandlers(): void {
   // Database handlers
@@ -26,6 +27,9 @@ export function registerIpcHandlers(): void {
 
   // Vault Backup, Restore & Pack Exporters
   registerExportIpcHandlers();
+
+  // Google Drive Cloud Sync handlers
+  registerSyncIpcHandlers();
 
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {

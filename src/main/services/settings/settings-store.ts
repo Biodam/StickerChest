@@ -23,6 +23,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   autoPasteOnSelect: true,
   animationPlaybackMode: 'hover',
   theme: 'slate_dark',
+  googleDriveSyncEnabled: false,
+  googleDriveAutoSync: true,
+  googleDriveClientId: '',
 };
 
 let cachedSettings: AppSettings | null = null;

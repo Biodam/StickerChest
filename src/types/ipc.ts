@@ -1,4 +1,13 @@
-import { StickerItem, SearchFilterOptions, IngestionProgressEvent, AppSettings, ImageTier, LibraryFacets } from './models';
+import {
+  StickerItem,
+  SearchFilterOptions,
+  IngestionProgressEvent,
+  AppSettings,
+  ImageTier,
+  LibraryFacets,
+  SyncProgress,
+  GoogleDriveAccountInfo,
+} from './models';
 
 export interface StickerChestAPI {
   // Database & Search
@@ -56,6 +65,13 @@ export interface StickerChestAPI {
     packAuthor?: string;
   }) => Promise<{ canceled: boolean; success?: boolean; totalExported?: number; outputPath?: string; error?: string }>;
   onExportProgress: (callback: (progress: any) => void) => () => void;
+
+  // Google Drive Cloud Sync
+  syncGetAccountInfo: () => Promise<GoogleDriveAccountInfo>;
+  syncConnectGoogleDrive: (clientId?: string) => Promise<{ success: boolean; error?: string }>;
+  syncDisconnectGoogleDrive: () => Promise<boolean>;
+  syncTriggerNow: () => Promise<{ success: boolean; error?: string }>;
+  onSyncProgress: (callback: (progress: SyncProgress) => void) => () => void;
 
   // Window Controls
   hidePicker: () => Promise<void>;

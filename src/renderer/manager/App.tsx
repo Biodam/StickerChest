@@ -110,6 +110,17 @@ export default function App() {
     });
   }, [api, fetchItems, fetchFacets, fetchUntagged]);
 
+  useEffect(() => {
+    if (!api?.onSyncProgress) return;
+    return api.onSyncProgress((event) => {
+      if (event.state === 'synced') {
+        fetchItems();
+        fetchFacets();
+        fetchUntagged();
+      }
+    });
+  }, [api, fetchItems, fetchFacets, fetchUntagged]);
+
   const handleToggleFavorite = async (itemId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (await api?.toggleFavorite?.(itemId)) {

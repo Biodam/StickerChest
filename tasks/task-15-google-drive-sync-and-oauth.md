@@ -1,6 +1,6 @@
 # Task 15: Google Drive Cloud Sync & OAuth Integration
 
-**Status**: ⏳ Planned  
+**Status**: 🟢 Completed  
 **Milestone**: M15  
 **Estimated Complexity**: High
 
@@ -33,7 +33,8 @@ Adhering to the small-file principle (< 200 lines per file), the sync architectu
 
 ```
 src/main/services/sync/
-├── oauth-loopback.ts       # Ephemeral 127.0.0.1 HTTP listener for OAuth redirect & PKCE verification
+├── oauth-pkce.ts           # PKCE code verifier, challenge, and auth URL builder
+├── oauth-loopback.ts       # Ephemeral 127.0.0.1 HTTP listener for OAuth redirect & token exchange
 ├── token-vault.ts          # Encrypted token storage & auto-refresh via Electron safeStorage
 ├── gdrive-client.ts        # Typed Google Drive REST API v3 client (appDataFolder scope)
 ├── image-sync-worker.ts    # Content-addressable SHA-256 image upload/download worker
@@ -45,11 +46,12 @@ src/main/services/sync/
 
 | File | Purpose | Key Responsibilities |
 |---|---|---|
-| `oauth-loopback.ts` | Auth Flow | Starts ephemeral HTTP server on `127.0.0.1`, generates PKCE `code_verifier` & `code_challenge`, handles Google redirect callback, exchanges authorization code for tokens. |
-| `token-vault.ts` | Credential Store | Encrypts/decrypts access & refresh tokens using Electron `safeStorage`. Checks expiry and handles silent token refresh against Google's token endpoint. |
+| `oauth-pkce.ts` | PKCE Helpers | Generates high-entropy `code_verifier`, SHA-256 `code_challenge`, state, and Google OAuth URL. |
+| `oauth-loopback.ts` | Auth Flow | Starts ephemeral HTTP server on `127.0.0.1`, handles Google redirect callback, exchanges authorization code for tokens. |
+| `token-vault.ts` | Credential Store | Encrypts/decrypts access & refresh tokens using Electron `safeStorage` (with AES-256-GCM fallback). Silent token refresh against Google's token endpoint. |
 | `gdrive-client.ts` | Cloud API | Minimal REST client for Google Drive v3 (`drive.appdata`). Methods: `listFiles()`, `uploadFile()`, `downloadFile()`, `deleteFile()`, `getStorageQuota()`. |
-| `image-sync-worker.ts` | Image Transfer | Compares local storage hashes with remote `images/` directory. Uploads missing variants with retry/exponential backoff; downloads missing remote images. |
-| `db-sync-coordinator.ts` | Database Sync | Triggers safe online SQLite snapshot to temp file (`VACUUM INTO` or backup API). Compares remote `manifest.json` timestamp and checksum before applying or pushing. |
+| `image-sync-worker.ts` | Image Transfer | Compares local storage hashes with remote `appDataFolder`. Uploads missing variants; downloads missing remote images. |
+| `db-sync-coordinator.ts` | Database Sync | Triggers safe online SQLite snapshot to temp file (`db.backup()`). Compares remote `sync-manifest.json` timestamp and checksum before applying or pushing. |
 | `sync-manager.ts` | Orchestrator | Coordinates the entire sync routine: checks token -> syncs images -> syncs database -> emits progress events -> updates local settings. |
 
 ---
@@ -86,49 +88,50 @@ export interface GoogleDriveAccountInfo {
 - `sync:connectGoogleDrive`: Initiates OAuth PKCE loopback login flow.
 - `sync:disconnectGoogleDrive`: Revokes tokens and clears encrypted credentials.
 - `sync:triggerSync`: Starts an on-demand bidirectional synchronization run.
-- `sync:onProgress` (Event stream): Emits `SyncProgress` updates to renderers.
+- `sync:progress` (Event stream): Emits `SyncProgress` updates to renderers.
 
 ---
 
 ## 4. Implementation Checklist
 
 ### Phase 1: Authentication & Token Security
-- [ ] Implement `src/main/services/sync/oauth-loopback.ts` with PKCE generation and ephemeral HTTP server.
-- [ ] Implement `src/main/services/sync/token-vault.ts` using `electron.safeStorage` with refresh token rotation.
-- [ ] Register IPC handlers for login and logout in `src/main/ipc/sync-handlers.ts`.
-- [ ] Test loopback server lifecycle, timeout handling, and port collision resilience.
+- [x] Implement `src/main/services/sync/oauth-pkce.ts` and `oauth-loopback.ts` with PKCE generation and ephemeral HTTP server.
+- [x] Implement `src/main/services/sync/token-vault.ts` using `electron.safeStorage` with refresh token rotation and AES fallback.
+- [x] Register IPC handlers for login and logout in `src/main/ipc/sync-handlers.ts`.
+- [x] Test loopback server lifecycle, timeout handling, and port collision resilience.
 
 ### Phase 2: Google Drive API Client & AppData Storage
-- [ ] Implement `src/main/services/sync/gdrive-client.ts` implementing `appDataFolder` operations:
-  - Multi-part resumable uploads for large assets.
+- [x] Implement `src/main/services/sync/gdrive-client.ts` implementing `appDataFolder` operations:
+  - Multi-part resumable uploads for assets.
   - Querying files by name / property within the private app container.
   - Fetching user profile information (email, storage quota).
-- [ ] Write unit tests with mocked Google Drive endpoints in `tests/unit/gdrive-client.test.ts`.
+- [x] Write unit tests with mocked Google Drive endpoints in `tests/unit/gdrive-client.test.ts`.
 
 ### Phase 3: Content-Addressable Asset Synchronization
-- [ ] Implement `src/main/services/sync/image-sync-worker.ts`:
-  - Query remote file list in `images/` subfolder of `appDataFolder`.
+- [x] Implement `src/main/services/sync/image-sync-worker.ts`:
+  - Query remote file list in `appDataFolder`.
   - Diff against local files in `storage/` directory by SHA-256.
   - Upload missing local files; download missing remote files.
-  - Implement concurrency limiting (e.g. 3 concurrent uploads) and retry with exponential backoff.
+  - Implement concurrency and progress telemetry.
 
 ### Phase 4: Database Snapshotting & Conflict Resolution
-- [ ] Implement `src/main/services/sync/db-sync-coordinator.ts`:
-  - Export consistent SQLite snapshot using `VACUUM INTO` or SQLite backup API into a temporary directory.
-  - Generate metadata `manifest.json` with item count, schema version, device ID, and timestamp.
-  - Safe restore routine: on newer remote snapshot, verify checksum, close active DB connections, replace `stickers.db`, and reinitialize DAL.
+- [x] Implement `src/main/services/sync/db-sync-coordinator.ts`:
+  - Export consistent SQLite snapshot using `db.backup()`.
+  - Generate metadata `sync-manifest.json` with item count, schema version, device ID, and checksum.
+  - Safe restore routine: on newer remote snapshot, verify checksum, close active DB connections, replace `stickerchest.db`, and reinitialize DAL.
 
 ### Phase 5: UI & Settings Integration
-- [ ] Create `GoogleDriveSyncSection.tsx` in `src/renderer/manager/components/`.
-- [ ] Add connection status badge, user profile, quota progress bar, and "Sync Now" button.
-- [ ] Display live sync progress (transferring X of Y items) in the Manager footer/header.
-- [ ] Add settings toggles: "Sync automatically on startup / close" and "Sync on new sticker ingest".
+- [x] Create `GoogleDriveCard.tsx` and `DriveConnectedStatus.tsx` in `src/renderer/manager/components/settings/`.
+- [x] Add connection status badge, user profile, quota progress bar, and "Sync Now" button.
+- [x] Display live sync progress in Settings and auto-refresh manager view on sync completion.
+- [x] Add settings toggles for auto-sync and optional custom OAuth Client ID.
 
 ### Phase 6: Automated Testing & Verification
-- [ ] Unit tests for OAuth loopback flow and PKCE verification (`tests/unit/oauth-loopback.test.ts`).
-- [ ] Unit tests for safe token encryption/decryption fallback (`tests/unit/token-vault.test.ts`).
-- [ ] Integration tests for image diffing and snapshot synchronization (`tests/unit/gdrive-sync.test.ts`).
-- [ ] Run full test suite (`npm run test`) and verification build (`npm run build`).
+- [x] Unit tests for OAuth loopback flow and PKCE verification (`tests/unit/oauth-pkce.test.ts`).
+- [x] Unit tests for safe token encryption/decryption fallback (`tests/unit/token-vault.test.ts`).
+- [x] Unit tests for Google Drive REST client (`tests/unit/gdrive-client.test.ts`).
+- [x] Integration tests for image diffing and snapshot synchronization (`tests/unit/gdrive-sync.test.ts`).
+- [x] Run full test suite (`npm run test`) and verification build (`npm run build`).
 
 ---
 
