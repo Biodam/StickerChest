@@ -46,11 +46,13 @@ export function searchItems(
     params.push(ftsSearch);
   }
 
-  // Tab conditions
-  if (tab === 'favorites') {
-    conditions.push(`u.is_favorite = 1`);
-  } else if (tab === 'recent') {
-    conditions.push(`u.last_copied_at IS NOT NULL`);
+  // Tab conditions: only restrict to favorites/recent when browsing without a search query
+  if (!ftsSearch) {
+    if (tab === 'favorites') {
+      conditions.push(`u.is_favorite = 1`);
+    } else if (tab === 'recent') {
+      conditions.push(`u.last_copied_at IS NOT NULL`);
+    }
   }
 
   // Filter conditions

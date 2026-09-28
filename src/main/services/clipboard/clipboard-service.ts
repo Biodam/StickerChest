@@ -1,4 +1,4 @@
-import { clipboard, nativeImage } from 'electron';
+import { clipboard, ClipboardItem, nativeImage } from 'electron';
 import fs from 'fs';
 import sharp from 'sharp';
 import { getDatabaseDAL } from '../database/dal';
@@ -37,7 +37,7 @@ export async function copyStickerToClipboard(
     const buffer = fs.readFileSync(targetPath);
     const ext = targetPath.toLowerCase();
 
-    // Standardize to PNG buffer for universal cross-application OS clipboard compatibility
+    // Universal OS clipboard compatibility: Always prepare a clean PNG image buffer
     let pngBuffer: Buffer;
     if (ext.endsWith('.png')) {
       pngBuffer = buffer;
@@ -45,36 +45,25 @@ export async function copyStickerToClipboard(
       pngBuffer = await sharp(buffer).png().toBuffer();
     }
 
-    let written = false;
+    const title = item.metadata?.character || item.filename;
+    const formats: Record<string, Blob> = {
+      'image/png': new Blob([new Uint8Array(pngBuffer)], { type: 'image/png' }),
+      'text/plain': new Blob([new Uint8Array(Buffer.from(title))], { type: 'text/plain' }),
+    };
 
-    // 1. Try modern Electron 44+ Async ClipboardItem API
-    try {
-      const electronModule = await import('electron');
-      const ItemClass = (electronModule as any).ClipboardItem || (globalThis as any).ClipboardItem;
-      if (ItemClass && typeof clipboard.write === 'function') {
-        const formats: Record<string, Blob> = {
-          'image/png': new Blob([new Uint8Array(pngBuffer)], { type: 'image/png' }),
-        };
-        if (ext.endsWith('.gif')) {
-          formats['image/gif'] = new Blob([new Uint8Array(buffer)], { type: 'image/gif' });
-        }
-        const clipItem = new ItemClass(formats);
-        await clipboard.write([clipItem]);
-        written = true;
-      }
-    } catch (modernErr) {
-      console.warn('[ClipboardService] Modern clipboard.write fallback needed:', modernErr);
+    if (ext.endsWith('.gif')) {
+      formats['image/gif'] = new Blob([new Uint8Array(buffer)], { type: 'image/gif' });
     }
 
-    // 2. Fallback to nativeImage writeImage or writeBuffer
-    if (!written) {
+    try {
+      const ItemClass = ClipboardItem || (globalThis as any).ClipboardItem;
+      const clipItem = new ItemClass(formats);
+      await clipboard.write([clipItem]);
+    } catch (writeErr) {
+      console.warn('[ClipboardService] ClipboardItem write failed, trying fallback:', writeErr);
       if (typeof (clipboard as any).writeImage === 'function' && typeof nativeImage?.createFromBuffer === 'function') {
         const img = nativeImage.createFromBuffer(pngBuffer);
         (clipboard as any).writeImage(img);
-        written = true;
-      } else if (typeof (clipboard as any).writeBuffer === 'function') {
-        (clipboard as any).writeBuffer('image/png', pngBuffer);
-        written = true;
       }
     }
 
@@ -90,20 +79,20 @@ export async function copyAndPasteSticker(
   itemId: string,
   preferredTier: ImageTier = 'sticker'
 ): Promise<boolean> {
-  // Ensure picker window hides immediately so OS focus returns to previously active window
+  const copied = await copyStickerToClipboard(itemId, preferredTier);
+  if (!copied) return false;
+
+  // Dismiss Quick Picker window so the previously active window regains OS focus
   try {
     hidePickerWindow();
   } catch (err) {
     console.warn('[ClipboardService] Could not hide picker window:', err);
   }
 
-  const copied = await copyStickerToClipboard(itemId, preferredTier);
-  if (!copied) return false;
-
   const settings = loadSettings();
   if (settings.autoPasteOnSelect !== false) {
-    // 150ms settling delay allows Windows/macOS to restore focus to target app before keystroke
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    // 200ms settling delay allows Windows/macOS to restore foreground focus before virtual Ctrl+V
+    await new Promise((resolve) => setTimeout(resolve, 200));
     await simulatePasteKeystroke();
   }
 

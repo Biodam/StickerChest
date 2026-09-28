@@ -18,9 +18,10 @@ export default function PickerApp() {
 
   const fetchItems = useCallback(async () => {
     if (!api?.searchItems) return;
+    const isSearching = searchQuery.trim().length > 0;
     const res = await api.searchItems({
       query: searchQuery,
-      tab: activeTab,
+      tab: isSearching ? 'all' : activeTab,
       limit: 48,
     });
     setItems(res.items);
@@ -47,21 +48,17 @@ export default function PickerApp() {
     async (item: StickerItem, isShiftPressed: boolean = false) => {
       if (!item) return;
 
-      // 1. Immediately hide the picker window to return OS focus to user's target app
-      try {
-        await api?.hidePicker?.();
-      } catch (e) {
-        console.warn('Could not hide picker:', e);
-      }
-
-      // 2. Perform copy & auto-paste
       try {
         if (isShiftPressed) {
+          // Shift+Enter: copy only without auto-paste, then dismiss
           await api?.copyItemToClipboard?.(item.id, copyTier);
+          await api?.hidePicker?.();
         } else if (api?.copyAndPasteItem) {
+          // Enter: main process handles clipboard copy, window hiding, and virtual paste
           await api.copyAndPasteItem(item.id, copyTier);
         } else if (api?.copyItemToClipboard) {
           await api.copyItemToClipboard(item.id, copyTier);
+          await api?.hidePicker?.();
         }
       } catch (err) {
         console.error('Failed to copy and paste sticker:', err);
