@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Automation;
+using System.Windows.Automation.Text;
 
 class Program {
     [DllImport("user32.dll")]
@@ -25,6 +27,12 @@ class Program {
     [DllImport("kernel32.dll")]
     static extern uint GetCurrentThreadId();
 
+    [DllImport("user32.dll")]
+    static extern bool GetCursorPos(out POINT lpPoint);
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct POINT { public int X; public int Y; }
+
     const int KEYEVENTF_KEYUP = 0x0002;
     const byte VK_LWIN = 0x5B;
     const byte VK_RWIN = 0x5C;
@@ -35,8 +43,8 @@ class Program {
 
     [STAThread]
     static void Main(string[] args) {
-        if (args.Length > 0 && args[0] == "get-foreground") {
-            Console.WriteLine(GetForegroundWindow().ToInt64());
+        if (args.Length > 0 && args[0] == "get-target") {
+            OutputTargetContext();
             return;
         }
 
@@ -57,24 +65,20 @@ class Program {
             }
         }
 
-        // 1. Populate multi-format clipboard if filePath is provided
+        // 1. Set multi-format clipboard
         if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath)) {
             try {
                 DataObject dataObj = new DataObject();
-                
-                // FileDrop
                 StringCollection files = new StringCollection();
                 files.Add(filePath);
                 dataObj.SetFileDropList(files);
 
-                // Text
                 if (!string.IsNullOrEmpty(text)) {
                     dataObj.SetText(text);
                 } else {
                     dataObj.SetText(Path.GetFileName(filePath));
                 }
 
-                // Bitmap (if image)
                 try {
                     using (Image img = Image.FromFile(filePath)) {
                         dataObj.SetImage(new Bitmap(img));
@@ -87,7 +91,7 @@ class Program {
             }
         }
 
-        // 2. Restore foreground window
+        // 2. Restore foreground window with AttachThreadInput
         if (targetHwndVal != 0) {
             IntPtr targetHwnd = new IntPtr(targetHwndVal);
             uint targetThread = GetWindowThreadProcessId(targetHwnd, IntPtr.Zero);
@@ -105,7 +109,7 @@ class Program {
             }
         }
 
-        // 3. Clear stuck modifiers
+        // 3. Clear stuck modifier keys
         keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
         keybd_event(VK_RWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
         keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
@@ -124,5 +128,55 @@ class Program {
         keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
 
         Console.WriteLine("SUCCESS");
+    }
+
+    static void OutputTargetContext() {
+        long hwndVal = 0;
+        int targetX = -1;
+        int targetY = -1;
+
+        try {
+            IntPtr fg = GetForegroundWindow();
+            hwndVal = fg.ToInt64();
+
+            AutomationElement focused = AutomationElement.FocusedElement;
+            if (focused != null) {
+                if (focused.Current.NativeWindowHandle != 0) {
+                    hwndVal = focused.Current.NativeWindowHandle;
+                }
+
+                object patternObj;
+                if (focused.TryGetCurrentPattern(TextPattern.Pattern, out patternObj)) {
+                    TextPattern textPattern = (TextPattern)patternObj;
+                    TextPatternRange[] ranges = textPattern.GetSelection();
+                    if (ranges != null && ranges.Length > 0) {
+                        System.Windows.Rect[] rects = ranges[0].GetBoundingRectangles();
+                        if (rects != null && rects.Length > 0) {
+                            targetX = (int)rects[0].Left;
+                            targetY = (int)rects[0].Bottom;
+                        }
+                    }
+                }
+
+                if (targetX < 0 || targetY < 0) {
+                    System.Windows.Rect bounds = focused.Current.BoundingRectangle;
+                    if (bounds.Width > 0 && bounds.Height > 0) {
+                        targetX = (int)bounds.Left;
+                        targetY = (int)bounds.Bottom;
+                    }
+                }
+            }
+        } catch {}
+
+        if (targetX < 0 || targetY < 0) {
+            POINT pt;
+            GetCursorPos(out pt);
+            targetX = pt.X;
+            targetY = pt.Y;
+        }
+
+        Console.WriteLine(string.Format("HWND={0}", hwndVal));
+        Console.WriteLine(string.Format("CARET_X={0}", targetX));
+        Console.WriteLine(string.Format("CARET_Y={0}", targetY));
     }
 }

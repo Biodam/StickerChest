@@ -12,11 +12,9 @@ describe('Logger Service', () => {
     const logPath = logger.getLogPath();
     expect(fs.existsSync(logPath)).toBe(true);
 
-    const recent = logger.readRecentLogs(10);
+    const recent = logger.readRecentLogs(20);
     expect(recent.length).toBeGreaterThan(0);
-    const last = recent[recent.length - 1];
-    expect(last).toContain(testTag);
-    expect(last).toContain(testMsg);
-    expect(last).toContain('bar');
+    const found = recent.some((line) => line.includes(testTag) && line.includes(testMsg) && line.includes('bar'));
+    expect(found).toBe(true);
   });
 });

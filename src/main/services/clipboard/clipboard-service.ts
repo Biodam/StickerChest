@@ -3,7 +3,7 @@ import fs from 'fs';
 import sharp from 'sharp';
 import { getDatabaseDAL } from '../database/dal';
 import { ImageTier } from '../../../types/models';
-import { hidePickerWindow } from '../../windows/pickerWindow';
+import { hidePickerWindow, getLastTargetHwnd } from '../../windows/pickerWindow';
 import { loadSettings } from '../settings/settings-store';
 import { simulatePasteKeystroke } from './paste-simulator';
 import { logger } from '../logger/logger';
@@ -140,8 +140,9 @@ export async function copyAndPasteSticker(
     logger.info('AutoPaste', 'Settling delay: waiting 150ms for OS foreground window focus restoration...');
     await new Promise((resolve) => setTimeout(resolve, 150));
 
-    logger.info('AutoPaste', 'Triggering paste keystroke simulation with native helper fallback...', { targetPath, title });
-    const pasted = await simulatePasteKeystroke({ filePath: targetPath, text: title });
+    const targetHwnd = getLastTargetHwnd();
+    logger.info('AutoPaste', 'Triggering paste keystroke simulation with target HWND...', { targetPath, title, targetHwnd });
+    const pasted = await simulatePasteKeystroke({ filePath: targetPath, text: title, hwnd: targetHwnd || undefined });
     logger.info('AutoPaste', `Paste simulation completed. Result: ${pasted}`);
   } else {
     logger.info('AutoPaste', 'autoPasteOnSelect is disabled in settings; skipping paste keystroke simulation');

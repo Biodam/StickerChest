@@ -1,4 +1,4 @@
-import { execFile, exec } from 'child_process';
+import { execFile, execFileSync, exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -8,11 +8,18 @@ import { logger } from '../logger/logger';
 export interface PasteSimulationOptions {
   filePath?: string;
   text?: string;
+  hwnd?: string;
+}
+
+export interface TargetContext {
+  hwnd?: string;
+  caretX?: number;
+  caretY?: number;
 }
 
 let cachedVbsPath: string | null = null;
 
-function getWinPasteExePath(): string | null {
+export function getWinPasteExePath(): string | null {
   const possiblePaths = [
     path.join(process.resourcesPath || '', 'resources', 'bin', 'win-paste.exe'),
     path.join(process.resourcesPath || '', 'bin', 'win-paste.exe'),
@@ -30,6 +37,29 @@ function getWinPasteExePath(): string | null {
     }
   }
   return null;
+}
+
+export function detectTargetContext(): TargetContext {
+  if (process.platform !== 'win32') return {};
+  const exe = getWinPasteExePath();
+  if (!exe) return {};
+
+  try {
+    const output = execFileSync(exe, ['get-target'], { encoding: 'utf-8', timeout: 400 });
+    const lines = output.trim().split('\n');
+    const result: TargetContext = {};
+    for (const line of lines) {
+      const parts = line.trim().split('=');
+      if (parts[0] === 'HWND' && parts[1] && parts[1] !== '0') result.hwnd = parts[1];
+      if (parts[0] === 'CARET_X' && parts[1]) result.caretX = parseInt(parts[1], 10);
+      if (parts[0] === 'CARET_Y' && parts[1]) result.caretY = parseInt(parts[1], 10);
+    }
+    logger.info('TargetContext', 'Detected target context before picker open', result);
+    return result;
+  } catch (err: any) {
+    logger.warn('TargetContext', `Failed to detect target context: ${err.message}`);
+    return {};
+  }
 }
 
 function getWindowsPasteScriptPath(): string {
@@ -53,7 +83,7 @@ function getWindowsPasteScriptPath(): string {
 
 function fallbackWindowsPaste(startTime: number, resolve: (val: boolean) => void): void {
   const scriptPath = getWindowsPasteScriptPath();
-  execFile('cscript', ['//nologo', scriptPath], (err, stdout, stderr) => {
+  execFile('cscript', ['//nologo', scriptPath], (err) => {
     const duration = Date.now() - startTime;
     if (err) {
       logger.warn('PasteSimulator', `cscript fallback failed (${duration}ms): ${err.message}. Trying PowerShell...`);
@@ -89,6 +119,9 @@ export function simulatePasteKeystroke(options?: PasteSimulationOptions): Promis
         if (winPasteExe) {
           logger.info('PasteSimulator', `Using native win-paste helper: ${winPasteExe}`);
           const args: string[] = [];
+          if (options?.hwnd) {
+            args.push('--hwnd', options.hwnd);
+          }
           if (options?.filePath) {
             args.push('--file', options.filePath);
           }
