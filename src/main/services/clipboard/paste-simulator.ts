@@ -2,9 +2,35 @@ import { execFile, exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { app } from 'electron';
 import { logger } from '../logger/logger';
 
+export interface PasteSimulationOptions {
+  filePath?: string;
+  text?: string;
+}
+
 let cachedVbsPath: string | null = null;
+
+function getWinPasteExePath(): string | null {
+  const possiblePaths = [
+    path.join(process.resourcesPath || '', 'resources', 'bin', 'win-paste.exe'),
+    path.join(process.resourcesPath || '', 'bin', 'win-paste.exe'),
+  ];
+
+  try {
+    possiblePaths.push(path.join(app.getAppPath(), 'resources', 'bin', 'win-paste.exe'));
+  } catch {}
+
+  possiblePaths.push(path.resolve(process.cwd(), 'resources', 'bin', 'win-paste.exe'));
+
+  for (const p of possiblePaths) {
+    if (p && fs.existsSync(p)) {
+      return p;
+    }
+  }
+  return null;
+}
 
 function getWindowsPasteScriptPath(): string {
   if (cachedVbsPath && fs.existsSync(cachedVbsPath)) {
@@ -25,37 +51,67 @@ function getWindowsPasteScriptPath(): string {
   return vbsPath;
 }
 
-export function simulatePasteKeystroke(): Promise<boolean> {
+function fallbackWindowsPaste(startTime: number, resolve: (val: boolean) => void): void {
+  const scriptPath = getWindowsPasteScriptPath();
+  execFile('cscript', ['//nologo', scriptPath], (err, stdout, stderr) => {
+    const duration = Date.now() - startTime;
+    if (err) {
+      logger.warn('PasteSimulator', `cscript fallback failed (${duration}ms): ${err.message}. Trying PowerShell...`);
+      exec(
+        'powershell -WindowStyle Hidden -Command "(New-Object -ComObject WScript.Shell).SendKeys(\'^v\')"',
+        (psErr) => {
+          const psDuration = Date.now() - startTime;
+          if (psErr) {
+            logger.error('PasteSimulator', `PowerShell fallback failed (${psDuration}ms): ${psErr.message}`);
+            resolve(false);
+          } else {
+            logger.info('PasteSimulator', `PowerShell paste succeeded (${psDuration}ms)`);
+            resolve(true);
+          }
+        }
+      );
+    } else {
+      logger.info('PasteSimulator', `cscript paste keystroke dispatched successfully in ${duration}ms`);
+      resolve(true);
+    }
+  });
+}
+
+export function simulatePasteKeystroke(options?: PasteSimulationOptions): Promise<boolean> {
   const startTime = Date.now();
   return new Promise((resolve) => {
     try {
       const platform = process.platform;
-      logger.info('PasteSimulator', `Executing simulatePasteKeystroke on platform: ${platform}`);
+      logger.info('PasteSimulator', `Executing simulatePasteKeystroke on platform: ${platform}`, options);
 
       if (platform === 'win32') {
-        const scriptPath = getWindowsPasteScriptPath();
-        execFile('cscript', ['//nologo', scriptPath], (err, stdout, stderr) => {
-          const duration = Date.now() - startTime;
-          if (err) {
-            logger.warn('PasteSimulator', `cscript failed (${duration}ms): ${err.message}, stderr: ${stderr}. Falling back to powershell`);
-            exec(
-              'powershell -WindowStyle Hidden -Command "(New-Object -ComObject WScript.Shell).SendKeys(\'^v\')"',
-              (psErr, psStdout, psStderr) => {
-                const psDuration = Date.now() - startTime;
-                if (psErr) {
-                  logger.error('PasteSimulator', `PowerShell fallback failed (${psDuration}ms): ${psErr.message}`, { psStderr });
-                  resolve(false);
-                } else {
-                  logger.info('PasteSimulator', `PowerShell paste succeeded (${psDuration}ms)`, { psStdout });
-                  resolve(true);
-                }
-              }
-            );
-          } else {
-            logger.info('PasteSimulator', `cscript paste keystroke (^v) dispatched successfully in ${duration}ms`);
-            resolve(true);
+        const winPasteExe = getWinPasteExePath();
+        if (winPasteExe) {
+          logger.info('PasteSimulator', `Using native win-paste helper: ${winPasteExe}`);
+          const args: string[] = [];
+          if (options?.filePath) {
+            args.push('--file', options.filePath);
           }
-        });
+          if (options?.text) {
+            args.push('--text', options.text);
+          }
+
+          execFile(winPasteExe, args, (err, stdout, stderr) => {
+            const duration = Date.now() - startTime;
+            if (err || !stdout.includes('SUCCESS')) {
+              logger.warn('PasteSimulator', `win-paste.exe returned non-zero (${duration}ms): ${err?.message || stderr}. Using fallback...`);
+              fallbackWindowsPaste(startTime, resolve);
+            } else {
+              logger.info('PasteSimulator', `Native win-paste.exe dispatched multi-format paste in ${duration}ms!`);
+              resolve(true);
+            }
+          });
+          return;
+        }
+
+        // Native binary not found; use VBS fallback
+        logger.info('PasteSimulator', 'win-paste.exe not found; using VBS fallback');
+        fallbackWindowsPaste(startTime, resolve);
       } else if (platform === 'darwin') {
         const appleScript = 'tell application "System Events" to keystroke "v" using command down';
         execFile('osascript', ['-e', appleScript], (err) => {

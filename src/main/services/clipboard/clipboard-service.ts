@@ -106,6 +106,21 @@ export async function copyAndPasteSticker(
 ): Promise<boolean> {
   logger.info('AutoPaste', `Initiating copyAndPasteSticker for itemId=${itemId}, tier=${preferredTier}`);
 
+  const dal = getDatabaseDAL();
+  const item = dal.getItemById(itemId);
+
+  let targetPath: string | undefined;
+  let title: string | undefined;
+  if (item) {
+    targetPath = item.originalPath;
+    if (preferredTier === 'emoji' && item.variants.emoji?.filePath) {
+      targetPath = item.variants.emoji.filePath;
+    } else if (item.variants.sticker?.filePath) {
+      targetPath = item.variants.sticker.filePath;
+    }
+    title = item.metadata?.character || item.metadata?.feeling || item.filename;
+  }
+
   const copied = await copyStickerToClipboard(itemId, preferredTier);
   if (!copied) {
     logger.warn('AutoPaste', `Copy failed for itemId=${itemId}; aborting paste simulation`);
@@ -122,11 +137,11 @@ export async function copyAndPasteSticker(
 
   const settings = loadSettings();
   if (settings.autoPasteOnSelect !== false) {
-    logger.info('AutoPaste', 'Settling delay: waiting 200ms for OS foreground window focus restoration...');
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    logger.info('AutoPaste', 'Settling delay: waiting 150ms for OS foreground window focus restoration...');
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
-    logger.info('AutoPaste', 'Triggering paste keystroke simulation...');
-    const pasted = await simulatePasteKeystroke();
+    logger.info('AutoPaste', 'Triggering paste keystroke simulation with native helper fallback...', { targetPath, title });
+    const pasted = await simulatePasteKeystroke({ filePath: targetPath, text: title });
     logger.info('AutoPaste', `Paste simulation completed. Result: ${pasted}`);
   } else {
     logger.info('AutoPaste', 'autoPasteOnSelect is disabled in settings; skipping paste keystroke simulation');
