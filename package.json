@@ -1,6 +1,6 @@
 {
   "name": "sticker-chest",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "> ⚠️ **DISCLAIMER: AI-GENERATED APPLICATION**   > This software is **entirely AI-generated** by Antigravity (Google DeepMind). All architecture, source code, documentation, and task plans were produced autonomously under prompt direction.",
   "main": "dist-electron/main/index.js",
   "scripts": {
