@@ -56,7 +56,6 @@ Prebuilt multiplatform installers for Windows and macOS are published under [Git
 | **Windows** | Setup Installer | [`Sticker.Chest.Setup.0.0.2.exe`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest.Setup.0.0.2.exe) |
 | **Windows** | Portable Executable | [`Sticker.Chest.0.0.2.exe`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest.0.0.2.exe) |
 | **macOS (Apple Silicon)** | Disk Image (DMG) | [`Sticker.Chest-0.0.2-arm64.dmg`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest-0.0.2-arm64.dmg) |
-| **macOS (Intel)** | Disk Image (DMG) | [`Sticker.Chest-0.0.2.dmg`](https://github.com/Biodam/StickerChest/releases/download/v0.0.2/Sticker.Chest-0.0.2.dmg) |
 
 ---
 

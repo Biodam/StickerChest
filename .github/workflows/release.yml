@@ -87,7 +87,7 @@ jobs:
           if-no-files-found: error
 
   build-macos:
-    name: Build macOS Installers (arm64 + x64)
+    name: Build macOS Installers (arm64)
     needs: check-quota
     runs-on: macos-latest
     steps:

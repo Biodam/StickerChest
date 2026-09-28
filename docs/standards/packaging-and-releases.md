@@ -13,8 +13,7 @@ Sticker Chest produces production-ready native installers and standalone portabl
 | **Windows (x64)** | **NSIS Installer** | `StickerChest.Setup.<version>.exe` | Desktop shortcut, Start menu entry, custom install directory, clean uninstaller. |
 | **Windows (x64)** | **Portable Exe** | `StickerChest.<version>.exe` | Standalone executable for USB drives or zero-install environments. |
 | **macOS (arm64)** | **Apple Disk Image** | `StickerChest-<version>-arm64.dmg` | Native Apple Silicon (M1/M2/M3/M4) DMG with drag-to-`/Applications` symlink. |
-| **macOS (x64)** | **Apple Disk Image** | `StickerChest-<version>.dmg` | Native Intel x64 DMG with drag-to-`/Applications` symlink. |
-| **macOS (Dual)** | **Zipped Bundle** | `StickerChest-<version>-*.zip` | Standalone zipped `.app` bundles for direct execution. |
+| **macOS (arm64)** | **Zipped Bundle** | `StickerChest-<version>-arm64-mac.zip` | Standalone zipped `.app` bundle for direct execution. |
 | **Updates** | **Auto-Update YAML** | `latest.yml`, `latest-mac.yml` | Distribution manifests for electron-updater compatibility. |
 
 ---
@@ -42,7 +41,7 @@ flowchart TD
     TagTrigger["Push Git Tag (v*)"] --> QuotaCheck["Preflight Quota & Visibility Check (ubuntu-latest, ~3s)"]
     
     QuotaCheck -->|"PASS"| WindowsJob["Build Windows Installers (windows-latest)\n- Compile better-sqlite3 & sharp\n- Run Vitest (singleFork pool)\n- Generate NSIS & Portable .exe"]
-    QuotaCheck -->|"PASS"| MacOSJob["Build macOS Installers (macos-latest)\n- Compile native addons\n- Run Vitest\n- Generate DMG & Zip (arm64 + x64)"]
+    QuotaCheck -->|"PASS"| MacOSJob["Build macOS Installers (macos-latest)\n- Compile native addons\n- Run Vitest\n- Generate DMG & Zip (arm64)"]
     
     WindowsJob --> PublishJob["Publish GitHub Release (ubuntu-latest)\n- Download all platform artifacts\n- Publish release with assets"]
     MacOSJob --> PublishJob
