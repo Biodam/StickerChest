@@ -6,8 +6,8 @@ export function registerSyncIpcHandlers(): void {
     return getSyncManager().getAccountInfo();
   });
 
-  ipcMain.handle('sync:connectGoogleDrive', async (_, clientId?: string) => {
-    return getSyncManager().connect(clientId);
+  ipcMain.handle('sync:connectGoogleDrive', async (_, clientId?: string, clientSecret?: string) => {
+    return getSyncManager().connect(clientId, clientSecret);
   });
 
   ipcMain.handle('sync:disconnectGoogleDrive', async () => {

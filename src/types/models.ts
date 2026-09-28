@@ -129,6 +129,7 @@ export interface AppSettings {
   googleDriveSyncEnabled?: boolean;
   googleDriveAutoSync?: boolean;
   googleDriveClientId?: string;
+  googleDriveClientSecret?: string;
 }
 
 

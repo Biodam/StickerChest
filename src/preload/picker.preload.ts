@@ -54,7 +54,7 @@ const api: StickerChestAPI = {
 
   // Google Drive Cloud Sync
   syncGetAccountInfo: () => ipcRenderer.invoke('sync:getAccountInfo'),
-  syncConnectGoogleDrive: (clientId) => ipcRenderer.invoke('sync:connectGoogleDrive', clientId),
+  syncConnectGoogleDrive: (clientId, clientSecret) => ipcRenderer.invoke('sync:connectGoogleDrive', clientId, clientSecret),
   syncDisconnectGoogleDrive: () => ipcRenderer.invoke('sync:disconnectGoogleDrive'),
   syncTriggerNow: () => ipcRenderer.invoke('sync:triggerSync'),
   onSyncProgress: (callback) => {

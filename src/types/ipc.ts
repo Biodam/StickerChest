@@ -68,7 +68,7 @@ export interface StickerChestAPI {
 
   // Google Drive Cloud Sync
   syncGetAccountInfo: () => Promise<GoogleDriveAccountInfo>;
-  syncConnectGoogleDrive: (clientId?: string) => Promise<{ success: boolean; error?: string }>;
+  syncConnectGoogleDrive: (clientId?: string, clientSecret?: string) => Promise<{ success: boolean; error?: string }>;
   syncDisconnectGoogleDrive: () => Promise<boolean>;
   syncTriggerNow: () => Promise<{ success: boolean; error?: string }>;
   onSyncProgress: (callback: (progress: SyncProgress) => void) => () => void;

@@ -65,10 +65,10 @@ export class SyncManager {
     }
   }
 
-  public async connect(clientId?: string): Promise<{ success: boolean; error?: string }> {
+  public async connect(clientId?: string, clientSecret?: string): Promise<{ success: boolean; error?: string }> {
     this.notifyProgress('authenticating', 'Waiting for Google OAuth login in browser...');
     try {
-      const result = await startOAuthFlow(clientId);
+      const result = await startOAuthFlow(clientId, clientSecret);
       if (result.success) {
         this.notifyProgress('synced', `Connected as ${result.email}`);
         await this.syncNow();

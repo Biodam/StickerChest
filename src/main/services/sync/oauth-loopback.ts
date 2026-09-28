@@ -5,6 +5,8 @@ import { getTokenVault, StoredTokens } from './token-vault';
 
 export const DEFAULT_GDRIVE_CLIENT_ID =
   process.env.GDRIVE_CLIENT_ID || '74155265273-kuhjen26hso406vpvaljoe5lvhl4h4tt.apps.googleusercontent.com';
+export const DEFAULT_GDRIVE_CLIENT_SECRET =
+  process.env.GDRIVE_CLIENT_SECRET || '';
 
 const SUCCESS_HTML = `
 <!DOCTYPE html>
@@ -30,8 +32,12 @@ const SUCCESS_HTML = `
 </html>
 `;
 
-export async function startOAuthFlow(customClientId?: string): Promise<{ success: boolean; email?: string; error?: string }> {
+export async function startOAuthFlow(
+  customClientId?: string,
+  customClientSecret?: string
+): Promise<{ success: boolean; email?: string; error?: string }> {
   const clientId = (customClientId && customClientId.trim().length > 0) ? customClientId.trim() : DEFAULT_GDRIVE_CLIENT_ID;
+  const clientSecret = (customClientSecret && customClientSecret.trim().length > 0) ? customClientSecret.trim() : DEFAULT_GDRIVE_CLIENT_SECRET;
 
   return new Promise((resolve) => {
     let server: http.Server | null = null;
@@ -80,6 +86,7 @@ export async function startOAuthFlow(customClientId?: string): Promise<{ success
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
             client_id: clientId,
+            client_secret: clientSecret,
             code,
             code_verifier: pkce.verifier,
             grant_type: 'authorization_code',
@@ -121,6 +128,7 @@ export async function startOAuthFlow(customClientId?: string): Promise<{ success
           email: userEmail,
           displayName,
           clientId,
+          clientSecret,
         };
 
         getTokenVault().saveTokens(tokens);

@@ -26,6 +26,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   googleDriveSyncEnabled: false,
   googleDriveAutoSync: true,
   googleDriveClientId: '74155265273-kuhjen26hso406vpvaljoe5lvhl4h4tt.apps.googleusercontent.com',
+  googleDriveClientSecret: process.env.GDRIVE_CLIENT_SECRET || '',
 };
 
 let cachedSettings: AppSettings | null = null;

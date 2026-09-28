@@ -11,6 +11,7 @@ export interface StoredTokens {
   email?: string;
   displayName?: string;
   clientId: string;
+  clientSecret?: string;
 }
 
 const FALLBACK_KEY = crypto.createHash('sha256').update('sticker-chest-auth-fallback-key').digest();
@@ -116,6 +117,9 @@ export class TokenVault {
         grant_type: 'refresh_token',
         refresh_token: tokens.refreshToken,
       });
+      if (tokens.clientSecret) {
+        params.set('client_secret', tokens.clientSecret);
+      }
 
       const response = await fetch(GOOGLE_TOKEN_ENDPOINT, {
         method: 'POST',
