@@ -12,6 +12,7 @@ interface StickerGridProps {
   onToggleFavorite: (itemId: string, e: React.MouseEvent) => void;
   onOpenSettings: () => void;
   onDropFiles?: (filePaths: string[]) => void;
+  gridSize?: number;
 }
 
 export const StickerGrid: React.FC<StickerGridProps> = ({
@@ -23,6 +24,7 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
   onToggleFavorite,
   onOpenSettings,
   onDropFiles,
+  gridSize = 160,
 }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -121,13 +123,19 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
       className="relative flex-1 overflow-y-auto p-4"
     >
       {isDraggingOver && <DropZoneOverlay />}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+      <div
+        className="grid gap-3"
+        style={{
+          gridTemplateColumns: `repeat(auto-fill, minmax(${gridSize}px, 1fr))`,
+        }}
+      >
         {items.map((item) => (
           <StickerCard
             key={item.id}
             item={item}
             isSelected={selectedItem?.id === item.id}
             isMultiSelected={selectedItemIds.has(item.id)}
+            isCompact={gridSize < 130}
             onSelect={(it, e) => onSelectItem(it, e)}
             onToggleFavorite={onToggleFavorite}
           />

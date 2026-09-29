@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Sparkles, X } from 'lucide-react';
+import { GridSizeControl } from './GridSizeControl';
 
 interface HeaderProps {
   searchQuery: string;
@@ -16,6 +17,8 @@ interface HeaderProps {
   untaggedCount?: number;
   onBatchAiTag?: () => void;
   isTagging?: boolean;
+  gridSize?: number;
+  onGridSizeChange?: (size: number) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,6 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   untaggedCount = 0,
   onBatchAiTag,
   isTagging = false,
+  gridSize,
+  onGridSizeChange,
 }) => {
   const hasFilterChips = Boolean(selectedFranchise || selectedCharacter || selectedTag);
 
@@ -59,8 +64,12 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Stats, Batch AI Tag & AI status */}
+        {/* Stats, Grid Size Control, Batch AI Tag & AI status */}
         <div className="flex items-center space-x-3 text-xs text-gray-400">
+          {gridSize !== undefined && onGridSizeChange && (
+            <GridSizeControl gridSize={gridSize} onGridSizeChange={onGridSizeChange} />
+          )}
+
           <span className="bg-[#25262b] px-2.5 py-1 rounded-md text-gray-300 font-mono">
             {totalItems} {totalItems === 1 ? 'sticker' : 'stickers'}
           </span>

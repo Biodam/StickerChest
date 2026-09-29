@@ -30,6 +30,7 @@
 - [x] Wire IPC hooks (`settings:get`, `settings:save`, `vault:scan`, `vault:progress`, `db:search`, `db:updateMetadata`, `gemini:batchTag`, `gemini:getUntaggedCount`) for real-time synchronization.
 - [x] Add "Batch AI Tag (N)" action button in Header with live untagged counter and real-time progress banner.
 - [x] Eliminate infinite re-selection loop and isolate form input state so metadata edits and tags persist without reset.
+- [x] Add interactive Grid Size Control (`GridSizeControl.tsx`, `useGridSize.ts`) with Small/Medium/Large presets, slider, and persistent localStorage setting.
 
 ---
 

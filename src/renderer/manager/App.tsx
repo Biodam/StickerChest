@@ -10,6 +10,7 @@ import { ExportModal } from './components/ExportModal';
 import { ImportModal } from './components/ImportModal';
 import { AboutModal } from './components/AboutModal';
 import { useSelection } from './hooks/useSelection';
+import { useGridSize } from './hooks/useGridSize';
 import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
   const [untaggedCount, setUntaggedCount] = useState(0);
 
   const { selectedIds, handleSelect, clearSelection } = useSelection();
+  const { gridSize, setGridSize } = useGridSize();
 
   const [settings, setSettings] = useState<AppSettings>({
     sourceFolder: '', geminiApiKey: '', geminiModel: 'gemini-3.8-flash',
@@ -211,6 +213,8 @@ export default function App() {
           untaggedCount={untaggedCount}
           onBatchAiTag={async () => settings.geminiApiKey ? api?.batchTagUntagged?.() : setSettingsOpen(true)}
           isTagging={progress?.status === 'tagging'}
+          gridSize={gridSize}
+          onGridSizeChange={setGridSize}
         />
 
         <IngestionBanner progress={progress} onDismiss={() => setProgress(null)} />
@@ -221,6 +225,7 @@ export default function App() {
             selectedItem={selectedItem}
             selectedItemIds={selectedIds}
             searchQuery={searchQuery}
+            gridSize={gridSize}
             onSelectItem={(it, e) => handleSelect(it, items, e, setSelectedItem)}
             onToggleFavorite={handleToggleFavorite}
             onOpenSettings={() => setSettingsOpen(true)}
@@ -258,26 +263,17 @@ export default function App() {
       </div>
 
       <ExportModal
-        isOpen={exportOpen}
-        onClose={() => setExportOpen(false)}
-        totalStickers={totalItems}
-        selectedItemIds={Array.from(selectedIds)}
+        isOpen={exportOpen} onClose={() => setExportOpen(false)}
+        totalStickers={totalItems} selectedItemIds={Array.from(selectedIds)}
       />
 
       <ImportModal
-        isOpen={importOpen}
-        onClose={() => setImportOpen(false)}
-        onRestoreComplete={() => {
-          fetchItems();
-          fetchFacets();
-          fetchUntagged();
-        }}
+        isOpen={importOpen} onClose={() => setImportOpen(false)}
+        onRestoreComplete={() => { fetchItems(); fetchFacets(); fetchUntagged(); }}
       />
 
       <SettingsModal
-        settings={settings}
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
+        settings={settings} isOpen={settingsOpen} onClose={() => setSettingsOpen(false)}
         onSaveSettings={async (up) => {
           setSettings((prev) => ({ ...prev, ...up }));
           await api?.saveSettings?.(up);
@@ -287,10 +283,7 @@ export default function App() {
         onTestKey={async (k, m) => api?.testGeminiKey?.(k, m) || { valid: false }}
       />
 
-      <AboutModal
-        isOpen={aboutOpen}
-        onClose={() => setAboutOpen(false)}
-      />
+      <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
     </div>
   );
 }
