@@ -80,16 +80,23 @@ export function showPickerWindow(): void {
   let posX: number;
   let posY: number;
 
-  if (target.caretX && target.caretX > 0 && target.caretY && target.caretY > 0) {
-    const display = screen.getDisplayNearestPoint({ x: target.caretX, y: target.caretY });
+  const hasCaret =
+    typeof target.caretX === 'number' &&
+    typeof target.caretY === 'number' &&
+    !Number.isNaN(target.caretX) &&
+    !Number.isNaN(target.caretY) &&
+    (target.caretX !== 0 || target.caretY !== 0);
+
+  if (hasCaret) {
+    const display = screen.getDisplayNearestPoint({ x: target.caretX!, y: target.caretY! });
     const { x: dX, y: dY, width: dW, height: dH } = display.workArea;
 
-    posX = target.caretX - 20;
-    posY = target.caretY + 12;
+    posX = target.caretX! - 20;
+    posY = target.caretY! + 12;
 
     // Flip above caret if it would overflow the bottom of the screen
     if (posY + PICKER_HEIGHT > dY + dH) {
-      posY = Math.max(dY + 10, target.caretY - PICKER_HEIGHT - 12);
+      posY = Math.max(dY + 10, target.caretY! - PICKER_HEIGHT - 12);
     }
 
     // Clamp horizontally to stay inside display boundaries
@@ -100,7 +107,10 @@ export function showPickerWindow(): void {
       posX = dX + 12;
     }
 
-    logger.info('PickerWindow', `Positioning picker near caret at (${posX}, ${posY}) for caret (${target.caretX}, ${target.caretY})`);
+    logger.info(
+      'PickerWindow',
+      `Positioning picker near caret at (${posX}, ${posY}) for caret (${target.caretX}, ${target.caretY}) on display [${dX}, ${dY}, ${dW}, ${dH}]`
+    );
   } else {
     // Fallback: center window on display nearest to mouse cursor
     const cursorPoint = screen.getCursorScreenPoint();

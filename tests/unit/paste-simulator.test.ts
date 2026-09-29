@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { simulatePasteKeystroke } from '../../src/main/services/clipboard/paste-simulator';
+import { simulatePasteKeystroke, detectTargetContext } from '../../src/main/services/clipboard/paste-simulator';
 import { copyAndPasteSticker } from '../../src/main/services/clipboard/clipboard-service';
 import { loadSettings } from '../../src/main/services/settings/settings-store';
 
@@ -18,5 +18,10 @@ describe('Paste Simulator & Auto-Paste Workflow', () => {
     // Should resolve safely to a boolean on any OS
     const result = await simulatePasteKeystroke();
     expect(typeof result).toBe('boolean');
+  });
+
+  it('should detect target context without crashing and return object', () => {
+    const context = detectTargetContext();
+    expect(typeof context).toBe('object');
   });
 });
