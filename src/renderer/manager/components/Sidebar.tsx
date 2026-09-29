@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info } from 'lucide-react';
+import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info, Loader2 } from 'lucide-react';
 import { LibraryFacets } from '../../../types/models';
 import { FacetFilterGroup } from './FacetFilterGroup';
 
@@ -173,7 +173,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'bg-[#25262b] hover:bg-[#2c2e33] text-gray-300'
           }`}
         >
-          <FolderSync className={`w-3.5 h-3.5 text-blue-400 ${isScanning ? 'animate-spin' : ''}`} />
+          {isScanning ? (
+            <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+          ) : (
+            <FolderSync className="w-3.5 h-3.5 text-blue-400" />
+          )}
           <span>{isScanning ? 'Scanning...' : 'Sync Folder'}</span>
         </button>
 
