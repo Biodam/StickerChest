@@ -2,30 +2,40 @@ import path from 'path';
 import fs from 'fs';
 import { app, BrowserWindow, protocol, net } from 'electron';
 import { pathToFileURL } from 'url';
-import { createMainWindow } from './windows/mainWindow';
+import { createMainWindow, showMainWindow } from './windows/mainWindow';
 import { createPickerWindow } from './windows/pickerWindow';
 import { createTray, destroyTray, isAppQuitting, setAppQuitting } from './windows/tray';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts/globalShortcuts';
 import { registerIpcHandlers } from './ipc';
 import { resolveVaultPath } from './services/ingestion/paths';
 import { loadSettings } from './services/settings/settings-store';
-
 import { setupApplicationMenu } from './windows/menu';
 
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'chest', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
-  { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
-]);
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
 
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception in Main process:', err);
-});
+if (!gotSingleInstanceLock) {
+  console.log('[App] Another instance of Sticker Chest is already running. Quitting secondary process.');
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    console.log('[App] Secondary instance launch attempted. Bringing existing window to front.');
+    showMainWindow();
+  });
 
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection in Main process:', reason);
-});
+  protocol.registerSchemesAsPrivileged([
+    { scheme: 'chest', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
+    { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } },
+  ]);
 
-app.whenReady().then(() => {
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception in Main process:', err);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection in Main process:', reason);
+  });
+
+  app.whenReady().then(() => {
   // Register custom protocol for local chest images
   const handleMediaRequest = async (request: Request) => {
     try {
@@ -130,4 +140,5 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+}
 

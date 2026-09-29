@@ -6,11 +6,21 @@ import { isAppQuitting } from './tray';
 
 let mainWindow: BrowserWindow | null = null;
 
-export function createMainWindow(): BrowserWindow {
+export function showMainWindow(): BrowserWindow {
   if (mainWindow && !mainWindow.isDestroyed()) {
     if (mainWindow.isMinimized()) mainWindow.restore();
+    if (!mainWindow.isVisible()) mainWindow.show();
     mainWindow.focus();
+    mainWindow.setAlwaysOnTop(true);
+    mainWindow.setAlwaysOnTop(false);
     return mainWindow;
+  }
+  return createMainWindow();
+}
+
+export function createMainWindow(): BrowserWindow {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    return showMainWindow();
   }
 
   const appPath = app.getAppPath();

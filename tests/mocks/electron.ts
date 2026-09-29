@@ -5,6 +5,7 @@ export const app = {
   quit: () => {},
   on: () => {},
   whenReady: async () => {},
+  requestSingleInstanceLock: () => true,
 };
 
 export const clipboard = {
@@ -30,6 +31,8 @@ export const BrowserWindow = class {
   focus = () => {};
   isDestroyed = () => false;
   isMinimized = () => false;
+  isVisible = () => true;
+  setAlwaysOnTop = () => {};
   restore = () => {};
   webContents = {
     on: () => {},
