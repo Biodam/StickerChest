@@ -101,18 +101,20 @@ if (!gotSingleInstanceLock) {
   // Register IPC handlers
   registerIpcHandlers();
 
-  // Create windows
-  createMainWindow();
-  createPickerWindow();
-
   // Create system tray companion
   createTray();
 
   // Setup application menu (File, Edit, View, Help -> About)
   setupApplicationMenu();
 
-  // Register global shortcuts (e.g. Win+/ on Windows, Control+/ on macOS to toggle floating picker)
+  // Load user settings
   const settings = loadSettings();
+
+  // Create windows
+  createMainWindow({ startMinimized: settings.startMinimized ?? true });
+  createPickerWindow();
+
+  // Register global shortcuts (e.g. Win+/ on Windows, Control+/ on macOS to toggle floating picker)
   registerGlobalShortcuts(settings.globalShortcut);
 
   app.on('activate', () => {

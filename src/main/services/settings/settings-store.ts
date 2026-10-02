@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   globalShortcut: DEFAULT_GLOBAL_SHORTCUT,
   preferredCopyTier: 'sticker',
   autoStartAtLogin: false,
+  startMinimized: true,
   syncIntervalMinutes: 15,
   autoAiTagOnIngest: true,
   cloudDriveMode: true,
@@ -73,6 +74,10 @@ export function loadSettings(): AppSettings {
 
   if (!loaded.theme) {
     loaded.theme = 'slate_dark';
+  }
+
+  if (loaded.startMinimized === undefined) {
+    loaded.startMinimized = true;
   }
 
   try {

@@ -25,4 +25,10 @@ describe('Single Instance Lock & Window Restoration', () => {
     expect(topSpy).toHaveBeenCalledWith(true);
     expect(topSpy).toHaveBeenCalledWith(false);
   });
+
+  it('should accept startMinimized option when creating main window', () => {
+    // createMainWindow accepts { startMinimized: boolean } without throwing
+    const win = createMainWindow({ startMinimized: true });
+    expect(win).toBeDefined();
+  });
 });

@@ -38,7 +38,7 @@ export default function App() {
   const [settings, setSettings] = useState<AppSettings>({
     sourceFolder: '', geminiApiKey: '', geminiModel: 'gemini-3.8-flash',
     globalShortcut: 'Super+/', preferredCopyTier: 'sticker',
-    autoStartAtLogin: false, syncIntervalMinutes: 15,
+    autoStartAtLogin: false, startMinimized: true, syncIntervalMinutes: 15,
     autoAiTagOnIngest: true, cloudDriveMode: true,
     autoPasteOnSelect: true,
   });

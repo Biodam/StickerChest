@@ -74,6 +74,9 @@ graph TB
   - Left-click triggers the Quick Picker companion immediately.
 - **Window Interception**:
   - Closing the Manager window hides it rather than terminating the Electron process, ensuring 24/7 companion availability with zero startup lag.
+- **Startup & Launch Behavior**:
+  - **Start with System**: Configurable via `autoStartAtLogin` (`app.setLoginItemSettings`).
+  - **Start Minimized**: Defaults to `true` (`startMinimized`), keeping the application hidden in the system tray at startup until summoned by hotkey or tray click.
 
 ---
 

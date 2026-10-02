@@ -120,6 +120,7 @@ export interface AppSettings {
   globalShortcut: string;
   preferredCopyTier: 'sticker' | 'emoji';
   autoStartAtLogin: boolean;
+  startMinimized?: boolean;
   syncIntervalMinutes: number;
   autoAiTagOnIngest: boolean;
   cloudDriveMode: boolean;

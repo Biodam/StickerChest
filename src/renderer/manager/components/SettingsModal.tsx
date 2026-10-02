@@ -33,6 +33,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [syncInterval, setSyncInterval] = useState(settings.syncIntervalMinutes ?? 15);
   const [autoTag, setAutoTag] = useState(settings.autoAiTagOnIngest ?? true);
   const [autoStart, setAutoStart] = useState(settings.autoStartAtLogin ?? false);
+  const [startMinimized, setStartMinimized] = useState(settings.startMinimized ?? true);
   const [autoPaste, setAutoPaste] = useState(settings.autoPasteOnSelect ?? true);
   const [hotkey, setHotkey] = useState(settings.globalShortcut || 'Super+/');
   const [theme, setTheme] = useState<ThemeId>(settings.theme || 'slate_dark');
@@ -53,6 +54,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setSyncInterval(settings.syncIntervalMinutes ?? 15);
     setAutoTag(settings.autoAiTagOnIngest ?? true);
     setAutoStart(settings.autoStartAtLogin ?? false);
+    setStartMinimized(settings.startMinimized ?? true);
     setAutoPaste(settings.autoPasteOnSelect ?? true);
     setHotkey(settings.globalShortcut || 'Super+/');
     setTheme(settings.theme || 'slate_dark');
@@ -88,6 +90,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       syncIntervalMinutes: syncInterval,
       autoAiTagOnIngest: autoTag,
       autoStartAtLogin: autoStart,
+      startMinimized,
       autoPasteOnSelect: autoPaste,
       globalShortcut: hotkey,
       theme,
@@ -141,7 +144,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           />
 
           {/* Start on System Login */}
-          <AutoStartCard autoStart={autoStart} onChangeAutoStart={setAutoStart} />
+          <AutoStartCard
+            autoStart={autoStart}
+            onChangeAutoStart={setAutoStart}
+            startMinimized={startMinimized}
+            onChangeStartMinimized={setStartMinimized}
+          />
 
           {/* Quick Picker & Auto-Paste Behavior */}
           <AutoPasteCard autoPaste={autoPaste} onChangeAutoPaste={setAutoPaste} />

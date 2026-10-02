@@ -18,7 +18,7 @@ export function showMainWindow(): BrowserWindow {
   return createMainWindow();
 }
 
-export function createMainWindow(): BrowserWindow {
+export function createMainWindow(options?: { startMinimized?: boolean }): BrowserWindow {
   if (mainWindow && !mainWindow.isDestroyed()) {
     return showMainWindow();
   }
@@ -58,8 +58,10 @@ export function createMainWindow(): BrowserWindow {
   });
 
   mainWindow.once('ready-to-show', () => {
-    console.log('[MainWindow] ready-to-show triggered');
-    mainWindow?.show();
+    console.log('[MainWindow] ready-to-show triggered, startMinimized =', options?.startMinimized);
+    if (!options?.startMinimized) {
+      mainWindow?.show();
+    }
   });
 
   mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {

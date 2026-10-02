@@ -32,6 +32,7 @@
 - [x] Implement Star Rating (1–5) and Key-Value pairs editor in `CustomAttributesEditor.tsx`.
 - [x] Wire bulk database operations in `src/main/services/database/bulk-queries.ts` and `dal.ts`.
 - [x] Write unit tests verifying bulk DAL operations (`tests/unit/bulk-operations.test.ts`).
+- [x] Add "Start Minimized" configuration alongside "Start with System" (defaulting to true).
 
 ---
 

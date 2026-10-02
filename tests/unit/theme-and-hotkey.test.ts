@@ -148,5 +148,16 @@ describe('Visual Theme System & Persistence', () => {
     saveSettings({ autoStartAtLogin: false });
     expect(loadSettings().autoStartAtLogin).toBe(false);
   });
+
+  it('should default startMinimized to true and persist preference in settings', () => {
+    const initialSettings = loadSettings();
+    expect(initialSettings.startMinimized).toBe(true);
+
+    saveSettings({ startMinimized: false });
+    expect(loadSettings().startMinimized).toBe(false);
+
+    saveSettings({ startMinimized: true });
+    expect(loadSettings().startMinimized).toBe(true);
+  });
 });
 
