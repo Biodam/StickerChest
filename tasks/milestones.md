@@ -35,6 +35,7 @@ This document tracks high-level progress across the core development milestones 
 | **M14** | **Custom Global Hotkeys & UI Themes** | Interactive global summon hotkey rebinding in Settings; curated theme engine (OLED Black, Slate, Cyberpunk, Catppuccin, Light) | 🟢 Completed |
 | **M15** | **Google Drive Cloud Sync & OAuth** | Direct Google OAuth 2.0 PKCE login, isolated `appDataFolder` cloud storage, content-addressable image mirroring & SQLite snapshot sync | 🟢 Completed |
 | **M16** | **Help Menu & About Information Dialog** | Application menu (`Help -> About Sticker Chest`), tray menu entry, sidebar button, read-only system specs & commit hash modal | 🟢 Completed |
+| **M17** | **Scoop Custom Bucket Distribution** | Direct GitHub-hosted custom Scoop bucket, portable manifest, shortcuts, autoupdate schema | 🟢 Completed |
 
 ---
 
@@ -56,6 +57,7 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 14: Custom Hotkeys & Visual Themes](file:///c:/Projects/sticker-database-manager/tasks/task-14-custom-hotkeys-and-visual-themes.md)
 - [x] [Task 15: Google Drive Cloud Sync & OAuth](file:///c:/Projects/sticker-database-manager/tasks/task-15-google-drive-sync-and-oauth.md)
 - [x] [Task 16: Help Menu & About Information Dialog](file:///c:/Projects/sticker-database-manager/tasks/task-16-about-dialog-and-system-menu.md)
+- [x] [Task 17: Scoop Custom Bucket Distribution](file:///c:/Projects/sticker-database-manager/tasks/task-17-scoop-bucket-distribution.md)
 
 
 
