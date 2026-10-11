@@ -9,20 +9,8 @@ if (!fs.existsSync(resourcesDir)) {
 
 // Crisp System Tray Mimic Chest Silhouette (high-contrast for Windows taskbar & macOS dark/light menubars)
 const trayIconSvg = `
-<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <!-- Chest Body -->
-  <rect x="4" y="14" width="24" height="13" rx="2" fill="#ffffff" />
-  <!-- Chest Lid (open arched top) -->
-  <path d="M 4 12 C 4 6 28 6 28 12 Z" fill="#ffffff" />
-  <!-- Mouth gap with subtle teeth -->
-  <rect x="6" y="12" width="20" height="2.5" fill="#0f172a" />
-  <polygon points="8,12 10,12 9,14" fill="#ffffff" />
-  <polygon points="12,12 14,12 13,14" fill="#ffffff" />
-  <polygon points="18,12 20,12 19,14" fill="#ffffff" />
-  <polygon points="22,12 24,12 23,14" fill="#ffffff" />
-  <!-- Center lock / latch -->
-  <rect x="14" y="13" width="4" height="5" rx="1" fill="#0f172a" />
-  <circle cx="16" cy="15" r="0.8" fill="#ffffff" />
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#ffffff" viewBox="0 0 256 256">
+  <path d="M184,40H72A56.06,56.06,0,0,0,16,96v96a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V96A56.06,56.06,0,0,0,184,40Zm40,56v8H192V56.8A40.07,40.07,0,0,1,224,96Zm-88,40H120V104h16Zm-24,16h32a8,8,0,0,0,8-8V120h24v72H80V120h24v24A8,8,0,0,0,112,152Zm40-48V96a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v8H80V56h96v48ZM64,56.8V104H32V96A40.07,40.07,0,0,1,64,56.8ZM32,120H64v72H32Zm192,72H192V120h32v72Z"></path>
 </svg>
 `;
 
