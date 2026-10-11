@@ -59,6 +59,33 @@ Prebuilt multiplatform installers for Windows and macOS are published under [Git
 
 ---
 
+## 🪣 Install with Scoop (Windows)
+
+This repository doubles as a custom [Scoop](https://scoop.sh) bucket, so you can install and update Sticker Chest without an installer or admin rights.
+
+```powershell
+# 1. Install Scoop (skip if already installed)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# 2. Add the Sticker Chest bucket
+scoop bucket add stickerchest https://github.com/Biodam/StickerChest.git
+
+# 3. Install
+scoop install stickerchest/sticker-chest
+```
+
+Update and uninstall:
+
+```powershell
+scoop update sticker-chest      # upgrade to the latest release
+scoop uninstall sticker-chest   # remove the app
+```
+
+A Start Menu shortcut named **Sticker Chest** is created automatically. More details in [`docs/standards/scoop-distribution.md`](file:///c:/Projects/sticker-database-manager/docs/standards/scoop-distribution.md).
+
+---
+
 ## 📂 Project Architecture & Documentation
 
 - **[`AGENTS.md`](file:///c:/Projects/sticker-database-manager/AGENTS.md)**: Agent instructions, modularity rules, file size limits, and naming conventions.
