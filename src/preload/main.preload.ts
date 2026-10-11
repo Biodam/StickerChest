@@ -59,6 +59,9 @@ const api: StickerChestAPI = {
     return () => ipcRenderer.removeListener('export:progress', handler);
   },
 
+  // Background removal
+  removeBackground: (itemIds) => ipcRenderer.invoke('image:removeBackground', itemIds),
+
   // Public Drive folder sync
   syncValidate: (folderUrl, apiKey) => ipcRenderer.invoke('sync:validate', folderUrl, apiKey),
   syncExportMetadata: () => ipcRenderer.invoke('sync:exportMetadata'),

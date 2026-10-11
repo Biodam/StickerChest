@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Sparkles, Star, Check, Film, Play, Pause } from 'lucide-react';
+import { X, Copy, Sparkles, Star, Check, Film, Play, Pause, Eraser } from 'lucide-react';
 import { StickerItem, ImageTier } from '../../../types/models';
 import { getChestImageUrl } from '../../shared/image-url';
 import { getAnimationTelemetry } from '../../shared/animation-helper';
@@ -10,6 +10,8 @@ interface InspectorDrawerProps {
   onClose: () => void;
   onToggleFavorite: (itemId: string) => void;
   onTagWithGemini: (itemId: string) => void;
+  onRemoveBackground: (itemId: string) => void;
+  removingBackground: boolean;
   onCopyItem: (itemId: string, tier: ImageTier) => void;
   onUpdateMetadata: (itemId: string, metadata: any) => void;
 }
@@ -19,6 +21,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   onClose,
   onToggleFavorite,
   onTagWithGemini,
+  onRemoveBackground,
+  removingBackground,
   onCopyItem,
   onUpdateMetadata,
 }) => {
@@ -128,6 +132,18 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
             <Star className={`w-4 h-4 ${item.usage.isFavorite ? 'fill-amber-400' : ''}`} />
           </button>
         </div>
+
+        {/* Remove Background */}
+        <button
+          onClick={() => onRemoveBackground(item.id)}
+          disabled={removingBackground || item.isAnimated}
+          title={item.isAnimated ? 'Animated stickers are not supported' : 'Save a transparent copy using a local AI model'}
+          className="mt-2 w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-lg bg-[#25262b] hover:bg-[#2c2e33] border border-[#2c2e33] text-xs font-medium text-gray-200 transition-colors disabled:opacity-50"
+        >
+          <Eraser className="w-3.5 h-3.5 text-pink-400" />
+          <span>{removingBackground ? 'Removing background...' : 'Remove Background'}</span>
+        </button>
+
       </div>
 
       {/* Metadata & Tagging Section */}

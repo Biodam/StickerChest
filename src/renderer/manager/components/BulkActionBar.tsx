@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Tag, Trash2, Sparkles, X, Check, Download } from 'lucide-react';
+import { Star, Tag, Trash2, Sparkles, X, Check, Download, Eraser } from 'lucide-react';
 
 interface BulkActionBarProps {
   selectedCount: number;
@@ -7,6 +7,8 @@ interface BulkActionBarProps {
   onBulkFavorite: (favorite: boolean) => void;
   onBulkAddTag: (tag: string) => void;
   onBulkAiTag: () => void;
+  onBulkRemoveBackground: () => void;
+  removingBackground: boolean;
   onBulkExport?: () => void;
   onBulkDelete: () => void;
 }
@@ -17,6 +19,8 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
   onBulkFavorite,
   onBulkAddTag,
   onBulkAiTag,
+  onBulkRemoveBackground,
+  removingBackground,
   onBulkExport,
   onBulkDelete,
 }) => {
@@ -98,6 +102,16 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
         >
           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
           <span>AI Tag</span>
+        </button>
+
+        {/* Bulk Remove Background */}
+        <button
+          onClick={onBulkRemoveBackground}
+          disabled={removingBackground}
+          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#2c2e33] hover:bg-[#373a40] text-gray-200 transition-colors disabled:opacity-50"
+        >
+          <Eraser className="w-3.5 h-3.5 text-pink-400" />
+          <span>{removingBackground ? 'Removing...' : 'Remove BG'}</span>
         </button>
 
         {/* Bulk Export Pack */}

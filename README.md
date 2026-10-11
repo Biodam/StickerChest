@@ -44,6 +44,9 @@
 - 📦 **Bulk Tagging & Drag-and-Drop Ingestion**:
   - Drag and drop images directly into the Manager window to ingest without re-scanning folders.
   - Multi-select stickers (`Ctrl+Click`, `Shift+Click`, `Ctrl+A`) for batch tagging, favoriting, or deleting.
+- 🪄 **Local AI Background Removal**:
+  - 100% offline background removal powered by on-device ONNX models (`@imgly/background-removal-node`).
+  - Available for single stickers in the Metadata Inspector and in batch via the Bulk Action Bar. Non-destructive (`name-nobg.png`).
 
 ---
 
@@ -96,6 +99,7 @@ A Start Menu shortcut named **Sticker Chest** is created automatically. More det
 - **[`docs/standards/database-schema.md`](file:///c:/Projects/sticker-database-manager/docs/standards/database-schema.md)**: SQLite 3 tables, triggers, and FTS5 virtual table specifications.
 - **[`docs/standards/cloud-drive-compatibility.md`](file:///c:/Projects/sticker-database-manager/docs/standards/cloud-drive-compatibility.md)**: Google Drive Desktop & OneDrive compatibility, file stability locks, and periodic sync.
 - **[`docs/architecture/system-overview.md`](file:///c:/Projects/sticker-database-manager/docs/architecture/system-overview.md)**: Electron multi-process design, IPC channels, window lifecycle, and auto-paste engine.
+- **[`docs/standards/background-removal.md`](file:///c:/Projects/sticker-database-manager/docs/standards/background-removal.md)**: Local AI background removal pipeline, ONNX worker process, and non-destructive output.
 - **[`tasks/milestones.md`](file:///c:/Projects/sticker-database-manager/tasks/milestones.md)**: Milestone roadmap tracking development progress.
 
 ---

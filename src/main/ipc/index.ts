@@ -8,6 +8,7 @@ import { registerSettingsIpcHandlers } from './settings-handlers';
 import { registerClipboardIpcHandlers } from './clipboard-handlers';
 import { registerExportIpcHandlers } from './export-handlers';
 import { registerSyncIpcHandlers } from './sync-handlers';
+import { registerBackgroundIpcHandlers } from './background-handlers';
 import { registerAboutIpcHandlers } from './about-handlers';
 import { registerLoggerIpcHandlers } from './logger-handlers';
 
@@ -37,6 +38,10 @@ export function registerIpcHandlers(): void {
 
   // Google Drive Cloud Sync handlers
   registerSyncIpcHandlers();
+
+  // Background removal handler
+  registerBackgroundIpcHandlers();
+
 
   // Window Controls
   ipcMain.handle('window:hidePicker', async () => {

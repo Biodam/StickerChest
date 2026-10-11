@@ -31,6 +31,7 @@ export default function App() {
   const [importOpen, setImportOpen] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
   const [untaggedCount, setUntaggedCount] = useState(0);
+  const [removingBackground, setRemovingBackground] = useState(false);
 
   const { selectedIds, handleSelect, clearSelection } = useSelection();
   const { gridSize, setGridSize } = useGridSize();
@@ -176,6 +177,25 @@ export default function App() {
     fetchUntagged();
   };
 
+  const handleRemoveBackground = async (ids: string[]) => {
+    if (!api?.removeBackground || ids.length === 0) return;
+    setRemovingBackground(true);
+    try {
+      const results = await api.removeBackground(ids);
+      const failed = results.filter((r) => !r.success);
+      if (failed.length > 0) {
+        alert(`Background removal failed for ${failed.length} of ${results.length} sticker(s): ${failed[0].error}`);
+      }
+    } catch (err: any) {
+      alert(`Background removal error: ${err.message}`);
+    } finally {
+      setRemovingBackground(false);
+      fetchItems();
+      fetchFacets();
+      fetchUntagged();
+    }
+  };
+
   const handleBulkDelete = async () => {
     await api?.deleteItems?.(Array.from(selectedIds));
     clearSelection();
@@ -245,6 +265,8 @@ export default function App() {
                 fetchFacets();
                 fetchUntagged();
               }}
+              onRemoveBackground={(id) => handleRemoveBackground([id])}
+              removingBackground={removingBackground}
               onCopyItem={(id, tier) => api?.copyItemToClipboard?.(id, tier)}
               onUpdateMetadata={handleUpdateMetadata}
             />
@@ -256,6 +278,8 @@ export default function App() {
             onBulkFavorite={handleBulkFavorite}
             onBulkAddTag={handleBulkAddTag}
             onBulkAiTag={handleBulkAiTag}
+            onBulkRemoveBackground={() => handleRemoveBackground(Array.from(selectedIds))}
+            removingBackground={removingBackground}
             onBulkExport={() => setExportOpen(true)}
             onBulkDelete={handleBulkDelete}
           />

@@ -138,5 +138,10 @@ export interface AboutInfo {
   totalStickers: number;
 }
 
-
-
+export interface BackgroundRemovalResult {
+  itemId: string;
+  success: boolean;
+  newItemId?: string;
+  outputPath?: string;
+  error?: string;
+}

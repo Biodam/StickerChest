@@ -9,6 +9,10 @@
     "dist-electron/**/*",
     "package.json"
   ],
+  "asarUnpack": [
+    "dist-electron/worker/**/*",
+    "**/node_modules/onnxruntime-node/**/*"
+  ],
   "extraResources": [
     {
       "from": "resources",

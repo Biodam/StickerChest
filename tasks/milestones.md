@@ -37,6 +37,7 @@ This document tracks high-level progress across the core development milestones 
 | **M16** | **Help Menu & About Information Dialog** | Application menu (`Help -> About Sticker Chest`), tray menu entry, sidebar button, read-only system specs & commit hash modal | 🟢 Completed |
 | **M17** | **Scoop Custom Bucket Distribution** | Direct GitHub-hosted custom Scoop bucket, portable manifest, shortcuts, autoupdate schema | 🟢 Completed |
 | **M18** | **Public Drive Folder Sync** | Removed Google OAuth; one-way sync from a public Drive folder (API key) into the local folder, plus optional metadata JSON | 🟢 Completed |
+| **M19** | **Local AI Background Removal** | Offline, on-device AI background removal for single & batch stickers via isolated ONNX worker process; non-destructive | 🟢 Completed |
 
 ---
 
@@ -56,7 +57,9 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 12: Animated Sticker & GIF Controls](file:///c:/Projects/sticker-database-manager/tasks/task-12-animated-sticker-and-gif-controls.md)
 - [x] [Task 13: Vault Backup & Pack Exporter](file:///c:/Projects/sticker-database-manager/tasks/task-13-vault-backup-and-pack-export.md)
 - [x] [Task 14: Custom Hotkeys & Visual Themes](file:///c:/Projects/sticker-database-manager/tasks/task-14-custom-hotkeys-and-visual-themes.md)
-- [x] ~~Task 15: Google Drive Cloud Sync & OAuth~~ (superseded by Task 18)
+- [x] [Task 15: Google Drive Cloud Sync & OAuth](file:///c:/Projects/sticker-database-manager/tasks/task-15-google-drive-sync-and-oauth.md) (superseded by Task 18)
 - [x] [Task 16: Help Menu & About Information Dialog](file:///c:/Projects/sticker-database-manager/tasks/task-16-about-dialog-and-system-menu.md)
 - [x] [Task 17: Scoop Custom Bucket Distribution](file:///c:/Projects/sticker-database-manager/tasks/task-17-scoop-bucket-distribution.md)
 - [x] [Task 18: Public Drive Folder Sync](file:///c:/Projects/sticker-database-manager/tasks/task-18-public-drive-sync.md)
+- [x] [Task 19: Local AI Background Removal](file:///c:/Projects/sticker-database-manager/tasks/task-19-background-removal.md)
+

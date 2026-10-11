@@ -35,6 +35,17 @@ export default defineConfig({
         },
       },
       {
+        entry: 'src/main/workers/background-worker.ts',
+        vite: {
+          build: {
+            outDir: 'dist-electron/worker',
+            rollupOptions: {
+              external: ['@imgly/background-removal-node', 'sharp', 'electron'],
+            },
+          },
+        },
+      },
+      {
         entry: 'src/preload/main.preload.ts',
         onstart(args) {
           args.reload();

@@ -7,6 +7,7 @@ import {
   LibraryFacets,
   SyncProgress,
   AboutInfo,
+  BackgroundRemovalResult,
 } from './models';
 
 export interface StickerChestAPI {
@@ -68,6 +69,9 @@ export interface StickerChestAPI {
     packAuthor?: string;
   }) => Promise<{ canceled: boolean; success?: boolean; totalExported?: number; outputPath?: string; error?: string }>;
   onExportProgress: (callback: (progress: any) => void) => () => void;
+
+  // Background removal
+  removeBackground: (itemIds: string[]) => Promise<BackgroundRemovalResult[]>;
 
   // Public Drive folder sync
   syncValidate: (folderUrl: string, apiKey: string) => Promise<{ success: boolean; fileCount?: number; error?: string }>;
