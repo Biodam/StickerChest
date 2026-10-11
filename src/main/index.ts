@@ -9,6 +9,7 @@ import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts/
 import { registerIpcHandlers } from './ipc';
 import { resolveVaultPath } from './services/ingestion/paths';
 import { loadSettings } from './services/settings/settings-store';
+import { getSyncManager } from './services/sync/sync-manager';
 import { setupApplicationMenu } from './windows/menu';
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
@@ -109,6 +110,7 @@ if (!gotSingleInstanceLock) {
 
   // Load user settings
   const settings = loadSettings();
+  getSyncManager().startAutoSync();
 
   // Create windows
   createMainWindow({ startMinimized: settings.startMinimized ?? true });

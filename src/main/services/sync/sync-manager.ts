@@ -1,146 +1,126 @@
-import { SyncProgress, GoogleDriveAccountInfo, SyncState } from '../../../types/models';
-import { getTokenVault } from './token-vault';
-import { getGDriveClient } from './gdrive-client';
-import { ImageSyncWorker } from './image-sync-worker';
-import { DbSyncCoordinator } from './db-sync-coordinator';
-import { startOAuthFlow } from './oauth-loopback';
+import fs from 'fs';
+import path from 'path';
+import { SyncProgress, SyncState } from '../../../types/models';
+import { loadSettings } from '../settings/settings-store';
+import { getIngestionService } from '../ingestion/folder-watcher';
 import { getMainWindow } from '../../windows/mainWindow';
 import { getPickerWindow } from '../../windows/pickerWindow';
+import { parseDriveFolderId } from './folder-link-parser';
+import { listFolder, downloadFile } from './drive-public-client';
+import { computeDownloads, ledgerStamp, sanitizeFilename, SyncLedger } from './sync-diff';
+import { importMetadata } from './metadata-sync';
 
-export class SyncManager {
+const LEDGER_NAME = '.drive-sync-state.json';
+
+function readLedger(folder: string): SyncLedger {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(folder, LEDGER_NAME), 'utf-8'));
+  } catch {
+    return {};
+  }
+}
+
+function writeLedger(folder: string, ledger: SyncLedger): void {
+  try {
+    fs.writeFileSync(path.join(folder, LEDGER_NAME), JSON.stringify(ledger, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to write drive sync ledger:', err);
+  }
+}
+
+export class DriveSyncManager {
   private isSyncing = false;
   private lastSyncTimestamp: number | null = null;
-  private currentProgress: SyncProgress = {
-    state: 'idle',
-    filesTransferred: 0,
-    totalFiles: 0,
-    bytesTransferred: 0,
-    totalBytes: 0,
-    lastSyncTimestamp: null,
-  };
+  private progress: SyncProgress = { state: 'idle', filesTransferred: 0, totalFiles: 0, lastSyncTimestamp: null };
 
-  private notifyProgress(state: SyncState, currentStep?: string, error?: string): void {
-    this.currentProgress = {
-      ...this.currentProgress,
-      state,
-      currentStep,
-      errorMessage: error,
-      lastSyncTimestamp: this.lastSyncTimestamp,
-    };
+  private notify(state: SyncState, step?: string, error?: string): void {
+    this.progress = { ...this.progress, state, currentStep: step, errorMessage: error, lastSyncTimestamp: this.lastSyncTimestamp };
     try {
-      getMainWindow()?.webContents.send('sync:progress', this.currentProgress);
-      getPickerWindow()?.webContents.send('sync:progress', this.currentProgress);
+      getMainWindow()?.webContents.send('sync:progress', this.progress);
+      getPickerWindow()?.webContents.send('sync:progress', this.progress);
     } catch {}
   }
 
-  public async getAccountInfo(): Promise<GoogleDriveAccountInfo> {
-    const vault = getTokenVault();
-    const tokens = vault.loadTokens();
-    if (!tokens) {
-      return { connected: false, lastSyncTimestamp: this.lastSyncTimestamp };
-    }
-
-    const accessToken = await vault.getValidAccessToken();
-    if (!accessToken) {
-      return { connected: false, email: tokens.email, lastSyncTimestamp: this.lastSyncTimestamp };
-    }
-
+  /** Validates link + key by listing the folder. */
+  public async validate(folderUrl: string, apiKey: string): Promise<{ success: boolean; fileCount?: number; error?: string }> {
+    const folderId = parseDriveFolderId(folderUrl);
+    if (!folderId) return { success: false, error: 'That does not look like a Google Drive folder link.' };
+    if (!apiKey.trim()) return { success: false, error: 'A Google API key is required.' };
     try {
-      const quota = await getGDriveClient().getStorageQuota(accessToken);
-      return {
-        connected: true,
-        email: tokens.email,
-        displayName: tokens.displayName,
-        storageUsedBytes: quota.usedBytes,
-        storageTotalBytes: quota.totalBytes,
-        lastSyncTimestamp: this.lastSyncTimestamp,
-      };
-    } catch {
-      return {
-        connected: true,
-        email: tokens.email,
-        displayName: tokens.displayName,
-        lastSyncTimestamp: this.lastSyncTimestamp,
-      };
-    }
-  }
-
-  public async connect(clientId?: string, clientSecret?: string): Promise<{ success: boolean; error?: string }> {
-    this.notifyProgress('authenticating', 'Waiting for Google OAuth login in browser...');
-    try {
-      const result = await startOAuthFlow(clientId, clientSecret);
-      if (result.success) {
-        this.notifyProgress('synced', `Connected as ${result.email}`);
-        await this.syncNow();
-        return { success: true };
-      }
-      this.notifyProgress('error', 'Authentication failed', result.error);
-      return { success: false, error: result.error };
+      const files = await listFolder(folderId, apiKey.trim());
+      return { success: true, fileCount: files.length };
     } catch (err: any) {
-      this.notifyProgress('error', 'Authentication error', err.message);
       return { success: false, error: err.message };
     }
   }
 
-  public async disconnect(): Promise<boolean> {
-    getTokenVault().clearTokens();
-    this.notifyProgress('idle', 'Disconnected from Google Drive');
-    return true;
-  }
+  public async syncNow(): Promise<{ success: boolean; downloaded?: number; error?: string }> {
+    if (this.isSyncing) return { success: false, error: 'Sync already in progress' };
 
-  public async syncNow(): Promise<{ success: boolean; error?: string }> {
-    if (this.isSyncing) {
-      return { success: false, error: 'Sync already in progress' };
-    }
-
-    const vault = getTokenVault();
-    const accessToken = await vault.getValidAccessToken();
-    if (!accessToken) {
-      this.notifyProgress('error', 'Not connected to Google Drive');
-      return { success: false, error: 'Not authenticated with Google Drive' };
-    }
+    const settings = loadSettings();
+    const folder = settings.sourceFolder;
+    if (!folder) return this.fail('Choose a local sticker folder first.');
+    const folderId = parseDriveFolderId(settings.driveFolderUrl || '');
+    if (!folderId) return this.fail('Paste a valid public Google Drive folder link in Settings.');
+    if (!settings.driveApiKey) return this.fail('Add a Google API key in Settings.');
 
     this.isSyncing = true;
-    this.notifyProgress('syncing', 'Syncing sticker assets...');
-
+    this.notify('syncing', 'Reading Drive folder...');
     try {
-      const client = getGDriveClient();
-      const imageWorker = new ImageSyncWorker(client);
-      const dbCoordinator = new DbSyncCoordinator(client);
+      const remote = await listFolder(folderId, settings.driveApiKey);
+      const ledger = readLedger(folder);
+      const todo = computeDownloads(remote, ledger, (name) => fs.existsSync(path.join(folder, name)));
 
-      // 1. Sync Images
-      await imageWorker.syncImages(accessToken, (imgProgress) => {
-        this.currentProgress.filesTransferred = imgProgress.uploaded + imgProgress.downloaded;
-        this.currentProgress.totalFiles = imgProgress.totalToProcess;
-        this.notifyProgress('syncing', `Syncing assets: ${imgProgress.currentFile || ''}`);
-      });
-
-      // 2. Check Remote DB vs Local
-      this.notifyProgress('syncing', 'Synchronizing vault database...');
-      const remoteManifest = await dbCoordinator.getRemoteManifest(accessToken);
-
-      if (remoteManifest && (!this.lastSyncTimestamp || remoteManifest.timestamp > this.lastSyncTimestamp)) {
-        this.notifyProgress('downloading', 'Applying newer remote database snapshot...');
-        await dbCoordinator.downloadAndApplySnapshot(accessToken, remoteManifest);
-      } else {
-        await dbCoordinator.uploadSnapshot(accessToken);
+      this.progress = { ...this.progress, filesTransferred: 0, totalFiles: todo.length };
+      for (const file of todo) {
+        const safe = sanitizeFilename(file.name);
+        this.notify('syncing', `Downloading ${safe} (${this.progress.filesTransferred + 1}/${todo.length})`);
+        await downloadFile(file.id, settings.driveApiKey, path.join(folder, safe));
+        ledger[safe] = ledgerStamp(file);
+        this.progress.filesTransferred += 1;
+        writeLedger(folder, ledger);
       }
 
+      if (todo.length > 0) {
+        this.notify('syncing', 'Importing new stickers...');
+        await getIngestionService().scanFolder(folder, false);
+      }
+      const applied = importMetadata(folder);
+
       this.lastSyncTimestamp = Date.now();
-      this.notifyProgress('synced', 'Library fully synchronized');
-      return { success: true };
+      this.notify('synced', `Synced ${todo.length} file(s)${applied ? `, applied metadata to ${applied}` : ''}`);
+      return { success: true, downloaded: todo.length };
     } catch (err: any) {
-      console.error('Cloud sync failure:', err);
-      this.notifyProgress('error', 'Sync failed', err.message);
-      return { success: false, error: err.message };
+      console.error('Drive folder sync failure:', err);
+      return this.fail(err.message);
     } finally {
       this.isSyncing = false;
     }
   }
+
+  private timer: NodeJS.Timeout | null = null;
+
+  /** Syncs once at startup and then on the configured interval (re-reads settings each tick). */
+  public startAutoSync(): void {
+    if (this.timer) return;
+    const tick = (): void => {
+      const s = loadSettings();
+      if (s.driveAutoSync && s.driveFolderUrl && s.driveApiKey && s.sourceFolder) {
+        void this.syncNow();
+      }
+    };
+    setTimeout(tick, 5000);
+    this.timer = setInterval(tick, Math.max(5, loadSettings().syncIntervalMinutes || 15) * 60_000);
+  }
+
+  private fail(message: string): { success: false; error: string } {
+    this.notify('error', 'Sync failed', message);
+    return { success: false, error: message };
+  }
 }
 
-let defaultSyncManager: SyncManager | null = null;
-export function getSyncManager(): SyncManager {
-  if (!defaultSyncManager) defaultSyncManager = new SyncManager();
-  return defaultSyncManager;
+let instance: DriveSyncManager | null = null;
+export function getSyncManager(): DriveSyncManager {
+  if (!instance) instance = new DriveSyncManager();
+  return instance;
 }

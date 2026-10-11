@@ -4,7 +4,7 @@ import { AppSettings, ThemeId } from '../../../types/models';
 import { FolderSyncCard } from './settings/FolderSyncCard';
 import { GeminiAiCard } from './settings/GeminiAiCard';
 import { AutoStartCard, AutoPasteCard, AnimationCard } from './settings/BehaviorCards';
-import { GoogleDriveCard } from './settings/GoogleDriveCard';
+import { PublicDriveCard } from './settings/PublicDriveCard';
 import { HotkeyRecorder } from './HotkeyRecorder';
 import { ThemeSelector } from './ThemeSelector';
 
@@ -40,8 +40,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [animationMode, setAnimationMode] = useState<'always' | 'hover' | 'reduced_motion'>(
     settings.animationPlaybackMode || 'hover'
   );
-  const [driveAutoSync, setDriveAutoSync] = useState(settings.googleDriveAutoSync ?? true);
-  const [driveClientId, setDriveClientId] = useState(settings.googleDriveClientId || '');
+  const [driveAutoSync, setDriveAutoSync] = useState(settings.driveAutoSync ?? true);
+  const [driveUrl, setDriveUrl] = useState(settings.driveFolderUrl || '');
+  const [driveKey, setDriveKey] = useState(settings.driveApiKey || '');
   const [testStatus, setTestStatus] = useState<{ testing: boolean; valid?: boolean; message?: string }>({
     testing: false,
   });
@@ -59,8 +60,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setHotkey(settings.globalShortcut || 'Super+/');
     setTheme(settings.theme || 'slate_dark');
     setAnimationMode(settings.animationPlaybackMode || 'hover');
-    setDriveAutoSync(settings.googleDriveAutoSync ?? true);
-    setDriveClientId(settings.googleDriveClientId || '');
+    setDriveAutoSync(settings.driveAutoSync ?? true);
+    setDriveUrl(settings.driveFolderUrl || '');
+    setDriveKey(settings.driveApiKey || '');
     setTestStatus({ testing: false });
   }, [settings, isOpen]);
 
@@ -95,8 +97,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       globalShortcut: hotkey,
       theme,
       animationPlaybackMode: animationMode,
-      googleDriveAutoSync: driveAutoSync,
-      googleDriveClientId: driveClientId,
+      driveAutoSync,
+      driveFolderUrl: driveUrl.trim(),
+      driveApiKey: driveKey.trim(),
     });
     onClose();
   };
@@ -125,12 +128,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <HotkeyRecorder currentHotkey={hotkey} onChangeHotkey={setHotkey} />
           </div>
 
-          {/* Google Drive Cloud Sync */}
-          <GoogleDriveCard
+          {/* Public Google Drive Folder Sync */}
+          <PublicDriveCard
+            folderUrl={driveUrl}
+            onChangeFolderUrl={setDriveUrl}
+            apiKey={driveKey}
+            onChangeApiKey={setDriveKey}
             autoSync={driveAutoSync}
             onChangeAutoSync={setDriveAutoSync}
-            clientId={driveClientId}
-            onChangeClientId={setDriveClientId}
           />
 
           {/* Curated Source Folder & Scanning */}

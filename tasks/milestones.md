@@ -33,9 +33,10 @@ This document tracks high-level progress across the core development milestones 
 | **M12** | **Animated Sticker & GIF Controls** | Hover-to-play vs always-play, viewport-aware offscreen animation pausing, frame-by-frame scrubber & telemetry in Inspector | 🟢 Completed |
 | **M13** | **Vault Backup & Pack Exporter** | Full portable `.stickervault` archive backup/restore with conflict resolution; Telegram, Discord, and WhatsApp sticker pack exporters | 🟢 Completed |
 | **M14** | **Custom Global Hotkeys & UI Themes** | Interactive global summon hotkey rebinding in Settings; curated theme engine (OLED Black, Slate, Cyberpunk, Catppuccin, Light) | 🟢 Completed |
-| **M15** | **Google Drive Cloud Sync & OAuth** | Direct Google OAuth 2.0 PKCE login, isolated `appDataFolder` cloud storage, content-addressable image mirroring & SQLite snapshot sync | 🟢 Completed |
+| **M15** | **Google Drive Cloud Sync & OAuth** | Superseded by M18 (OAuth removed) | ⚪ Superseded |
 | **M16** | **Help Menu & About Information Dialog** | Application menu (`Help -> About Sticker Chest`), tray menu entry, sidebar button, read-only system specs & commit hash modal | 🟢 Completed |
 | **M17** | **Scoop Custom Bucket Distribution** | Direct GitHub-hosted custom Scoop bucket, portable manifest, shortcuts, autoupdate schema | 🟢 Completed |
+| **M18** | **Public Drive Folder Sync** | Removed Google OAuth; one-way sync from a public Drive folder (API key) into the local folder, plus optional metadata JSON | 🟢 Completed |
 
 ---
 
@@ -55,10 +56,7 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 12: Animated Sticker & GIF Controls](file:///c:/Projects/sticker-database-manager/tasks/task-12-animated-sticker-and-gif-controls.md)
 - [x] [Task 13: Vault Backup & Pack Exporter](file:///c:/Projects/sticker-database-manager/tasks/task-13-vault-backup-and-pack-export.md)
 - [x] [Task 14: Custom Hotkeys & Visual Themes](file:///c:/Projects/sticker-database-manager/tasks/task-14-custom-hotkeys-and-visual-themes.md)
-- [x] [Task 15: Google Drive Cloud Sync & OAuth](file:///c:/Projects/sticker-database-manager/tasks/task-15-google-drive-sync-and-oauth.md)
+- [x] ~~Task 15: Google Drive Cloud Sync & OAuth~~ (superseded by Task 18)
 - [x] [Task 16: Help Menu & About Information Dialog](file:///c:/Projects/sticker-database-manager/tasks/task-16-about-dialog-and-system-menu.md)
 - [x] [Task 17: Scoop Custom Bucket Distribution](file:///c:/Projects/sticker-database-manager/tasks/task-17-scoop-bucket-distribution.md)
-
-
-
-
+- [x] [Task 18: Public Drive Folder Sync](file:///c:/Projects/sticker-database-manager/tasks/task-18-public-drive-sync.md)

@@ -6,7 +6,6 @@ import {
   ImageTier,
   LibraryFacets,
   SyncProgress,
-  GoogleDriveAccountInfo,
   AboutInfo,
 } from './models';
 
@@ -70,11 +69,10 @@ export interface StickerChestAPI {
   }) => Promise<{ canceled: boolean; success?: boolean; totalExported?: number; outputPath?: string; error?: string }>;
   onExportProgress: (callback: (progress: any) => void) => () => void;
 
-  // Google Drive Cloud Sync
-  syncGetAccountInfo: () => Promise<GoogleDriveAccountInfo>;
-  syncConnectGoogleDrive: (clientId?: string, clientSecret?: string) => Promise<{ success: boolean; error?: string }>;
-  syncDisconnectGoogleDrive: () => Promise<boolean>;
-  syncTriggerNow: () => Promise<{ success: boolean; error?: string }>;
+  // Public Drive folder sync
+  syncValidate: (folderUrl: string, apiKey: string) => Promise<{ success: boolean; fileCount?: number; error?: string }>;
+  syncExportMetadata: () => Promise<{ success: boolean; path?: string; count?: number; error?: string }>;
+  syncTriggerNow: () => Promise<{ success: boolean; downloaded?: number; error?: string }>;
   onSyncProgress: (callback: (progress: SyncProgress) => void) => () => void;
 
   // Window Controls

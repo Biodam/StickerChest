@@ -24,10 +24,6 @@ export default defineConfig({
         entry: 'src/main/index.ts',
         vite: {
           define: {
-            'process.env.GDRIVE_CLIENT_ID': JSON.stringify(
-              process.env.GDRIVE_CLIENT_ID || '74155265273-kuhjen26hso406vpvaljoe5lvhl4h4tt.apps.googleusercontent.com'
-            ),
-            'process.env.GDRIVE_CLIENT_SECRET': JSON.stringify(process.env.GDRIVE_CLIENT_SECRET || ''),
             'process.env.GIT_COMMIT_HASH': JSON.stringify(gitCommitHash),
           },
           build: {

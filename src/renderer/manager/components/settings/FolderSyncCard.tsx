@@ -45,7 +45,7 @@ export const FolderSyncCard: React.FC<FolderSyncCardProps> = ({
         <div className="flex flex-col space-y-1 mt-1.5 text-[11px] text-blue-300 bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20">
           <div className="flex items-center space-x-1.5 font-medium">
             <Cloud className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-            <span>Multi-Device Sync Ready (Google Drive / OneDrive / iCloud)</span>
+            <span>Local library folder</span>
           </div>
           <p className="text-[10px] text-gray-400 leading-relaxed">
             Sticker Chest saves database &amp; resized variants in <code className="text-blue-300">.stickerchest/</code> inside your selected folder.
