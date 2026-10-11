@@ -20,7 +20,7 @@ sticker-database-manager/
 If the user does not already have Scoop installed, run the following in PowerShell:
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.ne | iex
+irm get.scoop.sh | iex
 ```
 
 ### Step 2: Add the Sticker Chest Bucket
