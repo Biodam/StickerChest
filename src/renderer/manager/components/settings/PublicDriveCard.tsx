@@ -75,6 +75,17 @@ export const PublicDriveCard: React.FC<PublicDriveCardProps> = ({
       </p>
       <input className={inputClass} placeholder="https://drive.google.com/drive/folders/..." value={folderUrl} onChange={(e) => onChangeFolderUrl(e.target.value)} />
       <input className={inputClass} type="password" placeholder="Google API key (Drive API enabled)" value={apiKey} onChange={(e) => onChangeApiKey(e.target.value)} />
+      <p className="text-[10px] text-gray-500">
+        1.{' '}
+        <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">
+          Enable the Drive API
+        </a>
+        {' '}2.{' '}
+        <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">
+          Create an API key
+        </a>
+        {' '}(restrict it to the Drive API)
+      </p>
 
       <label className="flex items-center space-x-2 cursor-pointer">
         <input type="checkbox" checked={autoSync} onChange={(e) => onChangeAutoSync(e.target.checked)} />

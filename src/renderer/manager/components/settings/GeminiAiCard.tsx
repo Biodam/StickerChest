@@ -67,6 +67,12 @@ export const GeminiAiCard: React.FC<GeminiAiCardProps> = ({
             {testStatus.testing ? 'Testing...' : 'Test Key'}
           </button>
         </div>
+        <p className="text-[10px] text-gray-500 mt-1.5">
+          Get a free key at{' '}
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-amber-400 hover:underline">
+            aistudio.google.com/apikey
+          </a>
+        </p>
         {testStatus.valid !== undefined && (
           <div className={`flex items-center space-x-1.5 mt-1.5 text-[11px] ${testStatus.valid ? 'text-emerald-400' : 'text-rose-400'}`}>
             {testStatus.valid ? <Check className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
