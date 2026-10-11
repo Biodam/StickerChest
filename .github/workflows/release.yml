@@ -162,3 +162,59 @@ jobs:
             release-artifacts/latest*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-scoop-manifest:
+    name: Update Scoop Manifest
+    needs: publish-release
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.draft }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Determine Release Tag
+        id: tag_info
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag_name || 'v1.0.0' }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download portable executable from the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag_info.outputs.tag }}
+        run: |
+          VERSION="${TAG#v}"
+          gh release download "$TAG" --repo "${{ github.repository }}" -p "Sticker.Chest.${VERSION}.exe" -D release-assets
+
+      - name: Update bucket/sticker-chest.json
+        env:
+          TAG: ${{ steps.tag_info.outputs.tag }}
+        run: |
+          VERSION="${TAG#v}"
+          node scripts/update-scoop-manifest.js "$VERSION" "release-assets/Sticker.Chest.${VERSION}.exe"
+
+      - name: Commit and push manifest
+        env:
+          TAG: ${{ steps.tag_info.outputs.tag }}
+        run: |
+          if git diff --quiet -- bucket/sticker-chest.json; then
+            echo "Manifest already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bucket/sticker-chest.json
+          git commit -m "chore(scoop): update manifest to ${TAG}"
+          git push origin HEAD

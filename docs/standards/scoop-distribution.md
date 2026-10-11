@@ -58,4 +58,4 @@ The manifest file [`bucket/sticker-chest.json`](file:///c:/Projects/sticker-data
 
 - **`checkver: "github"`**: Checks the latest GitHub release tag on `Biodam/StickerChest`.
 - **`autoupdate`**: Automatically resolves the download URL pattern `Sticker.Chest.$version.exe` for newer releases.
-- **`hash`**: SHA-256 digest of the portable release executable. When publishing a new release, update this hash or run `scoop checkver -u` if using Scoop maintenance tools.
+- **`hash`** / **`version`** / **`url`**: Updated automatically after every release by the `update-scoop-manifest` job in [release.yml](file:///c:/Projects/sticker-database-manager/.github/workflows/release.yml), which downloads the portable `.exe` from the published release, runs [update-scoop-manifest.js](file:///c:/Projects/sticker-database-manager/scripts/update-scoop-manifest.js), and commits `bucket/sticker-chest.json` to the default branch. To run it manually: `node scripts/update-scoop-manifest.js <version> <path-to-exe>`.
