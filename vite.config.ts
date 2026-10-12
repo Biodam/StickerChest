@@ -40,7 +40,11 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron/worker',
             rollupOptions: {
-              external: ['@imgly/background-removal-node', 'sharp', 'electron'],
+              external: ['sharp', 'electron', 'onnxruntime-node'],
+              output: {
+                format: 'esm',
+                entryFileNames: 'background-worker.mjs',
+              },
             },
           },
         },

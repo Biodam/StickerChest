@@ -7,9 +7,9 @@ const TIMEOUT_MS = 120_000;
 
 /** Default location of the compiled worker (see vite.config.ts and electron-builder.json asarUnpack). */
 export function getDefaultWorkerPath(appPath: string): string {
-  const unpacked = path.join(appPath.replace(/app\.asar$/, 'app.asar.unpacked'), 'dist-electron', 'worker', 'background-worker.js');
+  const unpacked = path.join(appPath.replace(/app\.asar$/, 'app.asar.unpacked'), 'dist-electron', 'worker', 'background-worker.mjs');
   if (fs.existsSync(unpacked)) return unpacked;
-  return path.join(appPath, 'dist-electron', 'worker', 'background-worker.js');
+  return path.join(appPath, 'dist-electron', 'worker', 'background-worker.mjs');
 }
 
 /**
@@ -44,8 +44,16 @@ export async function removeImageBackground(inputPath: string, workerPath: strin
     });
     child.on('exit', (code) => {
       clearTimeout(timer);
-      if (code === 0) resolve();
-      else reject(new Error(stderr.trim().split('\n').pop() || `Worker exited with code ${code}`));
+      if (code === 0) {
+        resolve();
+      } else {
+        // Find meaningful error line (skip stack frames or trailing Node version banner)
+        const lines = stderr.trim().split('\n').map((l) => l.trim()).filter(Boolean);
+        const errLine = lines.find((l) => l.startsWith('Error:') || l.startsWith('Error ['))
+          || lines.find((l) => !l.startsWith('Node.js v') && !l.startsWith('at ') && !l.startsWith('code:'))
+          || `Worker exited with code ${code}`;
+        reject(new Error(errLine));
+      }
     });
   }).catch((err: Error) => {
     try { fs.rmSync(outputPath, { force: true }); } catch {}
