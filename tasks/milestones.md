@@ -26,7 +26,7 @@ This document tracks high-level progress across the core development milestones 
 | **M5** | **Manager Desktop UI** | Library grid, search/filter sidebar, inspector drawer, bulk tagger, settings | 🟢 Completed |
 | **M6** | **Quick Picker Companion Panel** | Frameless floating modal, global hotkey (`Win+/` / `Control+/`), Recent/Favs/All tabs, copy to clipboard | 🟢 Completed |
 | **M7** | **Testing, Verification & Packaging** | Unit/integration test suites, cross-platform build scripts (Windows & macOS) | 🟢 Completed |
-| **M8** | **Companion Polish & Advanced Usability** | System Tray companion, close-to-tray 24/7 mode, drag-and-drop ingestion, grid multi-select & bulk actions, NSFW blur & star ratings | 🟢 Completed |
+| **M8** | **Companion Polish & Advanced Usability** | System Tray companion, close-to-tray 24/7 mode, drag-and-drop & file picker "Add new" ingestion, grid multi-select & bulk actions, NSFW blur & star ratings | 🟢 Completed |
 | **M9** | **Multiplatform Installers & Release Pipeline** | Windows NSIS installer & portable exe, macOS DMG & zip bundle (arm64/x64), branded icon assets, GitHub Actions CI release workflow | 🟢 Completed |
 | **M10** | **Quick Picker Auto-Paste Integration** | Paste directly into active input field on select, native OS keystroke simulation (Windows/macOS/Linux), auto-paste settings toggle | 🟢 Completed |
 | **M11** | **Quick Picker Keyboard Navigation** | Window-level keyboard controls, 2D arrow grid navigation with auto-scroll into view, Home/End/PageUp/Down, Ctrl+1/2/3 tabs, Ctrl+T tier toggle, Ctrl+S favorite toggle, two-stage Escape | 🟢 Completed |

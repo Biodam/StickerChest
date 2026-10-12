@@ -1,5 +1,5 @@
 import React, { useState, DragEvent } from 'react';
-import { Image as ImageIcon, SearchX, UploadCloud } from 'lucide-react';
+import { Image as ImageIcon, SearchX, UploadCloud, Plus } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
 import { StickerCard } from './StickerCard';
 
@@ -13,6 +13,7 @@ interface StickerGridProps {
   onOpenSettings: () => void;
   onDropFiles?: (filePaths: string[]) => void;
   gridSize?: number;
+  onAddNew?: () => void;
 }
 
 export const StickerGrid: React.FC<StickerGridProps> = ({
@@ -25,6 +26,7 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
   onOpenSettings,
   onDropFiles,
   gridSize = 160,
+  onAddNew,
 }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -104,12 +106,23 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
         <p className="text-xs text-gray-400 max-w-sm mb-4">
           Drag and drop images or GIFs here, or select your folder in Settings to automatically index them.
         </p>
-        <button
-          onClick={onOpenSettings}
-          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-lg shadow-blue-500/20 transition-colors"
-        >
-          Configure Folder &amp; API Key
-        </button>
+        <div className="flex items-center space-x-2">
+          {onAddNew && (
+            <button
+              onClick={onAddNew}
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-lg shadow-blue-500/20 transition-colors flex items-center space-x-1.5"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Sticker</span>
+            </button>
+          )}
+          <button
+            onClick={onOpenSettings}
+            className="px-4 py-2 rounded-lg bg-[#25262b] hover:bg-[#2c2e33] text-xs font-semibold text-gray-300 transition-colors"
+          >
+            Configure Folder &amp; API Key
+          </button>
+        </div>
       </div>
     );
   }

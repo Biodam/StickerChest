@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info, Loader2 } from 'lucide-react';
+import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info, Loader2, Plus } from 'lucide-react';
 import { LibraryFacets } from '../../../types/models';
 import { FacetFilterGroup } from './FacetFilterGroup';
 
@@ -13,6 +13,7 @@ interface SidebarProps {
   onOpenAbout?: () => void;
   onOpenExport?: () => void;
   onOpenImport?: () => void;
+  onAddNew?: () => void;
   isScanning: boolean;
   facets: LibraryFacets;
   selectedFranchise: string | null;
@@ -34,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAbout,
   onOpenExport,
   onOpenImport,
+  onAddNew,
   isScanning,
   facets,
   selectedFranchise,
@@ -164,6 +166,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Action Footer */}
       <div className="p-3 border-t border-[#2c2e33] space-y-1.5 flex-shrink-0">
+        {onAddNew && (
+          <button
+            onClick={onAddNew}
+            className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-all"
+            title="Import image or GIF files as new stickers"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add New Sticker</span>
+          </button>
+        )}
+
         <button
           onClick={onSyncFolder}
           disabled={isScanning}

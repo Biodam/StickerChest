@@ -64,6 +64,12 @@ export const shell = {
   showItemInFolder: () => {},
 };
 
+export const dialog = {
+  showOpenDialog: async () => ({ canceled: false, filePaths: [] }),
+  showSaveDialog: async () => ({ canceled: false, filePath: '' }),
+  showMessageBox: async () => ({ response: 0 }),
+};
+
 export const ipcMain = {
   handle: () => {},
   on: () => {},
@@ -78,5 +84,7 @@ export default {
   Tray,
   Menu,
   shell,
+  dialog,
   ipcMain,
 };
+

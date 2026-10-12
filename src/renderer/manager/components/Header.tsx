@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Sparkles, X } from 'lucide-react';
+import { Search, Sparkles, X, Plus } from 'lucide-react';
 import { GridSizeControl } from './GridSizeControl';
 
 interface HeaderProps {
@@ -19,6 +19,7 @@ interface HeaderProps {
   isTagging?: boolean;
   gridSize?: number;
   onGridSizeChange?: (size: number) => void;
+  onAddNew?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,28 +39,42 @@ export const Header: React.FC<HeaderProps> = ({
   isTagging = false,
   gridSize,
   onGridSizeChange,
+  onAddNew,
 }) => {
   const hasFilterChips = Boolean(selectedFranchise || selectedCharacter || selectedTag);
 
   return (
     <header className="border-b border-[#2c2e33] bg-[#1a1b1e] px-6 py-2.5 flex flex-col justify-center space-y-2 select-none">
       <div className="flex items-center justify-between">
-        {/* Search Input Bar */}
-        <div className="relative w-96">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by character, franchise, action, or feeling..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-8 py-1.5 bg-[#25262b] border border-[#2c2e33] rounded-lg text-sm placeholder-gray-500 text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
-          />
-          {searchQuery && (
+        {/* Search Input Bar & Add New Button */}
+        <div className="flex items-center space-x-3">
+          <div className="relative w-80">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by character, franchise, action, or feeling..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-9 pr-8 py-1.5 bg-[#25262b] border border-[#2c2e33] rounded-lg text-sm placeholder-gray-500 text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={onClearSearch}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {onAddNew && (
             <button
-              onClick={onClearSearch}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+              onClick={onAddNew}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition-all shrink-0"
+              title="Select images to import into Sticker Vault"
             >
-              <X className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add new</span>
             </button>
           )}
         </div>

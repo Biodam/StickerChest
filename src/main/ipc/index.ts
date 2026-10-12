@@ -63,4 +63,20 @@ export function registerIpcHandlers(): void {
     }
     return result.filePaths[0];
   });
+
+  ipcMain.handle('dialog:selectImages', async () => {
+    const mainWindow = getMainWindow();
+    const result = await dialog.showOpenDialog(mainWindow || (undefined as any), {
+      properties: ['openFile', 'multiSelections'],
+      title: 'Select Sticker Images to Import',
+      filters: [
+        { name: 'Images & GIFs', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+    });
+    if (result.canceled || !result.filePaths) {
+      return [];
+    }
+    return result.filePaths;
+  });
 }

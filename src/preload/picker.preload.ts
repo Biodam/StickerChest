@@ -43,6 +43,7 @@ const api: StickerChestAPI = {
   getSettings: () => ipcRenderer.invoke('settings:get'),
   saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),
   selectFolderDialog: () => ipcRenderer.invoke('dialog:selectFolder'),
+  selectImagesDialog: () => ipcRenderer.invoke('dialog:selectImages'),
   onThemeChanged: (callback) => {
     const handler = (_event: any, theme: string) => callback(theme);
     ipcRenderer.on('theme:changed', handler);

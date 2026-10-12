@@ -157,6 +157,14 @@ export default function App() {
     fetchUntagged();
   };
 
+  const handleAddNew = async () => {
+    if (!api?.selectImagesDialog) return;
+    const filePaths = await api.selectImagesDialog();
+    if (filePaths && filePaths.length > 0) {
+      await handleDropFiles(filePaths);
+    }
+  };
+
   const handleBulkFavorite = async (favorite: boolean) => {
     await api?.bulkToggleFavorite?.(Array.from(selectedIds), favorite);
     fetchItems();
@@ -215,6 +223,7 @@ export default function App() {
         onOpenAbout={() => setAboutOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenImport={() => setImportOpen(true)}
+        onAddNew={handleAddNew}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
         facets={facets} selectedFranchise={selectedFranchise}
         selectedCharacter={selectedCharacter} selectedTag={selectedTag}
@@ -235,6 +244,7 @@ export default function App() {
           isTagging={progress?.status === 'tagging'}
           gridSize={gridSize}
           onGridSizeChange={setGridSize}
+          onAddNew={handleAddNew}
         />
 
         <IngestionBanner progress={progress} onDismiss={() => setProgress(null)} />
@@ -250,6 +260,7 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             onOpenSettings={() => setSettingsOpen(true)}
             onDropFiles={handleDropFiles}
+            onAddNew={handleAddNew}
           />
 
           {selectedItem && selectedIds.size <= 1 && (

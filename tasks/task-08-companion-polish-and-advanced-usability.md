@@ -27,6 +27,7 @@
 - [x] Create `src/main/windows/tray.ts` managing the system tray icon, tooltips, click handlers, and context menu.
 - [x] Update `src/main/index.ts` and `mainWindow.ts` with close-to-tray logic (`event.preventDefault(); mainWindow.hide()`).
 - [x] Implement drag-and-drop listener in `StickerGrid.tsx` with animated drop overlay and IPC handler to copy and ingest files.
+- [x] Add "Add new" file picker button in Header and Sidebar connecting to `dialog:selectImages` for the same ingestion flow.
 - [x] Add multi-selection state via `useSelection.ts` hook and render floating `BulkActionBar.tsx` toolbar when items are selected.
 - [x] Add NSFW blur styling in `StickerCard.tsx` and toggle in `CustomAttributesEditor.tsx` / `MetadataForm.tsx`.
 - [x] Implement Star Rating (1–5) and Key-Value pairs editor in `CustomAttributesEditor.tsx`.
