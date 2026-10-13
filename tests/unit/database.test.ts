@@ -387,4 +387,107 @@ describe('StickerDatabaseDAL & SQLite Schema', () => {
     expect(item?.tags).toContain('magic'); // AI tag successfully merged
     expect(item?.tags).toContain('blue-hair'); // AI tag successfully merged
   });
+
+  it('should allow unlocking a previously locked field so AI can overwrite it', () => {
+    const itemId = dal.upsertItem({
+      sha256Hash: 'unlock-test-hash',
+      filename: 'sasuke.png',
+      originalPath: '/curated/sasuke.png',
+      ext: '.png',
+      mimeType: 'image/png',
+      width: 200,
+      height: 200,
+      fileSizeBytes: 5000,
+      isAnimated: false,
+    });
+
+    // User locks character
+    dal.saveMetadata({
+      itemId,
+      character: 'Custom Sasuke',
+      userLockedFields: ['character'],
+      isUserEdited: true,
+    });
+
+    let item = dal.getItemById(itemId);
+    expect(item?.metadata?.userLockedFields).toEqual(['character']);
+    expect(item?.metadata?.character).toBe('Custom Sasuke');
+
+    // User unlocks character
+    dal.saveMetadata({
+      itemId,
+      userLockedFields: [],
+      isUserEdited: true,
+    });
+
+    item = dal.getItemById(itemId);
+    expect(item?.metadata?.userLockedFields).toEqual([]);
+
+    // AI runs and should now successfully overwrite character
+    dal.saveMetadata({
+      itemId,
+      character: 'Sasuke Uchiha',
+      isUserEdited: false,
+    });
+
+    item = dal.getItemById(itemId);
+    expect(item?.metadata?.character).toBe('Sasuke Uchiha');
+  });
+
+  it('should preserve AI tag flags when user saves metadata and allow AI re-tagging to refresh AI tags', () => {
+    const itemId = dal.upsertItem({
+      sha256Hash: 'tag-refresh-hash',
+      filename: 'pikachu.png',
+      originalPath: '/curated/pikachu.png',
+      ext: '.png',
+      mimeType: 'image/png',
+      width: 200,
+      height: 200,
+      fileSizeBytes: 5000,
+      isAnimated: false,
+    });
+
+    // 1. Initial AI tagging generates tags
+    dal.saveMetadata({
+      itemId,
+      character: 'Pikachu',
+      tags: ['yellow', 'electric'],
+      isUserEdited: false,
+      aiStatus: 'completed',
+    });
+
+    let item = dal.getItemById(itemId);
+    expect(item?.tags).toEqual(['yellow', 'electric']);
+    expect(item?.userTags).toEqual([]);
+
+    // 2. User edits metadata and adds a user tag 'favorite'
+    dal.saveMetadata({
+      itemId,
+      tags: ['yellow', 'electric', 'favorite'],
+      userLockedFields: [],
+      isUserEdited: true,
+    });
+
+    item = dal.getItemById(itemId);
+    expect(item?.tags).toEqual(['yellow', 'electric', 'favorite']);
+    expect(item?.userTags).toEqual(['favorite']); // Only 'favorite' is marked as a user tag
+
+    // 3. AI re-tags the item with fresh tags ['yellow', 'mouse', 'pika']
+    dal.saveMetadata({
+      itemId,
+      character: 'Pikachu',
+      tags: ['yellow', 'mouse', 'pika'],
+      isUserEdited: false,
+      aiStatus: 'completed',
+    });
+
+    item = dal.getItemById(itemId);
+    // User tag 'favorite' must still be retained, old AI tag 'electric' is replaced by 'mouse' and 'pika'
+    expect(item?.userTags).toEqual(['favorite']);
+    expect(item?.tags).toContain('favorite');
+    expect(item?.tags).toContain('yellow');
+    expect(item?.tags).toContain('mouse');
+    expect(item?.tags).toContain('pika');
+    expect(item?.tags).not.toContain('electric');
+  });
 });

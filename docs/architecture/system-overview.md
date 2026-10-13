@@ -178,4 +178,15 @@ Users can add new stickers into their vault on demand using two unified workflow
   3. Database record creation and automatic filename tagging / optional Gemini AI auto-tagging.
   4. Instant UI refresh of item lists, facet counters, and untagged count.
 
+---
+
+## 8. Granular Field-Level Metadata Locking & Selective AI Updates
+
+Sticker Chest uses an adaptive, field-granular metadata locking system to allow manual user edits while preserving the ability of Gemini Vision AI to enrich unedited attributes:
+- **Field-Level Protection**: Modifying an individual metadata field (`character`, `source_origin`, `action`, `feeling`, `description`) registers that specific field into `user_locked_fields` in SQLite. Unedited fields remain unlocked.
+- **Selective AI Overwrites**: When Gemini AI vision tagging runs (manually or in batch), the database layer (`upsertMetadata`) inspects `user_locked_fields`. It strictly preserves values for user-locked fields, while seamlessly updating unlocked fields with fresh AI vision extractions.
+- **Interactive UI Toggles**: Each field in [`MetadataForm.tsx`](file:///c:/Projects/sticker-database-manager/src/renderer/manager/components/MetadataForm.tsx) provides a clickable lock button (`Locked` / `Unlocked`) allowing users to explicitly protect AI suggestions or unlock fields to permit future AI refreshes.
+- **Tag Generation Isolation**: Tags maintain their provenance in `item_tags` via `is_ai_generated`. User additions (`is_ai_generated = 0`) are preserved across subsequent AI runs, while AI tags (`is_ai_generated = 1`) can be updated dynamically.
+
+
 

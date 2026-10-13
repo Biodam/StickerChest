@@ -38,6 +38,7 @@ This document tracks high-level progress across the core development milestones 
 | **M17** | **Scoop Custom Bucket Distribution** | Direct GitHub-hosted custom Scoop bucket, portable manifest, shortcuts, autoupdate schema | 🟢 Completed |
 | **M18** | **Public Drive Folder Sync** | Removed Google OAuth; one-way sync from a public Drive folder (API key) into the local folder, plus optional metadata JSON | 🟢 Completed |
 | **M19** | **Local AI Background Removal** | Offline, on-device AI background removal for single & batch stickers via isolated ONNX worker process; non-destructive | 🟢 Completed |
+| **M20** | **Granular Metadata Locking & Selective AI Updates** | Field-level locks, interactive UI toggles, auto dirty-locking, selective AI overwrites for unedited fields | 🟢 Completed |
 
 ---
 
@@ -62,4 +63,5 @@ This document tracks high-level progress across the core development milestones 
 - [x] [Task 17: Scoop Custom Bucket Distribution](file:///c:/Projects/sticker-database-manager/tasks/task-17-scoop-bucket-distribution.md)
 - [x] [Task 18: Public Drive Folder Sync](file:///c:/Projects/sticker-database-manager/tasks/task-18-public-drive-sync.md)
 - [x] [Task 19: Local AI Background Removal](file:///c:/Projects/sticker-database-manager/tasks/task-19-background-removal.md)
+- [x] [Task 20: Granular Metadata Locking & Selective AI Updates](file:///c:/Projects/sticker-database-manager/tasks/task-20-granular-metadata-locking.md)
 

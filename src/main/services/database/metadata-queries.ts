@@ -36,17 +36,17 @@ export function upsertMetadata(db: Database, input: MetadataUpsertInput): void {
     // Calculate updated locked fields
     let userLockedFields = existingLocked;
     if (isUserEdit) {
-      const newLocked = new Set(existingLocked);
-      if (input.userLockedFields && input.userLockedFields.length > 0) {
-        input.userLockedFields.forEach((f) => newLocked.add(f));
+      if (input.userLockedFields !== undefined) {
+        userLockedFields = Array.from(new Set(input.userLockedFields));
       } else {
-        if (input.character !== undefined && input.character !== null) newLocked.add('character');
-        if (input.sourceOrigin !== undefined && input.sourceOrigin !== null) newLocked.add('source_origin');
-        if (input.action !== undefined && input.action !== null) newLocked.add('action');
-        if (input.feeling !== undefined && input.feeling !== null) newLocked.add('feeling');
-        if (input.description !== undefined && input.description !== null) newLocked.add('description');
+        const newLocked = new Set(existingLocked);
+        if (input.character !== undefined && input.character !== null && input.character !== (existing?.character ?? null)) newLocked.add('character');
+        if (input.sourceOrigin !== undefined && input.sourceOrigin !== null && input.sourceOrigin !== (existing?.source_origin ?? null)) newLocked.add('source_origin');
+        if (input.action !== undefined && input.action !== null && input.action !== (existing?.action ?? null)) newLocked.add('action');
+        if (input.feeling !== undefined && input.feeling !== null && input.feeling !== (existing?.feeling ?? null)) newLocked.add('feeling');
+        if (input.description !== undefined && input.description !== null && input.description !== (existing?.description ?? null)) newLocked.add('description');
+        userLockedFields = Array.from(newLocked);
       }
-      userLockedFields = Array.from(newLocked);
     }
 
     // Protection logic: if AI is writing, never overwrite user-locked fields!
@@ -70,7 +70,9 @@ export function upsertMetadata(db: Database, input: MetadataUpsertInput): void {
       ? (existing?.description ?? null)
       : (input.description ?? existing?.description ?? null);
 
-    const isUserEdited = isUserEdit ? 1 : (existing?.is_user_edited ?? 0);
+    const isUserEdited = input.userLockedFields !== undefined
+      ? (userLockedFields.length > 0 ? 1 : 0)
+      : (isUserEdit ? (userLockedFields.length > 0 ? 1 : (existing?.is_user_edited ?? 0)) : (existing?.is_user_edited ?? 0));
     const lockedJson = JSON.stringify(userLockedFields);
 
     // Save tags: user edit marks tags with is_ai_generated = 0, AI never touches user tags
@@ -168,15 +170,20 @@ export function setTags(db: Database, itemId: string, tags: string[], isAiGenera
   `);
 
   const transaction = db.transaction((tagList: string[]) => {
-    if (!isAiGenerated) {
-      const cleanList = tagList.map((t) => t.trim().toLowerCase()).filter(Boolean);
-      const allItemTags = db.prepare(`
-        SELECT t.id, t.name, it.is_ai_generated
-        FROM item_tags it
-        JOIN tags t ON t.id = it.tag_id
-        WHERE it.item_id = ?
-      `).all(itemId) as { id: string; name: string; is_ai_generated: number }[];
+    const cleanList = tagList.map((t) => t.trim().toLowerCase()).filter(Boolean);
+    const allItemTags = db.prepare(`
+      SELECT t.id, t.name, it.is_ai_generated
+      FROM item_tags it
+      JOIN tags t ON t.id = it.tag_id
+      WHERE it.item_id = ?
+    `).all(itemId) as { id: string; name: string; is_ai_generated: number }[];
 
+    const existingMap = new Map<string, number>();
+    for (const t of allItemTags) {
+      existingMap.set(t.name.toLowerCase(), t.is_ai_generated);
+    }
+
+    if (!isAiGenerated) {
       for (const existingTag of allItemTags) {
         if (!cleanList.includes(existingTag.name.toLowerCase())) {
           db.prepare(`DELETE FROM item_tags WHERE item_id = ? AND tag_id = ?`).run(itemId, existingTag.id);
@@ -191,7 +198,10 @@ export function setTags(db: Database, itemId: string, tags: string[], isAiGenera
       insertTagStmt.run(randomUUID(), cleanTag);
       const tagRow = getTagStmt.get(cleanTag) as { id: string } | undefined;
       if (tagRow) {
-        linkStmt.run(itemId, tagRow.id, isAiGenerated ? 1 : 0);
+        const flag = existingMap.has(cleanTag)
+          ? existingMap.get(cleanTag)!
+          : (isAiGenerated ? 1 : 0);
+        linkStmt.run(itemId, tagRow.id, flag);
       }
     }
     syncFtsIndex(db, itemId);
