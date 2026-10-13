@@ -1,18 +1,18 @@
 {
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Cross-platform sticker and image asset manager for desktop power users",
   "homepage": "https://github.com/Biodam/StickerChest",
   "license": "ISC",
   "notes": "Sticker Chest is installed as a portable application with desktop & start menu shortcuts.",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/Biodam/StickerChest/releases/download/v0.0.9/Sticker.Chest.0.0.9.exe",
-      "hash": "1f6eb367101c861be2395b62f8bd2778da25818e81940ed7243ae611c54c0ece"
+      "url": "https://github.com/Biodam/StickerChest/releases/download/v0.0.10/Sticker.Chest.0.0.10.exe",
+      "hash": "b3da6b2310d394efe4276fde1e9b1af4254d01ad314c4a923de822478821ddd2"
     }
   },
   "shortcuts": [
     [
-      "Sticker.Chest.0.0.9.exe",
+      "Sticker.Chest.0.0.10.exe",
       "Sticker Chest"
     ]
   ],
