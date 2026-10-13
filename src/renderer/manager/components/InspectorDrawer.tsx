@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Sparkles, Star, Check, Film, Play, Pause, Eraser } from 'lucide-react';
+import { X, Copy, Sparkles, Star, Check, Film, Play, Pause, Eraser, Loader2 } from 'lucide-react';
 import { StickerItem, ImageTier } from '../../../types/models';
 import { getChestImageUrl } from '../../shared/image-url';
 import { getAnimationTelemetry } from '../../shared/animation-helper';
@@ -9,7 +9,8 @@ interface InspectorDrawerProps {
   item: StickerItem;
   onClose: () => void;
   onToggleFavorite: (itemId: string) => void;
-  onTagWithGemini: (itemId: string) => void;
+  onTagWithGemini: (itemId: string) => Promise<void> | void;
+  isTagging?: boolean;
   onRemoveBackground: (itemId: string) => void;
   removingBackground: boolean;
   onCopyItem: (itemId: string, tier: ImageTier) => void;
@@ -21,6 +22,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   onClose,
   onToggleFavorite,
   onTagWithGemini,
+  isTagging = false,
   onRemoveBackground,
   removingBackground,
   onCopyItem,
@@ -29,6 +31,19 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   const [selectedTier, setSelectedTier] = useState<ImageTier>('sticker');
   const [copied, setCopied] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isLocalTagging, setIsLocalTagging] = useState(false);
+
+  const isTaggingActive = isTagging || isLocalTagging || item.metadata?.aiStatus === 'processing';
+
+  const handleTag = async () => {
+    if (isTaggingActive) return;
+    setIsLocalTagging(true);
+    try {
+      await onTagWithGemini(item.id);
+    } finally {
+      setIsLocalTagging(false);
+    }
+  };
 
   const telemetry = getAnimationTelemetry(item);
 
@@ -152,20 +167,27 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <div className="flex items-center space-x-1.5">
             <span className="font-semibold text-gray-400 uppercase tracking-wider text-[10px]">Sticker Metadata</span>
             <span className={`text-[9px] px-1.5 py-0.2 rounded font-medium ${
-              item.metadata?.aiStatus === 'completed'
+              isTaggingActive
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                : item.metadata?.aiStatus === 'completed'
                 ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                 : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
             }`}>
-              {item.metadata?.aiStatus === 'completed' ? 'AI Tagged' : 'Manual'}
+              {isTaggingActive ? 'Tagging...' : item.metadata?.aiStatus === 'completed' ? 'AI Tagged' : 'Manual'}
             </span>
           </div>
           <button
-            onClick={() => onTagWithGemini(item.id)}
-            className="flex items-center space-x-1 text-amber-400 hover:text-amber-300 font-medium"
-            title="Analyze using Gemini Vision AI"
+            onClick={handleTag}
+            disabled={isTaggingActive}
+            className="flex items-center space-x-1 text-amber-400 hover:text-amber-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+            title={isTaggingActive ? 'Analyzing using Gemini Vision AI...' : 'Analyze using Gemini Vision AI'}
           >
-            <Sparkles className="w-3 h-3" />
-            <span>AI Tag</span>
+            {isTaggingActive ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Sparkles className="w-3 h-3" />
+            )}
+            <span>{isTaggingActive ? 'Tagging...' : 'AI Tag'}</span>
           </button>
         </div>
 

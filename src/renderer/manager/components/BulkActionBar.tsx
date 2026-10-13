@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Tag, Trash2, Sparkles, X, Check, Download, Eraser } from 'lucide-react';
+import { Star, Tag, Trash2, Sparkles, X, Check, Download, Eraser, Loader2 } from 'lucide-react';
 
 interface BulkActionBarProps {
   selectedCount: number;
@@ -7,6 +7,7 @@ interface BulkActionBarProps {
   onBulkFavorite: (favorite: boolean) => void;
   onBulkAddTag: (tag: string) => void;
   onBulkAiTag: () => void;
+  isAiTagging?: boolean;
   onBulkRemoveBackground: () => void;
   removingBackground: boolean;
   onBulkExport?: () => void;
@@ -19,6 +20,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
   onBulkFavorite,
   onBulkAddTag,
   onBulkAiTag,
+  isAiTagging = false,
   onBulkRemoveBackground,
   removingBackground,
   onBulkExport,
@@ -98,10 +100,15 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
         {/* Bulk AI Re-tag */}
         <button
           onClick={onBulkAiTag}
-          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#2c2e33] hover:bg-[#373a40] text-gray-200 transition-colors"
+          disabled={isAiTagging}
+          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-[#2c2e33] hover:bg-[#373a40] text-gray-200 transition-colors disabled:opacity-50"
         >
-          <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-          <span>AI Tag</span>
+          {isAiTagging ? (
+            <Loader2 className="w-3.5 h-3.5 text-purple-400 animate-spin" />
+          ) : (
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+          )}
+          <span>{isAiTagging ? 'Tagging...' : 'AI Tag'}</span>
         </button>
 
         {/* Bulk Remove Background */}

@@ -32,6 +32,8 @@ export default function App() {
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
   const [untaggedCount, setUntaggedCount] = useState(0);
   const [removingBackground, setRemovingBackground] = useState(false);
+  const [taggingItemId, setTaggingItemId] = useState<string | null>(null);
+  const [isBulkAiTagging, setIsBulkAiTagging] = useState(false);
 
   const { selectedIds, handleSelect, clearSelection } = useSelection();
   const { gridSize, setGridSize } = useGridSize();
@@ -189,12 +191,21 @@ export default function App() {
   };
 
   const handleBulkAiTag = async () => {
-    for (const id of selectedIds) {
-      await api?.tagItemWithGemini?.(id);
+    if (!settings.geminiApiKey) {
+      setSettingsOpen(true);
+      return;
     }
-    fetchItems();
-    fetchFacets();
-    fetchUntagged();
+    setIsBulkAiTagging(true);
+    try {
+      for (const id of selectedIds) {
+        await api?.tagItemWithGemini?.(id);
+      }
+    } finally {
+      setIsBulkAiTagging(false);
+      fetchItems();
+      fetchFacets();
+      fetchUntagged();
+    }
   };
 
   const handleRemoveBackground = async (ids: string[]) => {
@@ -280,13 +291,23 @@ export default function App() {
               item={selectedItem}
               onClose={() => setSelectedItem(null)}
               onToggleFavorite={() => handleToggleFavorite(selectedItem.id)}
+              isTagging={taggingItemId === selectedItem.id}
               onTagWithGemini={async (id) => {
-                await api?.tagItemWithGemini?.(id);
-                const fresh = await api?.getItem?.(id);
-                if (fresh) setSelectedItem(fresh);
-                fetchItems();
-                fetchFacets();
-                fetchUntagged();
+                if (!settings.geminiApiKey) {
+                  setSettingsOpen(true);
+                  return;
+                }
+                setTaggingItemId(id);
+                try {
+                  await api?.tagItemWithGemini?.(id);
+                  const fresh = await api?.getItem?.(id);
+                  if (fresh) setSelectedItem(fresh);
+                  fetchItems();
+                  fetchFacets();
+                  fetchUntagged();
+                } finally {
+                  setTaggingItemId(null);
+                }
               }}
               onRemoveBackground={(id) => handleRemoveBackground([id])}
               removingBackground={removingBackground}
@@ -301,6 +322,7 @@ export default function App() {
             onBulkFavorite={handleBulkFavorite}
             onBulkAddTag={handleBulkAddTag}
             onBulkAiTag={handleBulkAiTag}
+            isAiTagging={isBulkAiTagging}
             onBulkRemoveBackground={() => handleRemoveBackground(Array.from(selectedIds))}
             removingBackground={removingBackground}
             onBulkExport={() => setExportOpen(true)}
