@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, webUtils } from 'electron';
 import { StickerChestAPI } from '../types/ipc';
 
 const api: StickerChestAPI = {
@@ -34,6 +34,7 @@ const api: StickerChestAPI = {
     return () => ipcRenderer.removeListener('vault:progress', handler);
   },
   showItemInFolder: (filePath) => ipcRenderer.invoke('vault:showItemInFolder', filePath),
+  getPathForFile: (file) => (webUtils && typeof webUtils.getPathForFile === 'function' ? webUtils.getPathForFile(file) : (file as any).path || ''),
 
   tagItemWithGemini: (itemId) => ipcRenderer.invoke('gemini:tagItem', itemId),
   batchTagUntagged: () => ipcRenderer.invoke('gemini:batchTag'),

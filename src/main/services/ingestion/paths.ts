@@ -20,11 +20,16 @@ export function getVaultRoot(): string {
   }
 }
 
+export function getVaultSourcesDir(): string {
+  const root = getVaultRoot();
+  return path.join(root, 'sources');
+}
+
 export function ensureVaultDirectories(): void {
   const root = getVaultRoot();
 
   // 1. Sources directory for user organization
-  const sourcesDir = path.join(root, 'sources');
+  const sourcesDir = getVaultSourcesDir();
   if (!fs.existsSync(sourcesDir)) {
     fs.mkdirSync(sourcesDir, { recursive: true });
   }

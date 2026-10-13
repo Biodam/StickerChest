@@ -45,6 +45,7 @@ export interface StickerChestAPI {
   scanSourceFolder: (forceReprocess?: boolean, folderPath?: string) => Promise<{ started: boolean }>;
   onIngestionProgress: (callback: (progress: IngestionProgressEvent) => void) => () => void;
   showItemInFolder: (filePath: string) => Promise<boolean>;
+  getPathForFile?: (file: File) => string;
 
   // AI Tagging
   tagItemWithGemini: (itemId: string) => Promise<boolean>;

@@ -70,6 +70,10 @@ export const dialog = {
   showMessageBox: async () => ({ response: 0 }),
 };
 
+export const webUtils = {
+  getPathForFile: (file: any) => file?.path || '',
+};
+
 export const ipcMain = {
   handle: () => {},
   on: () => {},
@@ -85,6 +89,7 @@ export default {
   Menu,
   shell,
   dialog,
+  webUtils,
   ipcMain,
 };
 

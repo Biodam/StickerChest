@@ -33,12 +33,18 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
   const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
     setIsDraggingOver(true);
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
   };
 
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
@@ -56,10 +62,22 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const filePaths: string[] = [];
+      const api = window.stickerChest || window.stickerVault;
       for (let i = 0; i < e.dataTransfer.files.length; i++) {
         const file = e.dataTransfer.files[i] as File & { path?: string };
-        if (file.path) {
-          filePaths.push(file.path);
+        let resolvedPath = '';
+        if (api?.getPathForFile) {
+          try {
+            resolvedPath = api.getPathForFile(file);
+          } catch {
+            resolvedPath = '';
+          }
+        }
+        if (!resolvedPath && file.path) {
+          resolvedPath = file.path;
+        }
+        if (resolvedPath) {
+          filePaths.push(resolvedPath);
         }
       }
       if (filePaths.length > 0 && onDropFiles) {

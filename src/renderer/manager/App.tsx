@@ -110,6 +110,18 @@ export default function App() {
   }, [fetchItems]);
 
   useEffect(() => {
+    const preventWindowFileDrop = (e: DragEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('dragover', preventWindowFileDrop);
+    window.addEventListener('drop', preventWindowFileDrop);
+    return () => {
+      window.removeEventListener('dragover', preventWindowFileDrop);
+      window.removeEventListener('drop', preventWindowFileDrop);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!api?.onIngestionProgress) return;
     return api.onIngestionProgress((event) => {
       setProgress(event);
