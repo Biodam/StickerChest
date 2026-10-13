@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Film, ShieldAlert, Check } from 'lucide-react';
+import { Star, Film, ShieldAlert, Check, Trash2 } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
 import { AnimatedStickerImage } from '../../shared/AnimatedStickerImage';
 
@@ -10,6 +10,7 @@ interface StickerCardProps {
   isCompact?: boolean;
   onSelect: (item: StickerItem, e: React.MouseEvent) => void;
   onToggleFavorite: (itemId: string, e: React.MouseEvent) => void;
+  onDelete?: (item: StickerItem, e: React.MouseEvent) => void;
 }
 
 export const StickerCard: React.FC<StickerCardProps> = ({
@@ -19,6 +20,7 @@ export const StickerCard: React.FC<StickerCardProps> = ({
   isCompact = false,
   onSelect,
   onToggleFavorite,
+  onDelete,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const title = item.metadata?.character || item.filename;
@@ -56,17 +58,31 @@ export const StickerCard: React.FC<StickerCardProps> = ({
         )}
       </div>
 
-      {/* Top Right: Favorite Button */}
-      <button
-        onClick={(e) => onToggleFavorite(item.id, e)}
-        className={`absolute ${isCompact ? 'top-1.5 right-1.5 p-1' : 'top-2 right-2 p-1.5'} rounded-lg transition-colors z-10 ${
-          item.usage.isFavorite
-            ? 'text-amber-400 bg-amber-400/10'
-            : 'text-gray-400 opacity-0 group-hover:opacity-100 hover:text-amber-400 bg-[#121316]/70'
-        }`}
-      >
-        <Star className={`${isCompact ? 'w-3 h-3' : 'w-3.5 h-3.5'} ${item.usage.isFavorite ? 'fill-amber-400' : ''}`} />
-      </button>
+      {/* Top Right: Delete Button (hover) & Favorite Button */}
+      <div className={`absolute ${isCompact ? 'top-1.5 right-1.5' : 'top-2 right-2'} flex items-center space-x-1 z-10`}>
+        {onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item, e);
+            }}
+            title="Delete sticker (Delete)"
+            className={`${isCompact ? 'p-1' : 'p-1.5'} rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 hover:text-rose-400 hover:bg-rose-500/20 bg-[#121316]/70 transition-all`}
+          >
+            <Trash2 className={`${isCompact ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
+          </button>
+        )}
+        <button
+          onClick={(e) => onToggleFavorite(item.id, e)}
+          className={`${isCompact ? 'p-1' : 'p-1.5'} rounded-lg transition-colors ${
+            item.usage.isFavorite
+              ? 'text-amber-400 bg-amber-400/10'
+              : 'text-gray-400 opacity-0 group-hover:opacity-100 hover:text-amber-400 bg-[#121316]/70'
+          }`}
+        >
+          <Star className={`${isCompact ? 'w-3 h-3' : 'w-3.5 h-3.5'} ${item.usage.isFavorite ? 'fill-amber-400' : ''}`} />
+        </button>
+      </div>
 
       {/* Image Preview Box with Viewport & Hover Awareness */}
       <div className={`relative w-full aspect-square flex items-center justify-center rounded-lg bg-[#141517] overflow-hidden ${

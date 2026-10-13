@@ -32,6 +32,7 @@
 - [x] Eliminate infinite re-selection loop and isolate form input state so metadata edits and tags persist without reset.
 - [x] Add interactive Grid Size Control (`GridSizeControl.tsx`, `useGridSize.ts`) with Small/Medium/Large presets, slider, and persistent localStorage setting.
 - [x] Add loading feedback (spinner, "Tagging..." text, disabled button state, pulsating badge) when clicking "AI Tag" in Inspector Drawer and Bulk Action Bar.
+- [x] Add sticker deletion functionality: keyboard `Delete` / `Backspace` shortcut with text input typing guards, trashcan buttons in Inspector Drawer, Sticker Card hover, and Bulk Action Bar, and unified `DeleteConfirmModal` with preview thumbnails and disk cache cleanup.
 
 ---
 

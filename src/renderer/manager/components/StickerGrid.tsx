@@ -14,6 +14,7 @@ interface StickerGridProps {
   onDropFiles?: (filePaths: string[]) => void;
   gridSize?: number;
   onAddNew?: () => void;
+  onDeleteItem?: (item: StickerItem) => void;
 }
 
 export const StickerGrid: React.FC<StickerGridProps> = ({
@@ -27,6 +28,7 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
   onDropFiles,
   gridSize = 160,
   onAddNew,
+  onDeleteItem,
 }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -169,6 +171,7 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
             isCompact={gridSize < 130}
             onSelect={(it, e) => onSelectItem(it, e)}
             onToggleFavorite={onToggleFavorite}
+            onDelete={onDeleteItem}
           />
         ))}
       </div>

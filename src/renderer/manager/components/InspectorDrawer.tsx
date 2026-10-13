@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Sparkles, Star, Check, Film, Play, Pause, Eraser, Loader2 } from 'lucide-react';
+import { X, Copy, Sparkles, Star, Check, Film, Play, Pause, Eraser, Loader2, Trash2 } from 'lucide-react';
 import { StickerItem, ImageTier } from '../../../types/models';
 import { getChestImageUrl } from '../../shared/image-url';
 import { getAnimationTelemetry } from '../../shared/animation-helper';
@@ -15,6 +15,7 @@ interface InspectorDrawerProps {
   removingBackground: boolean;
   onCopyItem: (itemId: string, tier: ImageTier) => void;
   onUpdateMetadata: (itemId: string, metadata: any) => void;
+  onDelete?: (item: StickerItem) => void;
 }
 
 export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
@@ -27,6 +28,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   removingBackground,
   onCopyItem,
   onUpdateMetadata,
+  onDelete,
 }) => {
   const [selectedTier, setSelectedTier] = useState<ImageTier>('sticker');
   const [copied, setCopied] = useState(false);
@@ -158,6 +160,18 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <Eraser className="w-3.5 h-3.5 text-pink-400" />
           <span>{removingBackground ? 'Removing background...' : 'Remove Background'}</span>
         </button>
+
+        {/* Delete Sticker */}
+        {onDelete && (
+          <button
+            onClick={() => onDelete(item)}
+            title="Delete this sticker from vault"
+            className="mt-2 w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-medium text-rose-300 hover:text-rose-200 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+            <span>Delete Sticker</span>
+          </button>
+        )}
 
       </div>
 

@@ -1,5 +1,7 @@
+import fs from 'fs';
 import { ipcMain } from 'electron';
 import { getDatabaseDAL } from '../services/database/dal';
+import { resolveVaultPath } from '../services/ingestion/paths';
 import { SearchFilterOptions } from '../../types/models';
 
 export function registerDbIpcHandlers(): void {
@@ -73,6 +75,26 @@ export function registerDbIpcHandlers(): void {
   // Bulk Handlers
   ipcMain.handle('db:deleteItems', async (_event, itemIds: string[]) => {
     try {
+      // Clean up cached variants on disk
+      for (const id of itemIds) {
+        try {
+          const item = dal.getItemById(id);
+          if (item) {
+            for (const tier of ['sticker', 'emoji', 'thumb'] as const) {
+              const variant = item.variants[tier];
+              if (variant?.filePath) {
+                const resolved = resolveVaultPath(variant.filePath);
+                if (fs.existsSync(resolved)) {
+                  fs.unlinkSync(resolved);
+                }
+              }
+            }
+          }
+        } catch (cleanupErr) {
+          console.warn(`Failed to clean up cached variant for ${id}:`, cleanupErr);
+        }
+      }
+
       const count = dal.deleteItems(itemIds);
       return count > 0;
     } catch (err: any) {

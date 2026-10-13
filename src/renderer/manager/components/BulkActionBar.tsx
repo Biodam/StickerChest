@@ -28,7 +28,6 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
 }) => {
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (selectedCount < 2) return null;
 
@@ -134,34 +133,14 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
         )}
 
         {/* Bulk Delete */}
-        {showDeleteConfirm ? (
-          <div className="flex items-center space-x-1.5 bg-rose-950/80 px-2 py-1 rounded-lg border border-rose-500/50">
-            <span className="text-[11px] text-rose-300">Delete {selectedCount}?</span>
-            <button
-              onClick={() => {
-                onBulkDelete();
-                setShowDeleteConfirm(false);
-              }}
-              className="px-2 py-0.5 bg-rose-600 hover:bg-rose-500 text-white rounded text-[11px] font-semibold"
-            >
-              Yes
-            </button>
-            <button
-              onClick={() => setShowDeleteConfirm(false)}
-              className="px-1.5 py-0.5 text-gray-400 hover:text-white text-[11px]"
-            >
-              No
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition-colors"
-          >
-            <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-            <span>Delete</span>
-          </button>
-        )}
+        <button
+          onClick={onBulkDelete}
+          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition-colors"
+          title="Delete selected stickers (Delete)"
+        >
+          <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+          <span>Delete</span>
+        </button>
 
         {/* Clear Selection */}
         <button

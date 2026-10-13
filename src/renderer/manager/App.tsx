@@ -9,6 +9,7 @@ import { BulkActionBar } from './components/BulkActionBar';
 import { ExportModal } from './components/ExportModal';
 import { ImportModal } from './components/ImportModal';
 import { AboutModal } from './components/AboutModal';
+import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { useSelection } from './hooks/useSelection';
 import { useGridSize } from './hooks/useGridSize';
 import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
@@ -29,6 +30,9 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemsToDelete, setItemsToDelete] = useState<StickerItem[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
   const [untaggedCount, setUntaggedCount] = useState(0);
   const [removingBackground, setRemovingBackground] = useState(false);
@@ -227,14 +231,91 @@ export default function App() {
     }
   };
 
-  const handleBulkDelete = async () => {
-    await api?.deleteItems?.(Array.from(selectedIds));
-    clearSelection();
-    setSelectedItem(null);
-    fetchItems();
-    fetchFacets();
-    fetchUntagged();
+  const handleRequestSingleDelete = useCallback((item: StickerItem) => {
+    setItemsToDelete([item]);
+    setDeleteModalOpen(true);
+  }, []);
+
+  const handleRequestBulkDelete = useCallback(() => {
+    const selected = items.filter((it) => selectedIds.has(it.id));
+    if (selected.length === 0 && selectedItem) {
+      selected.push(selectedItem);
+    }
+    if (selected.length > 0) {
+      setItemsToDelete(selected);
+      setDeleteModalOpen(true);
+    }
+  }, [items, selectedIds, selectedItem]);
+
+  const handleConfirmDelete = async () => {
+    if (itemsToDelete.length === 0 || !api?.deleteItems) return;
+    setIsDeleting(true);
+    try {
+      await api.deleteItems(itemsToDelete.map((it) => it.id));
+      setDeleteModalOpen(false);
+      setItemsToDelete([]);
+      clearSelection();
+      setSelectedItem(null);
+      fetchItems();
+      fetchFacets();
+      fetchUntagged();
+    } catch (err: any) {
+      console.error('Delete error:', err);
+    } finally {
+      setIsDeleting(false);
+    }
   };
+
+  // Keyboard shortcut for deleting selected stickers (Delete / Backspace)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const target = e.target as HTMLElement | null;
+        if (
+          target &&
+          (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable ||
+            target.closest?.('input, textarea, [contenteditable="true"]'))
+        ) {
+          return;
+        }
+
+        if (
+          deleteModalOpen ||
+          settingsOpen ||
+          aboutOpen ||
+          exportOpen ||
+          importOpen
+        ) {
+          return;
+        }
+
+        const selected = items.filter((it) => selectedIds.has(it.id));
+        if (selected.length === 0 && selectedItem) {
+          selected.push(selectedItem);
+        }
+
+        if (selected.length > 0) {
+          e.preventDefault();
+          setItemsToDelete(selected);
+          setDeleteModalOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    items,
+    selectedIds,
+    selectedItem,
+    deleteModalOpen,
+    settingsOpen,
+    aboutOpen,
+    exportOpen,
+    importOpen,
+  ]);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#121316] text-[#f1f3f5]">
@@ -284,6 +365,7 @@ export default function App() {
             onOpenSettings={() => setSettingsOpen(true)}
             onDropFiles={handleDropFiles}
             onAddNew={handleAddNew}
+            onDeleteItem={handleRequestSingleDelete}
           />
 
           {selectedItem && selectedIds.size <= 1 && (
@@ -313,6 +395,7 @@ export default function App() {
               removingBackground={removingBackground}
               onCopyItem={(id, tier) => api?.copyItemToClipboard?.(id, tier)}
               onUpdateMetadata={handleUpdateMetadata}
+              onDelete={handleRequestSingleDelete}
             />
           )}
 
@@ -326,7 +409,7 @@ export default function App() {
             onBulkRemoveBackground={() => handleRemoveBackground(Array.from(selectedIds))}
             removingBackground={removingBackground}
             onBulkExport={() => setExportOpen(true)}
-            onBulkDelete={handleBulkDelete}
+            onBulkDelete={handleRequestBulkDelete}
           />
         </div>
       </div>
@@ -353,6 +436,14 @@ export default function App() {
       />
 
       <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
+
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        items={itemsToDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
