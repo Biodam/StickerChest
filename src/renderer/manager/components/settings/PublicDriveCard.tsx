@@ -73,6 +73,9 @@ export const PublicDriveCard: React.FC<PublicDriveCardProps> = ({
       <p className="text-[10px] text-gray-400 leading-relaxed">
         Paste a folder link shared as "Anyone with the link". New images are downloaded into your local sticker folder (one-way, no login).
       </p>
+      <div className="p-2 rounded-lg bg-blue-950/30 border border-blue-900/40 text-[10px] text-blue-300 leading-relaxed">
+        💡 <strong>Note:</strong> API keys are read-only (downloads from Drive). To sync stickers created here to other PCs, upload them to your Drive folder, or set your <em>Local Source Folder</em> to a Google Drive for Desktop / OneDrive synced directory.
+      </div>
       <input className={inputClass} placeholder="https://drive.google.com/drive/folders/..." value={folderUrl} onChange={(e) => onChangeFolderUrl(e.target.value)} />
       <input className={inputClass} type="password" placeholder="Google API key (Drive API enabled)" value={apiKey} onChange={(e) => onChangeApiKey(e.target.value)} />
       <p className="text-[10px] text-gray-500">

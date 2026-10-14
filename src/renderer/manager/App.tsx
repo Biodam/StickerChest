@@ -12,7 +12,7 @@ import { AboutModal } from './components/AboutModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { useSelection } from './hooks/useSelection';
 import { useGridSize } from './hooks/useGridSize';
-import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets } from '../../types/models';
+import { StickerItem, AppSettings, IngestionProgressEvent, ImageTier, LibraryFacets, SyncProgress } from '../../types/models';
 
 export default function App() {
   const api = window.stickerChest || window.stickerVault;
@@ -34,6 +34,7 @@ export default function App() {
   const [itemsToDelete, setItemsToDelete] = useState<StickerItem[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [progress, setProgress] = useState<IngestionProgressEvent | null>(null);
+  const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null);
   const [untaggedCount, setUntaggedCount] = useState(0);
   const [removingBackground, setRemovingBackground] = useState(false);
   const [taggingItemId, setTaggingItemId] = useState<string | null>(null);
@@ -142,7 +143,8 @@ export default function App() {
   useEffect(() => {
     if (!api?.onSyncProgress) return;
     return api.onSyncProgress((event) => {
-      if (event.state === 'synced') {
+      setSyncProgress(event);
+      if (event.state === 'synced' || event.state === 'error') {
         fetchItems();
         fetchFacets();
         fetchUntagged();
@@ -181,6 +183,21 @@ export default function App() {
     if (filePaths && filePaths.length > 0) {
       await handleDropFiles(filePaths);
     }
+  };
+
+  const handleSyncFolder = async () => {
+    if (!settings.sourceFolder) {
+      setSettingsOpen(true);
+      return;
+    }
+    if (settings.driveFolderUrl && settings.driveApiKey && api?.syncTriggerNow) {
+      await api.syncTriggerNow();
+    } else if (api?.scanSourceFolder) {
+      await api.scanSourceFolder(false);
+    }
+    fetchItems();
+    fetchFacets();
+    fetchUntagged();
   };
 
   const handleBulkFavorite = async (favorite: boolean) => {
@@ -322,13 +339,13 @@ export default function App() {
       <Sidebar
         activeTab={activeTab} isAnimatedOnly={isAnimatedOnly}
         onSelectTab={setActiveTab} onToggleAnimatedOnly={() => setIsAnimatedOnly(!isAnimatedOnly)}
-        onSyncFolder={async () => settings.sourceFolder ? api?.scanSourceFolder?.(false) : setSettingsOpen(true)}
+        onSyncFolder={handleSyncFolder}
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenAbout={() => setAboutOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenImport={() => setImportOpen(true)}
         onAddNew={handleAddNew}
-        isScanning={progress?.status === 'scanning' || progress?.status === 'resizing'}
+        isScanning={progress?.status === 'scanning' || progress?.status === 'resizing' || syncProgress?.state === 'syncing'}
         facets={facets} selectedFranchise={selectedFranchise}
         selectedCharacter={selectedCharacter} selectedTag={selectedTag}
         onSelectFranchise={setSelectedFranchise} onSelectCharacter={setSelectedCharacter}
@@ -351,7 +368,11 @@ export default function App() {
           onAddNew={handleAddNew}
         />
 
-        <IngestionBanner progress={progress} onDismiss={() => setProgress(null)} />
+        <IngestionBanner
+          progress={progress}
+          syncProgress={syncProgress}
+          onDismiss={() => { setProgress(null); setSyncProgress(null); }}
+        />
 
         <div className="flex-1 flex overflow-hidden relative">
           <StickerGrid

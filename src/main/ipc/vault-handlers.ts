@@ -1,7 +1,13 @@
+import fs from 'fs';
+import path from 'path';
 import { ipcMain, BrowserWindow, shell } from 'electron';
 import { getIngestionService } from '../services/ingestion/folder-watcher';
 import { loadSettings } from '../services/settings/settings-store';
-import { resolveVaultPath } from '../services/ingestion/paths';
+import { resolveVaultPath, getVaultSourcesDir } from '../services/ingestion/paths';
+import { ingestImageFile } from '../services/ingestion/coordinator';
+import { isSupportedImageExtension } from '../services/imaging/format-detector';
+import { getDatabaseDAL } from '../services/database/dal';
+import { exportMetadata } from '../services/sync/metadata-sync';
 
 export function registerVaultIpcHandlers(): void {
   const ingestionService = getIngestionService();
@@ -42,10 +48,14 @@ export function registerVaultIpcHandlers(): void {
 
   ipcMain.handle('vault:ingestFiles', async (_event, filePaths: string[]) => {
     try {
-      const { ingestImageFile } = await import('../services/ingestion/coordinator');
-      const { isSupportedImageExtension } = await import('../services/imaging/format-detector');
-      const { getDatabaseDAL } = await import('../services/database/dal');
       const dal = getDatabaseDAL();
+      const settings = loadSettings();
+
+      const vaultRoot = settings.sourceFolder ? path.resolve(settings.sourceFolder) : null;
+      const sourcesDir = vaultRoot ? getVaultSourcesDir() : null;
+      if (sourcesDir && !fs.existsSync(sourcesDir)) {
+        fs.mkdirSync(sourcesDir, { recursive: true });
+      }
 
       let ingested = 0;
       let duplicates = 0;
@@ -54,7 +64,29 @@ export function registerVaultIpcHandlers(): void {
       for (const filePath of filePaths) {
         if (!isSupportedImageExtension(filePath)) continue;
         try {
-          const res = await ingestImageFile(filePath, dal, false);
+          let targetPath = filePath;
+          if (vaultRoot && sourcesDir) {
+            const resolvedFile = path.resolve(filePath);
+            const isInsideVault = resolvedFile.toLowerCase().startsWith(vaultRoot.toLowerCase());
+            if (!isInsideVault) {
+              const baseName = path.basename(resolvedFile);
+              let candidate = path.join(sourcesDir, baseName);
+              if (fs.existsSync(candidate) && path.resolve(candidate).toLowerCase() !== resolvedFile.toLowerCase()) {
+                const parsed = path.parse(baseName);
+                let counter = 1;
+                while (fs.existsSync(candidate) && path.resolve(candidate).toLowerCase() !== resolvedFile.toLowerCase()) {
+                  candidate = path.join(sourcesDir, `${parsed.name}_${counter}${parsed.ext}`);
+                  counter++;
+                }
+              }
+              if (!fs.existsSync(candidate)) {
+                fs.copyFileSync(resolvedFile, candidate);
+              }
+              targetPath = candidate;
+            }
+          }
+
+          const res = await ingestImageFile(targetPath, dal, false);
           if (res.isNew) {
             ingested++;
           } else {
@@ -63,6 +95,14 @@ export function registerVaultIpcHandlers(): void {
         } catch (fileErr) {
           console.error(`Failed to ingest dropped file ${filePath}:`, fileErr);
           errors++;
+        }
+      }
+
+      if (vaultRoot && ingested > 0) {
+        try {
+          exportMetadata(vaultRoot, dal);
+        } catch {
+          // Best effort metadata export
         }
       }
 

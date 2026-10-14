@@ -81,10 +81,8 @@ export class DriveSyncManager {
         writeLedger(folder, ledger);
       }
 
-      if (todo.length > 0) {
-        this.notify('syncing', 'Importing new stickers...');
-        await getIngestionService().scanFolder(folder, false);
-      }
+      this.notify('syncing', 'Scanning sticker folder...');
+      await getIngestionService().scanFolder(folder, false);
       const applied = importMetadata(folder);
 
       this.lastSyncTimestamp = Date.now();

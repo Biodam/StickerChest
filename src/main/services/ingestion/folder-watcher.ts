@@ -5,6 +5,7 @@ import { IngestionProgressEvent } from '../../../types/models';
 import { isSupportedImageExtension } from '../imaging/format-detector';
 import { getDatabaseDAL } from '../database/dal';
 import { isCloudDrivePath } from './cloud-sync-helper';
+import { importMetadata } from '../sync/metadata-sync';
 
 export type ProgressListener = (event: IngestionProgressEvent) => void;
 
@@ -61,6 +62,12 @@ export class IngestionService {
         }
 
         processed++;
+      }
+
+      try {
+        importMetadata(folderPath, dal);
+      } catch {
+        // Best effort metadata import
       }
 
       this.notify({ status: 'idle', processedCount: processed, totalCount: total });
