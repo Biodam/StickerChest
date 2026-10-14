@@ -76,6 +76,7 @@ const api: StickerChestAPI = {
 
   hidePicker: () => ipcRenderer.invoke('window:hidePicker'),
   openManager: () => ipcRenderer.invoke('window:openManager'),
+  openExternalUrl: (url) => ipcRenderer.invoke('app:openExternal', url),
 
   logMessage: (level, tag, message, meta) => ipcRenderer.invoke('logger:log', level, tag, message, meta),
   getRecentLogs: (maxLines) => ipcRenderer.invoke('logger:getRecentLogs', maxLines),

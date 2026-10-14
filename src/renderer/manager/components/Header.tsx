@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Sparkles, X, Plus } from 'lucide-react';
+import { Search, Sparkles, X, Plus, ExternalLink } from 'lucide-react';
 import { GridSizeControl } from './GridSizeControl';
 
 interface HeaderProps {
@@ -20,6 +20,7 @@ interface HeaderProps {
   gridSize?: number;
   onGridSizeChange?: (size: number) => void;
   onAddNew?: () => void;
+  isDriveConfigured?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   gridSize,
   onGridSizeChange,
   onAddNew,
+  isDriveConfigured = false,
 }) => {
   const hasFilterChips = Boolean(selectedFranchise || selectedCharacter || selectedTag);
 
@@ -71,9 +73,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onAddNew}
               className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition-all shrink-0"
-              title="Select images to import into Sticker Vault"
+              title={isDriveConfigured ? "Open configured Google Drive folder in browser to upload stickers" : "Select images to import into Sticker Vault"}
             >
-              <Plus className="w-3.5 h-3.5" />
+              {isDriveConfigured ? <ExternalLink className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
               <span>Add new</span>
             </button>
           )}

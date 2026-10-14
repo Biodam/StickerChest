@@ -22,7 +22,11 @@ Resolved multi-device sticker synchronization issues where items added on one co
 5. **UI & Guidance Polish (`src/renderer/manager/components/Sidebar.tsx` & `PublicDriveCard.tsx`)**:
    - Updated button label to show "Syncing..." while active.
    - Clarified read-only nature of Google API keys and documented how to use desktop cloud folders (Google Drive / OneDrive) for two-way automatic multi-device synchronization.
+6. **Add Sticker Browser Opener (`src/main/ipc/index.ts`, `src/preload/*.ts`, `src/renderer/manager/App.tsx`)**:
+   - Registered secure `app:openExternal` IPC handler to open external `http://` / `https://` URLs in the default browser.
+   - Updated `handleAddNew`: when `driveFolderUrl` is configured, clicking "Add New Sticker" opens the Google Drive folder in the browser for direct uploading.
+   - Enhanced `Sidebar`, `Header`, and `StickerGrid` buttons with external link visual indicators and descriptive tooltips when Drive sync is active.
 
 ## Verification
-- Vitest suite: 28 test files passed (144/144 tests).
+- Vitest suite: 28 test files passed (146/146 tests).
 - Production build: `npm run build` completed with zero warnings and zero TypeScript errors.

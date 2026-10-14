@@ -178,6 +178,12 @@ export default function App() {
   };
 
   const handleAddNew = async () => {
+    if (settings.driveFolderUrl) {
+      if (api?.openExternalUrl) {
+        await api.openExternalUrl(settings.driveFolderUrl);
+      }
+      return;
+    }
     if (!api?.selectImagesDialog) return;
     const filePaths = await api.selectImagesDialog();
     if (filePaths && filePaths.length > 0) {
@@ -345,6 +351,7 @@ export default function App() {
         onOpenExport={() => setExportOpen(true)}
         onOpenImport={() => setImportOpen(true)}
         onAddNew={handleAddNew}
+        isDriveConfigured={Boolean(settings.driveFolderUrl)}
         isScanning={progress?.status === 'scanning' || progress?.status === 'resizing' || syncProgress?.state === 'syncing'}
         facets={facets} selectedFranchise={selectedFranchise}
         selectedCharacter={selectedCharacter} selectedTag={selectedTag}
@@ -366,6 +373,7 @@ export default function App() {
           gridSize={gridSize}
           onGridSizeChange={setGridSize}
           onAddNew={handleAddNew}
+          isDriveConfigured={Boolean(settings.driveFolderUrl)}
         />
 
         <IngestionBanner
@@ -387,6 +395,7 @@ export default function App() {
             onDropFiles={handleDropFiles}
             onAddNew={handleAddNew}
             onDeleteItem={handleRequestSingleDelete}
+            isDriveConfigured={Boolean(settings.driveFolderUrl)}
           />
 
           {selectedItem && selectedIds.size <= 1 && (

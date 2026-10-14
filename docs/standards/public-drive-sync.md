@@ -8,6 +8,7 @@ Replaces the former Google OAuth sync. The user pastes a public ("Anyone with th
 - State is kept in `<sourceFolder>/.drive-sync-state.json` (filename -> md5). Files deleted locally are re-downloaded.
 - Auto-sync runs 5s after startup and every `syncIntervalMinutes` when `driveAutoSync` is on.
 - The sidebar "Sync Folder" button runs `syncTriggerNow()` if Drive credentials are set (downloading remote assets and importing metadata), or `scanSourceFolder()` if no Drive link is configured.
+- The "Add New Sticker" / "Add new" buttons open the configured `driveFolderUrl` directly in the default browser (with an external link icon) when Drive sync is set, allowing effortless drag-and-drop file uploads into Google Drive.
 - Optional `sticker-chest-metadata.json` (tags, character, description, favorites keyed by SHA-256) is imported after sync and exported automatically upon file ingestion; items edited locally are not overwritten. "Export metadata" also writes this file into the source folder for manual upload to Drive.
 
 ## Two-Way Multi-Computer Sync (Recommended Setup)

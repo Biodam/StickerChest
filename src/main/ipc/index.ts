@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron';
+import { ipcMain, dialog, shell } from 'electron';
 import { hidePickerWindow } from '../windows/pickerWindow';
 import { createMainWindow, getMainWindow } from '../windows/mainWindow';
 import { registerDbIpcHandlers } from './db-handlers';
@@ -78,5 +78,18 @@ export function registerIpcHandlers(): void {
       return [];
     }
     return result.filePaths;
+  });
+
+  ipcMain.handle('app:openExternal', async (_event, url: string) => {
+    try {
+      if (typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'))) {
+        await shell.openExternal(url);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Failed to open external URL:', err);
+      return false;
+    }
   });
 }

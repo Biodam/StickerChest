@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info, Loader2, Plus } from 'lucide-react';
+import { Grid, Clock, Star, Film, FolderSync, Settings, Tv, User, Tag, FilterX, Download, UploadCloud, Info, Loader2, Plus, ExternalLink } from 'lucide-react';
 import { LibraryFacets } from '../../../types/models';
 import { FacetFilterGroup } from './FacetFilterGroup';
 
@@ -14,6 +14,7 @@ interface SidebarProps {
   onOpenExport?: () => void;
   onOpenImport?: () => void;
   onAddNew?: () => void;
+  isDriveConfigured?: boolean;
   isScanning: boolean;
   facets: LibraryFacets;
   selectedFranchise: string | null;
@@ -36,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenExport,
   onOpenImport,
   onAddNew,
+  isDriveConfigured = false,
   isScanning,
   facets,
   selectedFranchise,
@@ -170,9 +172,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={onAddNew}
             className="w-full flex items-center justify-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-all"
-            title="Import image or GIF files as new stickers"
+            title={isDriveConfigured ? "Open configured Google Drive folder in browser to upload stickers" : "Import image or GIF files as new stickers"}
           >
-            <Plus className="w-3.5 h-3.5" />
+            {isDriveConfigured ? <ExternalLink className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
             <span>Add New Sticker</span>
           </button>
         )}

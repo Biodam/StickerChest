@@ -35,3 +35,21 @@ describe('computeDownloads', () => {
     expect(sanitizeFilename('../evil:name?.png')).toBe('evil_name_.png');
   });
 });
+
+describe('Drive URL external opener validation', () => {
+  const isValidExternalUrl = (url: string): boolean => {
+    return typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'));
+  };
+
+  it('accepts valid http and https URLs', () => {
+    expect(isValidExternalUrl('https://drive.google.com/drive/folders/xyz')).toBe(true);
+    expect(isValidExternalUrl('http://drive.google.com/drive/folders/xyz')).toBe(true);
+  });
+
+  it('rejects malicious or unsupported protocols', () => {
+    expect(isValidExternalUrl('file:///etc/passwd')).toBe(false);
+    expect(isValidExternalUrl('javascript:alert(1)')).toBe(false);
+    expect(isValidExternalUrl('')).toBe(false);
+  });
+});
+

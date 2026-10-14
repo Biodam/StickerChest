@@ -81,9 +81,10 @@ export interface StickerChestAPI {
   syncTriggerNow: () => Promise<{ success: boolean; downloaded?: number; error?: string }>;
   onSyncProgress: (callback: (progress: SyncProgress) => void) => () => void;
 
-  // Window Controls
+  // Window & Shell Controls
   hidePicker: () => Promise<void>;
   openManager: () => Promise<void>;
+  openExternalUrl?: (url: string) => Promise<boolean>;
 
   // Diagnostics & Logging
   logMessage?: (level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG', tag: string, message: string, meta?: any) => Promise<boolean>;

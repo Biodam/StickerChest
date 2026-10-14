@@ -1,5 +1,5 @@
 import React, { useState, DragEvent } from 'react';
-import { Image as ImageIcon, SearchX, UploadCloud, Plus } from 'lucide-react';
+import { Image as ImageIcon, SearchX, UploadCloud, Plus, ExternalLink } from 'lucide-react';
 import { StickerItem } from '../../../types/models';
 import { StickerCard } from './StickerCard';
 
@@ -15,6 +15,7 @@ interface StickerGridProps {
   gridSize?: number;
   onAddNew?: () => void;
   onDeleteItem?: (item: StickerItem) => void;
+  isDriveConfigured?: boolean;
 }
 
 export const StickerGrid: React.FC<StickerGridProps> = ({
@@ -29,6 +30,7 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
   gridSize = 160,
   onAddNew,
   onDeleteItem,
+  isDriveConfigured = false,
 }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -131,8 +133,9 @@ export const StickerGrid: React.FC<StickerGridProps> = ({
             <button
               onClick={onAddNew}
               className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-lg shadow-blue-500/20 transition-colors flex items-center space-x-1.5"
+              title={isDriveConfigured ? "Open configured Google Drive folder in browser to upload stickers" : "Import image or GIF files as new stickers"}
             >
-              <Plus className="w-4 h-4" />
+              {isDriveConfigured ? <ExternalLink className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
               <span>Add New Sticker</span>
             </button>
           )}
