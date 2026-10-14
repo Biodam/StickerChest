@@ -6,7 +6,7 @@ import Database from 'better-sqlite3';
 import { initializeSchema } from '../../src/main/services/database/schema';
 import { StickerDatabaseDAL } from '../../src/main/services/database/dal';
 import { calculateFileSha256, calculateBufferSha256 } from '../../src/main/services/imaging/hasher';
-import { detectImageInfo } from '../../src/main/services/imaging/format-detector';
+import { detectImageInfo, isSupportedImageExtension } from '../../src/main/services/imaging/format-detector';
 import {
   generateStickerVariant,
   generateEmojiVariant,
@@ -14,11 +14,13 @@ import {
 } from '../../src/main/services/imaging/resizer';
 import { setCustomVaultRoot } from '../../src/main/services/ingestion/paths';
 import { ingestImageFile } from '../../src/main/services/ingestion/coordinator';
+import { scanDirectoryForImages } from '../../src/main/services/ingestion/file-scanner';
 
 describe('Imaging & Ingestion Pipeline', () => {
   const testDir = path.resolve(process.cwd(), '.test-assets');
   const testVault = path.join(testDir, 'vault');
   const testImage = path.join(testDir, 'sample_box.png');
+  const testAvifImage = path.join(testDir, 'sample_box.avif');
 
   beforeAll(async () => {
     if (!fs.existsSync(testDir)) {
@@ -37,6 +39,18 @@ describe('Imaging & Ingestion Pipeline', () => {
     })
       .png()
       .toFile(testImage);
+
+    // Create a 640x480 test AVIF image
+    await sharp({
+      create: {
+        width: 640,
+        height: 480,
+        channels: 4,
+        background: { r: 100, g: 200, b: 50, alpha: 1 },
+      },
+    })
+      .avif()
+      .toFile(testAvifImage);
   });
 
   afterAll(() => {
@@ -121,5 +135,50 @@ describe('Imaging & Ingestion Pipeline', () => {
     expect(secondResult.itemId).toBe(result.itemId);
 
     db.close();
+  });
+
+  it('should recognize .avif in isSupportedImageExtension', () => {
+    expect(isSupportedImageExtension('sample.avif')).toBe(true);
+    expect(isSupportedImageExtension('SAMPLE.AVIF')).toBe(true);
+    expect(isSupportedImageExtension('path/to/cat.avif')).toBe(true);
+    expect(isSupportedImageExtension('document.pdf')).toBe(false);
+  });
+
+  it('should detect AVIF image metadata and mimeType', async () => {
+    const info = await detectImageInfo(testAvifImage);
+    expect(info.width).toBe(640);
+    expect(info.height).toBe(480);
+    expect(info.format).toBe('avif');
+    expect(info.mimeType).toBe('image/avif');
+    expect(info.isAnimated).toBe(false);
+    expect(info.frameCount).toBe(1);
+  });
+
+  it('should ingest an AVIF image and generate all variants in the database DAL', async () => {
+    const db = new Database(':memory:');
+    initializeSchema(db);
+    const dal = new StickerDatabaseDAL(db);
+
+    const result = await ingestImageFile(testAvifImage, dal);
+    expect(result.itemId).toBeDefined();
+    expect(result.isNew).toBe(true);
+
+    const item = dal.getItemById(result.itemId);
+    expect(item).not.toBeNull();
+    expect(item?.ext).toBe('.avif');
+    expect(item?.mimeType).toBe('image/avif');
+    expect(item?.variants.sticker).not.toBeNull();
+    expect(item?.variants.emoji).not.toBeNull();
+    expect(item?.variants.thumb).not.toBeNull();
+    expect(item?.width).toBe(640);
+    expect(item?.height).toBe(480);
+
+    db.close();
+  });
+
+  it('should include AVIF files when scanning directory', async () => {
+    const files = await scanDirectoryForImages(testDir);
+    expect(files).toContain(testAvifImage);
+    expect(files).toContain(testImage);
   });
 });

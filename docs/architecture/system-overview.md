@@ -170,7 +170,7 @@ Sticker Chest provides native archival preservation and cross-platform packaging
 ## 7. Manual Image Ingestion & File Picker Workflows
 
 Users can add new stickers into their vault on demand using two unified workflows:
-- **Drag-and-Drop Ingestion**: Dropping images (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`) onto the library grid activates a visual drop zone overlay. Dropped files are passed directly to `vault:ingestFiles` IPC.
+- **Drag-and-Drop Ingestion**: Dropping images (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.avif`) onto the library grid activates a visual drop zone overlay. Dropped files are passed directly to `vault:ingestFiles` IPC.
 - **"Add new" File Picker**: Clicking the "Add new" button in the Manager Header (or "Add New Sticker" in the Sidebar or Empty State) triggers `dialog:selectImages`, opening the OS native multi-selection file picker filtered for supported image and animated GIF formats. Selected files route through the identical `vault:ingestFiles` ingestion flow.
 - **Ingestion Pipeline Execution**:
   1. File stability and deduplication verification via SHA-256 hash.

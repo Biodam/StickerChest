@@ -70,7 +70,7 @@ export function registerIpcHandlers(): void {
       properties: ['openFile', 'multiSelections'],
       title: 'Select Sticker Images to Import',
       filters: [
-        { name: 'Images & GIFs', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] },
+        { name: 'Images & GIFs', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'] },
         { name: 'All Files', extensions: ['*'] },
       ],
     });

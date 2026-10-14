@@ -17,14 +17,19 @@ const MIME_MAP: Record<string, string> = {
   webp: 'image/webp',
   gif: 'image/gif',
   avif: 'image/avif',
+  heif: 'image/avif',
   tiff: 'image/tiff',
 };
 
 export async function detectImageInfo(filePath: string): Promise<ImageFileInfo> {
   const metadata = await sharp(filePath, { animated: true }).metadata();
 
-  const format = (metadata.format || path.extname(filePath).replace('.', '')).toLowerCase();
-  const mimeType = MIME_MAP[format] || `image/${format}`;
+  const ext = path.extname(filePath).replace('.', '').toLowerCase();
+  let format = (metadata.format || ext).toLowerCase();
+  if (format === 'heif' && (ext === 'avif' || ext === 'heif')) {
+    format = ext === 'avif' ? 'avif' : 'heif';
+  }
+  const mimeType = MIME_MAP[format] || (format === 'heif' ? 'image/avif' : `image/${format}`);
   const frameCount = metadata.pages || 1;
   const isAnimated = frameCount > 1;
 
@@ -44,5 +49,5 @@ export async function detectImageInfo(filePath: string): Promise<ImageFileInfo> 
 
 export function isSupportedImageExtension(filePath: string): boolean {
   const ext = path.extname(filePath).toLowerCase();
-  return ['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(ext);
+  return ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif'].includes(ext);
 }

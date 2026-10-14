@@ -22,10 +22,10 @@ describe('parseDriveFolderId', () => {
 describe('computeDownloads', () => {
   const f = (name: string, md5 = 'a', mimeType = 'image/png') => ({ id: name, name, mimeType, md5Checksum: md5 });
   it('downloads new and changed images, skips unchanged, folders and unsupported files', () => {
-    const remote = [f('a.png'), f('b.png', 'new'), f('c.txt'), f('sub', 'x', 'application/vnd.google-apps.folder'), f(METADATA_FILENAME, 'm', 'application/json')];
+    const remote = [f('a.png'), f('b.png', 'new'), f('d.avif', 'new'), f('c.txt'), f('sub', 'x', 'application/vnd.google-apps.folder'), f(METADATA_FILENAME, 'm', 'application/json')];
     const ledger = { 'a.png': 'a', 'b.png': 'old' };
     const names = computeDownloads(remote, ledger, () => true).map((x) => x.name);
-    expect(names).toEqual(['b.png', METADATA_FILENAME]);
+    expect(names).toEqual(['b.png', 'd.avif', METADATA_FILENAME]);
   });
   it('re-downloads files deleted locally', () => {
     const names = computeDownloads([f('a.png')], { 'a.png': 'a' }, () => false).map((x) => x.name);

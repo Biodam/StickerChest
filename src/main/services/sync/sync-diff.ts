@@ -2,7 +2,7 @@ import path from 'path';
 import { DriveFileInfo, FOLDER_MIME } from './drive-public-client';
 
 export const METADATA_FILENAME = 'sticker-chest-metadata.json';
-const SUPPORTED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif'];
+const SUPPORTED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif'];
 
 /** Maps remote filename -> md5 of last successful download. */
 export type SyncLedger = Record<string, string>;

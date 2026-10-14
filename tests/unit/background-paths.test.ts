@@ -32,6 +32,7 @@ describe('background-paths', () => {
       expect(guessMimeType('test.jpeg')).toBe('image/jpeg');
       expect(guessMimeType('test.webp')).toBe('image/webp');
       expect(guessMimeType('test.gif')).toBe('image/gif');
+      expect(guessMimeType('test.avif')).toBe('image/avif');
     });
   });
 });

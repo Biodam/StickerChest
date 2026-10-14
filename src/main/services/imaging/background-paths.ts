@@ -26,6 +26,8 @@ export function guessMimeType(filePath: string): string {
       return 'image/webp';
     case '.gif':
       return 'image/gif';
+    case '.avif':
+      return 'image/avif';
     default:
       return 'image/png';
   }

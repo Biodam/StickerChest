@@ -4,7 +4,7 @@ Replaces the former Google OAuth sync. The user pastes a public ("Anyone with th
 
 ## Behavior
 - **One-way**: Drive -> local `sourceFolder`. Writing to Drive requires OAuth, so local additions are not uploaded.
-- Lists the folder via Drive API v3 `files.list` (`key=`), downloads new/changed `.png/.jpg/.jpeg/.webp/.gif` files (`alt=media`), then triggers the normal ingestion scan.
+- Lists the folder via Drive API v3 `files.list` (`key=`), downloads new/changed `.png/.jpg/.jpeg/.webp/.gif/.avif` files (`alt=media`), then triggers the normal ingestion scan.
 - State is kept in `<sourceFolder>/.drive-sync-state.json` (filename -> md5). Files deleted locally are re-downloaded.
 - Auto-sync runs 5s after startup and every `syncIntervalMinutes` when `driveAutoSync` is on.
 - Optional `sticker-chest-metadata.json` (tags, character, description, favorites keyed by SHA-256) is imported after sync; items edited locally are not overwritten. "Export metadata" writes this file into the source folder for manual upload to Drive.

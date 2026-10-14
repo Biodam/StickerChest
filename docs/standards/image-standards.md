@@ -12,6 +12,7 @@ This document defines the technical standards for ingested and processed visual 
 | **JPEG** | `.jpg`, `.jpeg` | No | Baseline photographic images |
 | **WebP** | `.webp` | Yes (Animated WebP) | High compression ratio with transparency |
 | **GIF** | `.gif` | Yes (Multi-frame) | Classic animated format; frame delays preserved |
+| **AVIF** | `.avif` | Yes (Multi-frame sequence) | Next-generation AV1 image compression with alpha |
 
 ---
 
