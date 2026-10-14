@@ -29,7 +29,9 @@
   - Compact sticker grid (`PickerGrid.tsx`) with keyboard focus and arrow navigation.
   - Tier selector toggle (`copyTier`: Sticker vs Emoji).
 - [x] Implement clipboard copy IPC call (`clipboard-service.ts`, `clipboard-handlers.ts`) and auto-dismiss on selection.
+- [x] Implement strict workArea bounds clamping and bogus caret rejection in `picker-positioner.ts` to ensure the Quick Picker is never positioned outside the display area.
 - [x] Unit test suite in `tests/unit/clipboard.test.ts` verifying copy operations, usage tracking, and Recent sorting.
+- [x] Unit test suite in `tests/unit/picker-positioner.test.ts` verifying multi-monitor clamping, edge flips, and caret validation.
 
 ---
 
